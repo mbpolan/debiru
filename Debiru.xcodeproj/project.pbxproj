@@ -17,6 +17,8 @@
 		2799462925FDA32D001DCCE3 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799462825FDA32D001DCCE3 /* Board.swift */; };
 		279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF6F25FEBC7D00884724 /* DataProvider.swift */; };
 		279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */; };
+		279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */; };
+		279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7C25FFE06400884724 /* BoardListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +35,8 @@
 		2799462825FDA32D001DCCE3 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		279CFF6F25FEBC7D00884724 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourChanDataProvider.swift; sourceTree = "<group>"; };
+		279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchedThreadsView.swift; sourceTree = "<group>"; };
+		279CFF7C25FFE06400884724 /* BoardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +95,8 @@
 				2799461D25FDA18A001DCCE3 /* BoardView.swift */,
 				2799460B25FD9E5A001DCCE3 /* ContentView.swift */,
 				2799461A25FD9EE6001DCCE3 /* SidebarView.swift */,
+				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
+				279CFF7C25FFE06400884724 /* BoardListView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -199,6 +205,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */,
+				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
+				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
