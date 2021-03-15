@@ -7,18 +7,8 @@
 
 import Foundation
 
-struct Boards: Codable {
-    let boards: [Board]
-}
-
-struct Board: Codable, Hashable {
+struct Board: Identifiable, Hashable {
     let id: String
     let title: String
     let description: String
-    
-    private enum CodingKeys: String, CodingKey {
-        case id = "board"
-        case title
-        case description = "meta_description"
-    }
 }

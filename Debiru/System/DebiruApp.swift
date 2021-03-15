@@ -16,3 +16,7 @@ struct DebiruApp: App {
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
     }
 }
+
+extension Notification.Name {
+    static let showBoard = Notification.Name("showBoard")
+}

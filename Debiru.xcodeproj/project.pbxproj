@@ -12,13 +12,14 @@
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
 		2799461B25FD9EE6001DCCE3 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799461A25FD9EE6001DCCE3 /* SidebarView.swift */; };
-		2799461E25FDA18A001DCCE3 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799461D25FDA18A001DCCE3 /* BoardView.swift */; };
 		2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799462425FDA2EB001DCCE3 /* AppState.swift */; };
 		2799462925FDA32D001DCCE3 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799462825FDA32D001DCCE3 /* Board.swift */; };
 		279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF6F25FEBC7D00884724 /* DataProvider.swift */; };
 		279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */; };
 		279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */; };
 		279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7C25FFE06400884724 /* BoardListView.swift */; };
+		279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7F25FFEA6900884724 /* CatalogView.swift */; };
+		279CFF8625FFEC9000884724 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF8525FFEC9000884724 /* Thread.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,13 +31,14 @@
 		2799461225FD9E5B001DCCE3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2799461325FD9E5B001DCCE3 /* Debiru.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Debiru.entitlements; sourceTree = "<group>"; };
 		2799461A25FD9EE6001DCCE3 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
-		2799461D25FDA18A001DCCE3 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		2799462425FDA2EB001DCCE3 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2799462825FDA32D001DCCE3 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		279CFF6F25FEBC7D00884724 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourChanDataProvider.swift; sourceTree = "<group>"; };
 		279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchedThreadsView.swift; sourceTree = "<group>"; };
 		279CFF7C25FFE06400884724 /* BoardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListView.swift; sourceTree = "<group>"; };
+		279CFF7F25FFEA6900884724 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogView.swift; sourceTree = "<group>"; };
+		279CFF8525FFEC9000884724 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,11 +94,11 @@
 		2799462025FDA1E8001DCCE3 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				2799461D25FDA18A001DCCE3 /* BoardView.swift */,
 				2799460B25FD9E5A001DCCE3 /* ContentView.swift */,
 				2799461A25FD9EE6001DCCE3 /* SidebarView.swift */,
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				279CFF7C25FFE06400884724 /* BoardListView.swift */,
+				279CFF7F25FFEA6900884724 /* CatalogView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -131,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				2799462825FDA32D001DCCE3 /* Board.swift */,
+				279CFF8525FFEC9000884724 /* Thread.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -205,12 +208,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */,
+				279CFF8625FFEC9000884724 /* Thread.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
 				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
-				2799461E25FDA18A001DCCE3 /* BoardView.swift in Sources */,
+				279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,
 				2799461B25FD9EE6001DCCE3 /* SidebarView.swift in Sources */,

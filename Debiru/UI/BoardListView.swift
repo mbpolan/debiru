@@ -28,7 +28,7 @@ struct BoardListView: View {
     }
     
     private func handleSelectBoard(_ board: Board) {
-        
+        NotificationCenter.default.post(name: .showBoard, object: board)
     }
 }
 

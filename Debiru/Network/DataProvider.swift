@@ -11,6 +11,8 @@ import Foundation
 protocol DataProvider {
     
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable?
+    
+    func getCatalog(for board: Board, completion: @escaping(_: Result<[Thread], Error>) -> Void) -> AnyCancellable?
 }
 
 enum NetworkError: Error {
