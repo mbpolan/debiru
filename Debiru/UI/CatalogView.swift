@@ -12,14 +12,23 @@ import SwiftUI
 
 struct CatalogView: View {
     @ObservedObject private var viewModel: CatalogViewModel = CatalogViewModel()
-    private let dataProvider: DataProvider = FourChanDataProvider()
+    private let dataProvider: DataProvider
+    private let board: Board
     
-    let board: Board
+    init(board: Board, dataProvider: DataProvider = FourChanDataProvider()) {
+        self.board = board
+        self.dataProvider = dataProvider
+    }
     
     var body: some View {
         List(viewModel.threads, id: \.self) { thread in
             HStack {
+                if let asset = thread.attachment {
+                    WebImage(asset, board: board)
+                }
+                
                 Text(thread.subject ?? "")
+                Spacer()
             }
         }
         .onAppear {
@@ -48,7 +57,8 @@ class CatalogViewModel: ObservableObject {
 
 struct CatalogView_Previews: PreviewProvider {
     static var previews: some View {
-        CatalogView(board: Board(
+        CatalogView(
+            board: Board(
                         id: "f",
                         title: "Foobar",
                         description: "whatever"))

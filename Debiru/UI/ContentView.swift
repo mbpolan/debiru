@@ -14,8 +14,12 @@ struct ContentView: View {
     @StateObject private var appState: AppState = AppState()
     @ObservedObject private var viewModel: ContentViewModel = ContentViewModel()
     
-    private let dataProvider: DataProvider = FourChanDataProvider()
+    private let dataProvider: DataProvider
     private let showBoardPublisher = NotificationCenter.default.publisher(for: .showBoard)
+    
+    init(dataProvider: DataProvider = FourChanDataProvider()) {
+        self.dataProvider = dataProvider
+    }
     
     var body: some View {
         NavigationView {
@@ -85,6 +89,7 @@ class ContentViewModel: ObservableObject {
 // MARK: - Preview
 
 struct ContentView_Previews: PreviewProvider {
+    
     static var previews: some View {
         ContentView()
     }

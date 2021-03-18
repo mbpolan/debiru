@@ -20,6 +20,8 @@
 		279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7C25FFE06400884724 /* BoardListView.swift */; };
 		279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7F25FFEA6900884724 /* CatalogView.swift */; };
 		279CFF8625FFEC9000884724 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF8525FFEC9000884724 /* Thread.swift */; };
+		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
+		27C568362602D83A00983ECD /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568352602D83A00983ECD /* WebImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +41,8 @@
 		279CFF7C25FFE06400884724 /* BoardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListView.swift; sourceTree = "<group>"; };
 		279CFF7F25FFEA6900884724 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogView.swift; sourceTree = "<group>"; };
 		279CFF8525FFEC9000884724 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
+		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
+		27C568352602D83A00983ECD /* WebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +103,7 @@
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				279CFF7C25FFE06400884724 /* BoardListView.swift */,
 				279CFF7F25FFEA6900884724 /* CatalogView.swift */,
+				27C568352602D83A00983ECD /* WebImage.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -134,6 +139,7 @@
 			children = (
 				2799462825FDA32D001DCCE3 /* Board.swift */,
 				279CFF8525FFEC9000884724 /* Thread.swift */,
+				27C568322602D2A000983ECD /* Asset.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -209,10 +215,12 @@
 			files = (
 				2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */,
 				279CFF8625FFEC9000884724 /* Thread.swift in Sources */,
+				27C568362602D83A00983ECD /* WebImage.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
 				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
+				27C568332602D2A000983ECD /* Asset.swift in Sources */,
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
 				279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
