@@ -24,10 +24,17 @@ struct CatalogView: View {
         List(viewModel.threads, id: \.self) { thread in
             HStack {
                 if let asset = thread.attachment {
-                    WebImage(asset, board: board)
+                    WebImage(asset,
+                             board: board,
+                             bounds: CGSize(width: 128.0, height: 128.0))
                 }
                 
-                Text(thread.subject ?? "")
+                VStack(alignment: .leading) {
+                    Text(thread.subject ?? "")
+                        .font(.title)
+                    
+                    Text(thread.content ?? "")
+                }
                 Spacer()
             }
         }

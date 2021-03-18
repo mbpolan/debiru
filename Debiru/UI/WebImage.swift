@@ -8,6 +8,8 @@
 import Combine
 import SwiftUI
 
+// MARK: - View
+
 struct WebImage: View {
     @ObservedObject private var viewModel: WebImageViewModel = WebImageViewModel()
     private let asset: Asset
@@ -15,10 +17,10 @@ struct WebImage: View {
     private let dataProvider: DataProvider = FourChanDataProvider()
     private let bounds: CGSize?
     
-    init(_ asset: Asset, board: Board) {
+    init(_ asset: Asset, board: Board, bounds: CGSize? = nil) {
         self.asset = asset
         self.board = board
-        self.bounds = nil
+        self.bounds = bounds
     }
     
     var body: some View {
@@ -53,7 +55,7 @@ struct WebImage: View {
         if let bounds = self.bounds {
             result = AnyView(
                 image
-                .clipShape(Capsule())
+                .clipShape(Circle())
                 .frame(width: bounds.width, height: bounds.height))
         } else {
             result = AnyView(
@@ -80,6 +82,8 @@ struct WebImage: View {
         }
     }
 }
+
+// MARK: - View Model
 
 class WebImageViewModel: ObservableObject {
     @Published var pending: AnyCancellable?
