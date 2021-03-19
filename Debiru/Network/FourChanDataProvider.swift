@@ -11,45 +11,72 @@ import Foundation
 struct FourChanDataProvider: DataProvider {
     private let apiBaseUrl = "https://a.4cdn.org"
     private let assetBaseUrl = "https://i.4cdn.org"
+    private let imageCache: DataCache = DataCache()
     
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable? {
-        if let url = URL(string: "\(apiBaseUrl)/boards.json") {
-            return URLSession.shared.dataTaskPublisher(for: url)
-                .tryMap { output in
-                    guard let response = output.response as? HTTPURLResponse,
-                          response.statusCode == 200 else {
-                        throw NetworkError.invalidResponse("Failed to fetch data")
-                    }
-                    
-                    return output.data
+        return getData(
+            url: "\(apiBaseUrl)/boards.json",
+            mapper: { (value: BoardsResponse) in
+                return value.boards.map { model in
+                    Board(
+                        id: model.id,
+                        title: model.title,
+                        description: model.description)
                 }
-                .decode(type: BoardsResponse.self, decoder: JSONDecoder())
-                .eraseToAnyPublisher()
-                .receive(on: DispatchQueue.main)
-                .sink(receiveCompletion: { result in
-                    switch result {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }, receiveValue: { value in
-                    let boards = value.boards.map { model in
-                        Board(
-                            id: model.id,
-                            title: model.title,
-                            description: model.description)
-                    }
-                    
-                    completion(.success(boards))
-                })
-        }
-        
-        return nil
+            },
+            completion: completion)
     }
     
     func getCatalog(for board: Board, completion: @escaping(_: Result<[Thread], Error>) -> Void) -> AnyCancellable? {
-        if let url = URL(string: "\(apiBaseUrl)/\(board.id)/catalog.json") {
+        
+        return getData(
+            url: "\(apiBaseUrl)/\(board.id)/catalog.json",
+            mapper: { (value: [CatalogModel]) in
+                return value.map { page in
+                    return page.threads.map { thread in
+                        var asset: Asset?
+                        if let id = thread.assetId,
+                           let width = thread.imageWidth,
+                           let height = thread.imageHeight,
+                           let thumbWidth = thread.thumbnailWidth,
+                           let thumbHeight = thread.thumbnailHeight,
+                           let filename = thread.filename,
+                           let ext = thread.extension {
+                            
+                            asset = Asset(
+                                id: id,
+                                width: width,
+                                height: height,
+                                thumbnailWidth: thumbWidth,
+                                thumbnailHeight: thumbHeight,
+                                filename: filename,
+                                extension: ext)
+                        }
+                        
+                        return Thread(
+                            id: thread.id,
+                            poster: thread.poster,
+                            subject: thread.subject,
+                            content: thread.content,
+                            sticky: thread.sticky == 1,
+                            closed: thread.closed == 1,
+                            attachment: asset)
+                    }
+                }.reduce([], +)
+            },
+            completion: completion)
+    }
+    
+    func getImage(for asset: Asset, board: Board, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
+        
+        let key = "\(assetBaseUrl)/\(board.id)/\(asset.id)\(asset.extension)"
+        if let url = URL(string: key) {
+            if let cachedImage = imageCache.get(forKey: key) {
+                print("CACHE HIT: \(key)")
+                completion(.success(cachedImage))
+                return nil
+            }
+            
             return URLSession.shared.dataTaskPublisher(for: url)
                 .tryMap { output in
                     guard let response = output.response as? HTTPURLResponse,
@@ -59,7 +86,6 @@ struct FourChanDataProvider: DataProvider {
                     
                     return output.data
                 }
-                .decode(type: [CatalogModel].self, decoder: JSONDecoder())
                 .eraseToAnyPublisher()
                 .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { result in
@@ -69,48 +95,21 @@ struct FourChanDataProvider: DataProvider {
                     case .failure(let error):
                         completion(.failure(error))
                     }
-                }, receiveValue: { value in
-                    let threads: [Thread] = value.map { page in
-                        return page.threads.map { thread in
-                            var asset: Asset?
-                            if let id = thread.assetId,
-                               let width = thread.imageWidth,
-                               let height = thread.imageHeight,
-                               let thumbWidth = thread.thumbnailWidth,
-                               let thumbHeight = thread.thumbnailHeight,
-                               let filename = thread.filename,
-                               let ext = thread.extension {
-                                
-                                asset = Asset(
-                                    id: id,
-                                    width: width,
-                                    height: height,
-                                    thumbnailWidth: thumbWidth,
-                                    thumbnailHeight: thumbHeight,
-                                    filename: filename,
-                                    extension: ext)
-                            }
-                            
-                            return Thread(
-                                id: thread.id,
-                                poster: thread.poster,
-                                subject: thread.subject,
-                                content: thread.content,
-                                sticky: thread.sticky == 1,
-                                closed: thread.closed == 1,
-                                attachment: asset)
-                        }
-                    }.reduce([], +)
-                    
-                    completion(.success(threads))
+                }, receiveValue: { (value: Data) in
+                    imageCache.set(key, value: value)
+                    completion(.success(value))
                 })
         }
         
         return nil
     }
     
-    func getImage(for asset: Asset, board: Board, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
-        if let url = URL(string: "\(assetBaseUrl)/\(board.id)/\(asset.id)\(asset.extension)") {
+    private func getData<S: Decodable, T>(
+                                url: String,
+                               mapper: @escaping(_ data: S) -> T,
+                               completion: @escaping(_: Result<T, Error>) -> Void) -> AnyCancellable? {
+        
+        if let url = URL(string: url) {
             return URLSession.shared.dataTaskPublisher(for: url)
                 .tryMap { output in
                     guard let response = output.response as? HTTPURLResponse,
@@ -120,6 +119,7 @@ struct FourChanDataProvider: DataProvider {
                     
                     return output.data
                 }
+                .decode(type: S.self, decoder: JSONDecoder())
                 .eraseToAnyPublisher()
                 .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { result in
@@ -130,7 +130,7 @@ struct FourChanDataProvider: DataProvider {
                         completion(.failure(error))
                     }
                 }, receiveValue: { value in
-                    completion(.success(value))
+                    completion(.success(mapper(value)))
                 })
         }
         

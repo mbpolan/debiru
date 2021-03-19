@@ -23,6 +23,7 @@
 		27BBF1ED2604308700534CB7 /* RichTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EC2604308700534CB7 /* RichTextView.swift */; };
 		27BBF1F02604345100534CB7 /* OpenItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EF2604345100534CB7 /* OpenItemsView.swift */; };
 		27BBF1F3260436BF00534CB7 /* BoardListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */; };
+		27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F626043CA000534CB7 /* DataCache.swift */; };
 		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
 		27C568362602D83A00983ECD /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568352602D83A00983ECD /* WebImage.swift */; };
 /* End PBXBuildFile section */
@@ -47,6 +48,7 @@
 		27BBF1EC2604308700534CB7 /* RichTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextView.swift; sourceTree = "<group>"; };
 		27BBF1EF2604345100534CB7 /* OpenItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenItemsView.swift; sourceTree = "<group>"; };
 		27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListCellView.swift; sourceTree = "<group>"; };
+		27BBF1F626043CA000534CB7 /* DataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCache.swift; sourceTree = "<group>"; };
 		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		27C568352602D83A00983ECD /* WebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -139,6 +141,7 @@
 				279CFF7325FEBCC900884724 /* Models */,
 				279CFF6F25FEBC7D00884724 /* DataProvider.swift */,
 				279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */,
+				27BBF1F626043CA000534CB7 /* DataCache.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -225,6 +228,7 @@
 				2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */,
 				27BBF1F3260436BF00534CB7 /* BoardListCellView.swift in Sources */,
 				279CFF8625FFEC9000884724 /* Thread.swift in Sources */,
+				27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */,
 				27C568362602D83A00983ECD /* WebImage.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
 				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,
