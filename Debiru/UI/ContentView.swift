@@ -58,6 +58,11 @@ struct ContentView: View {
     
     private func handleShowBoard(_ board: Board) {
         appState.currentBoardId = board.id
+        
+        // add this board to our open items view, if it's not there already
+        if !appState.openItems.contains(where: { $0 == .board(board) }) {
+            appState.openItems.append(.board(board))
+        }
     }
     
     private func handleBoards(_ result: Result<[Board], Error>) {
