@@ -14,16 +14,10 @@ struct BoardListView: View {
     
     var body: some View {
         List(appState.boards, id: \.self) { board in
-            HStack(alignment: .center) {
-                Text("/\(board.id)/")
-                    .font(.title)
-                
-                Text(board.title)
-                    .font(.headline)
-            }
-            .onTapGesture {
-                handleSelectBoard(board)
-            }
+            BoardListCellView(board)
+                .onTapGesture {
+                    handleSelectBoard(board)
+                }
         }
     }
     
@@ -44,6 +38,7 @@ struct BoardListView_Previews: PreviewProvider {
                                         id: "f",
                                         title: "Foobar",
                                         description: "Foobar is an board on some imageboard for discussing imageboards")
-                                ]))
+                                ],
+                                openItems: []))
     }
 }
