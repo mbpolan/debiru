@@ -11,7 +11,7 @@ import SwiftUI
 // MARK: - View
 
 struct ContentView: View {
-    @StateObject private var appState: AppState = AppState()
+    @EnvironmentObject private var appState: AppState
     @ObservedObject private var viewModel: ContentViewModel = ContentViewModel()
     
     private let dataProvider: DataProvider
@@ -25,10 +25,15 @@ struct ContentView: View {
         NavigationView {
             SidebarView()
             
-            if viewModel.pendingBoards != nil {
-                ProgressView("Loading")
-            } else if let board = appState.boards.first(where: { $0.id == appState.currentBoardId }) {
-                CatalogView(board: board)
+            switch appState.currentItem {
+            case .board(_):
+                CatalogView()
+            default:
+                if viewModel.pendingBoards != nil {
+                    ProgressView("Loading")
+                } else {
+                    Text("unknown?")
+                }
             }
         }
         .environmentObject(appState)
@@ -57,7 +62,7 @@ struct ContentView: View {
     }
     
     private func handleShowBoard(_ board: Board) {
-        appState.currentBoardId = board.id
+        appState.currentItem = .board(board)
         
         // add this board to our open items view, if it's not there already
         if !appState.openItems.contains(where: { $0 == .board(board) }) {

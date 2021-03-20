@@ -12,19 +12,20 @@ import SwiftUI
 // MARK: - View
 
 struct CatalogView: View {
-    @ObservedObject private var viewModel: CatalogViewModel = CatalogViewModel()
+    @EnvironmentObject private var appState: AppState
+    @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
     private let dataProvider: DataProvider
-    private let board: Board
     
-    init(board: Board, dataProvider: DataProvider = FourChanDataProvider()) {
-        self.board = board
+    init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
     }
     
     var body: some View {
-        List(viewModel.threads, id: \.self) { thread in
+        print(viewModel.threads.count)
+        return List(viewModel.threads, id: \.self) { thread in
             HStack {
-                if let asset = thread.attachment {
+                if let board = getBoard(appState.currentItem),
+                   let asset = thread.attachment {
                     WebImage(asset,
                              board: board,
                              bounds: CGSize(width: 128.0, height: 128.0))
@@ -39,17 +40,53 @@ struct CatalogView: View {
                 Spacer()
             }
         }
+        .navigationTitle(getNavigationTitle())
+        .onChange(of: appState.currentItem) { item in
+            reload(from: item)
+        }
         .onAppear {
-            viewModel.pendingThreads = dataProvider.getCatalog(for: board) { result in
-                switch result {
-                case .success(let threads):
-                    viewModel.threads = threads
-                case .failure(let error):
-                    print(error)
-                }
-                
-                viewModel.pendingThreads = nil
+            reloadFromState()
+        }
+    }
+    
+    private func getNavigationTitle() -> String {
+        if let board = getBoard(appState.currentItem) {
+            return "/\(board.id)/"
+        }
+        
+        return ""
+    }
+    
+    private func getBoard(_ item: ViewableItem?) -> Board? {
+        switch item {
+        case .board(let board):
+            return board
+        default:
+            return nil
+        }
+    }
+    
+    private func reloadFromState() {
+        guard let board = getBoard(appState.currentItem) else { return }
+        reload(board)
+    }
+    
+    private func reload(from item: ViewableItem?) {
+        guard let board = getBoard(item) else { return }
+        reload(board)
+    }
+    
+    private func reload(_ board: Board) {
+        viewModel.pendingThreads = dataProvider.getCatalog(for: board) { result in
+            switch result {
+            case .success(let threads):
+                self.viewModel.threads = threads
+            case .failure(let error):
+                print(error)
             }
+            
+            self.viewModel.pendingThreads = nil
+            self.viewModel.objectWillChange.send()
         }
     }
 }
@@ -64,11 +101,16 @@ class CatalogViewModel: ObservableObject {
 // MARK: - Preview
 
 struct CatalogView_Previews: PreviewProvider {
+    private static let board = Board(
+        id: "f",
+        title: "Foobar",
+        description: "whatever")
+    
     static var previews: some View {
-        CatalogView(
-            board: Board(
-                        id: "f",
-                        title: "Foobar",
-                        description: "whatever"))
+        CatalogView()
+            .environmentObject(AppState(
+                                currentItem: .board(board),
+                                boards: [board],
+                                openItems: []))
     }
 }

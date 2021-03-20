@@ -8,7 +8,7 @@
 import SwiftUI
 
 class AppState: ObservableObject {
-    @Published var currentBoardId: String?
+    @Published var currentItem: ViewableItem?
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
     
@@ -17,8 +17,8 @@ class AppState: ObservableObject {
         self.openItems = []
     }
     
-    init(currentBoardId: String?, boards: [Board], openItems: [ViewableItem]) {
-        self.currentBoardId = currentBoardId
+    init(currentItem: ViewableItem?, boards: [Board], openItems: [ViewableItem]) {
+        self.currentItem = currentItem
         self.boards = boards
         self.openItems = openItems
     }

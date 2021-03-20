@@ -79,9 +79,11 @@ struct FourChanDataProvider: DataProvider {
             
             return URLSession.shared.dataTaskPublisher(for: url)
                 .tryMap { output in
-                    guard let response = output.response as? HTTPURLResponse,
-                          response.statusCode == 200 else {
-                        throw NetworkError.invalidResponse("Failed to fetch data")
+                    guard let response = output.response as? HTTPURLResponse else {
+                        throw NetworkError.invalidResponse("Unreadable image response")
+                    }
+                    if response.statusCode != 200 {
+                        throw NetworkError.invalidResponse("Failed to fetch image: \(key): \(response.statusCode)")
                     }
                     
                     return output.data
@@ -105,16 +107,19 @@ struct FourChanDataProvider: DataProvider {
     }
     
     private func getData<S: Decodable, T>(
-                                url: String,
-                               mapper: @escaping(_ data: S) -> T,
-                               completion: @escaping(_: Result<T, Error>) -> Void) -> AnyCancellable? {
+        url: String,
+        mapper: @escaping(_ data: S) -> T,
+        completion: @escaping(_: Result<T, Error>) -> Void) -> AnyCancellable? {
         
         if let url = URL(string: url) {
             return URLSession.shared.dataTaskPublisher(for: url)
                 .tryMap { output in
-                    guard let response = output.response as? HTTPURLResponse,
-                          response.statusCode == 200 else {
-                        throw NetworkError.invalidResponse("Failed to fetch data")
+                    guard let response = output.response as? HTTPURLResponse else {
+                        throw NetworkError.invalidResponse("Unreadable data response")
+                    }
+                    
+                    if response.statusCode != 200 {
+                        throw NetworkError.invalidResponse("Failed to fetch data: \(response.statusCode)")
                     }
                     
                     return output.data

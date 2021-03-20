@@ -29,16 +29,16 @@ struct BoardListView: View {
 // MARK: - Preview
 
 struct BoardListView_Previews: PreviewProvider {
+    private static let board = Board(
+        id: "f",
+        title: "Foobar",
+        description: "Foobar is an board on some imageboard for discussing imageboards")
+    
     static var previews: some View {
         BoardListView()
             .environmentObject(AppState(
-                                currentBoardId: "g",
-                                boards: [
-                                    Board(
-                                        id: "f",
-                                        title: "Foobar",
-                                        description: "Foobar is an board on some imageboard for discussing imageboards")
-                                ],
+                                currentItem: .board(board),
+                                boards: [board],
                                 openItems: []))
     }
 }

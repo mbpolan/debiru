@@ -38,7 +38,7 @@ struct OpenItemsView_Previews: PreviewProvider {
     static var previews: some View {
         OpenItemsView()
             .environmentObject(AppState(
-                                currentBoardId: nil,
+                                currentItem: nil,
                                 boards: [],
                                 openItems: []))
     }

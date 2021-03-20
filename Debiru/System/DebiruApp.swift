@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct DebiruApp: App {
+    private var appState: AppState = AppState()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appState)
         }
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
     }
