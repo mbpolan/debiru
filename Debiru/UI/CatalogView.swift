@@ -86,7 +86,6 @@ struct CatalogView: View {
             }
             
             self.viewModel.pendingThreads = nil
-            self.viewModel.objectWillChange.send()
         }
     }
 }

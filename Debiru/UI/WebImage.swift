@@ -55,7 +55,7 @@ struct WebImage: View {
         if let bounds = self.bounds {
             result = AnyView(
                 image
-                .clipShape(Circle())
+                    .clipShape(RoundedRectangle(cornerRadius: 5.0))
                 .frame(width: bounds.width, height: bounds.height))
         } else {
             result = AnyView(
