@@ -11,7 +11,7 @@ import SwiftUI
 // MARK: - View
 
 struct WebImage: View {
-    @ObservedObject private var viewModel: WebImageViewModel = WebImageViewModel()
+    @StateObject private var viewModel: WebImageViewModel = WebImageViewModel()
     private let asset: Asset
     private let board: Board
     private let dataProvider: DataProvider = FourChanDataProvider()
@@ -24,14 +24,16 @@ struct WebImage: View {
     }
     
     var body: some View {
-        return Group {
-            if viewModel.state == .done,
-               let image = viewModel.data {
+        Group {
+            switch viewModel.state {
+            case .done(let image):
                 makeImage(image)
-            } else if viewModel.state == .error {
-                Text(":(")
+            case .error(let error):
+                Image(systemName: "exclamationmark.circle")
+                    .help(error)
+                    .imageScale(.large)
                     .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
-            } else {
+            default:
                 Text("...")
                     .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
             }
@@ -70,15 +72,14 @@ struct WebImage: View {
         switch result {
         case .success(let data):
             if let image = NSImage(data: data) {
-                self.viewModel.data = image
-                self.viewModel.state = .done
+                self.viewModel.state = .done(image)
             } else {
-                self.viewModel.state = .error
+                self.viewModel.state = .error("This image is not valid")
             }
             
         case .failure(let error):
             print(error)
-            self.viewModel.state = .error
+            self.viewModel.state = .error(error.localizedDescription)
         }
     }
 }
@@ -87,13 +88,12 @@ struct WebImage: View {
 
 class WebImageViewModel: ObservableObject {
     @Published var pending: AnyCancellable?
-    @Published var data: NSImage?
     @Published var state: State = .empty
     
-    enum State {
+    enum State: Equatable {
         case empty
         case loading
-        case error
-        case done
+        case error(String)
+        case done(NSImage)
     }
 }

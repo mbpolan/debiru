@@ -21,8 +21,7 @@ struct CatalogView: View {
     }
     
     var body: some View {
-        print(viewModel.threads.count)
-        return List(viewModel.threads, id: \.self) { thread in
+        List(threads, id: \.self) { thread in
             HStack {
                 if let board = getBoard(appState.currentItem),
                    let asset = thread.attachment {
@@ -41,12 +40,39 @@ struct CatalogView: View {
             }
         }
         .navigationTitle(getNavigationTitle())
+        .toolbar {
+            SearchBarView(
+                expanded: $viewModel.searchExpanded,
+                search: $viewModel.search)
+        }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
         }
         .onAppear {
             reloadFromState()
         }
+    }
+    
+    private var threads: [Thread] {
+        if viewModel.searchExpanded && !viewModel.search.isEmpty {
+            let query = viewModel.search.trimmingCharacters(in: .whitespaces)
+            
+            return viewModel.threads.filter { thread in
+                if let subject = thread.subject,
+                   subject.localizedCaseInsensitiveContains(query) {
+                    return true
+                }
+                
+                if let content = thread.content,
+                   content.localizedCaseInsensitiveContains(query) {
+                    return true
+                }
+                
+                return false
+            }
+        }
+        
+        return viewModel.threads
     }
     
     private func getNavigationTitle() -> String {
@@ -95,6 +121,8 @@ struct CatalogView: View {
 class CatalogViewModel: ObservableObject {
     @Published var threads: [Thread] = []
     @Published var pendingThreads: AnyCancellable?
+    @Published var search: String = ""
+    @Published var searchExpanded: Bool = false
 }
 
 // MARK: - Preview
