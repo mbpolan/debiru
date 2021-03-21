@@ -34,7 +34,7 @@ struct CatalogView: View {
                     Text(thread.subject ?? "")
                         .font(.title)
                     
-                    RichTextView(thread.content ?? "")
+                    RichTextView(html: thread.content ?? "")
                         .frame(maxWidth: .infinity)
                 }
                 Spacer()

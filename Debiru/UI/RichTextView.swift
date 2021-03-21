@@ -5,160 +5,72 @@
 //  Created by Mike Polan on 3/18/21.
 //
 
-import SwiftSoup
 import SwiftUI
 
 // MARK: - View
 
-struct RichTextView: View {
-    
+struct RichTextView: NSViewRepresentable {
     private let html: String
+    private let styles = """
+<style>
+* {
+  color: white;
+}
+.quote {
+  color: green;
+}
+.quotelink {
+  color: blue;
+  cursor: pointer;
+}
+</style>
+"""
     
-    init(_ html: String) {
-        self.html = html
+    init(html: String) {
+        self.html = "\(styles)\(html)"
     }
     
-    var body: some View {
-        let views = renderHTML()
-        
-        VStack(spacing: 0) {
-            ForEach(0..<views.count, id: \.self) { i in
-                views[i]
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
     }
     
-    private func renderHTML() -> [AnyView] {
-        do {
-            // remove <wbr> elements to avoid breaking links
-            let sanitized = html.replacingOccurrences(of: "<wbr>", with: "")
-            
-            let doc: Document = try SwiftSoup.parseBodyFragment(sanitized)
-            if let body = doc.body() {
-                return try renderNode(body, attributes: .empty)
-            } else {
-                return []
-            }
-        } catch let error {
-            print(error)
-            return [Text(error.localizedDescription).toErasedView()]
+    func makeNSView(context: Context) -> NSTextView {
+        let view = NSTextView()
+        view.drawsBackground = false
+        view.isEditable = false
+        view.autoresizesSubviews = true
+        view.autoresizingMask = .init([.width, .height])
+        view.delegate = context.coordinator
+        
+        if let string = makeString() {
+            view.textStorage?.setAttributedString(string)
         }
+        
+        return view
     }
     
-    struct Attributes {
-        let bold: Bool
-        let italics: Bool
-        let quote: Bool
-        let quoteLink: Bool
-        let spoiler: Bool
-        let href: String?
-        
-        static var empty: Attributes {
-            return Attributes(
-                bold: false,
-                italics: false,
-                quote: false,
-                quoteLink: false,
-                spoiler: false,
-                href: nil)
-        }
-    }
+    func updateNSView(_ nsView: NSTextView, context: Context) { }
     
-    private func renderNode(_ node: Node, attributes: Attributes) throws -> [AnyView] {
-        var views: [AnyView] = []
-        try node.getChildNodes().forEach { child in
-            switch child {
-            case let n as TextNode:
-                views.append(renderTextNode(n, attributes: attributes))
-            case let e as Element:
-                views.append(contentsOf: try renderElement(e, attributes: attributes))
-            default:
-                views.append(AnyView(Text("unknown")))
-            }
-        }
+    private func makeString() -> NSMutableAttributedString? {
+        guard let string = NSMutableAttributedString(
+                html: Data(html.utf8),
+                options: [.documentType: NSAttributedString.DocumentType.html],
+                documentAttributes: nil) else { return nil }
         
-        return views
+        let range = NSMakeRange(0, string.length)
+        string.addAttribute(.font, value: NSFont.preferredFont(forTextStyle: .body, options: [:]), range: range)
+        
+        return string
     }
-    
-    private func renderElement(_ element: Element, attributes: Attributes) throws -> [AnyView] {
-        if element.tagName() == "br" {
-            return []
-        } else if element.tagName() == "a" {
-            let href = try element.attr("href")
+}
+
+// MARK: - Coordinator
+
+extension RichTextView {
+    class Coordinator: NSObject, NSTextViewDelegate, NSTextDelegate {
+        func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
             
-            return try renderNode(element, attributes: Attributes(
-                                    bold: attributes.bold,
-                                    italics: attributes.italics,
-                                    quote: attributes.quote,
-                                    quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
-                                    spoiler: attributes.spoiler,
-                                    href: href))
-            
-        } else if element.tagName() == "span" {
-            return try renderNode(element, attributes: Attributes(
-                                    bold: attributes.bold,
-                                    italics: attributes.italics,
-                                    quote: attributes.quote || element.hasClass("quote"),
-                                    quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
-                                    spoiler: attributes.spoiler,
-                                    href: attributes.href))
-            
-        } else if element.tagName() == "s" {
-            return try renderNode(element, attributes: Attributes(
-                                    bold: attributes.bold,
-                                    italics: attributes.italics,
-                                    quote: attributes.quote || element.hasClass("quote"),
-                                    quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
-                                    spoiler: true,
-                                    href: attributes.href))
-            
-        } else {
-            return [Text(element.tagName()).toErasedView()]
-        }
-    }
-    
-    private func renderTextNode(_ node: TextNode, attributes: Attributes) -> AnyView {
-        var text = Text(node.text())
-        
-        if attributes.bold {
-            text = text.bold()
-        }
-        
-        if attributes.italics {
-            text = text.italic()
-        }
-        
-        if attributes.quote {
-            text = text.foregroundColor(.green)
-        }
-        
-        if attributes.spoiler {
-            let view = text
-                .foregroundColor(.black)
-                .background(Color.black)
-                .onHover { hovering in
-                    if hovering {
-                        
-                    } else {
-                        
-                    }
-                }
-                .toErasedView()
-            
-            return view
-        }
-        
-        if attributes.quoteLink,
-           let link = attributes.href {
-            return text
-                .foregroundColor(.blue)
-                .onTapGesture {
-                    print(link)
-                }
-                .toErasedView()
-        } else {
-            return text.toErasedView()
+            return true
         }
     }
 }
@@ -189,11 +101,11 @@ This is not a spoiler. <s>But this is</s>. And not this.
     
     private static let quotes = "<span class=\"quote\">&gt;218664916</span><br>That looks cool."
     private static let empty = ""
-    private static let html = spoiler
+    private static let html = quotes
     
     static var previews: some View {
         HStack(alignment: .firstTextBaseline) {
-            RichTextView(html)
+            RichTextView(html: html)
         }
         .frame(width: 300)
     }
