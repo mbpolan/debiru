@@ -42,7 +42,7 @@ struct RichTextView: View {
             }
         } catch let error {
             print(error)
-            return [AnyView(Text(error.localizedDescription))]
+            return [Text(error.localizedDescription).toErasedView()]
         }
     }
     
@@ -51,6 +51,7 @@ struct RichTextView: View {
         let italics: Bool
         let quote: Bool
         let quoteLink: Bool
+        let spoiler: Bool
         let href: String?
         
         static var empty: Attributes {
@@ -59,6 +60,7 @@ struct RichTextView: View {
                 italics: false,
                 quote: false,
                 quoteLink: false,
+                spoiler: false,
                 href: nil)
         }
     }
@@ -90,16 +92,29 @@ struct RichTextView: View {
                                     italics: attributes.italics,
                                     quote: attributes.quote,
                                     quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
+                                    spoiler: attributes.spoiler,
                                     href: href))
+            
         } else if element.tagName() == "span" {
             return try renderNode(element, attributes: Attributes(
                                     bold: attributes.bold,
                                     italics: attributes.italics,
                                     quote: attributes.quote || element.hasClass("quote"),
                                     quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
+                                    spoiler: attributes.spoiler,
                                     href: attributes.href))
+            
+        } else if element.tagName() == "s" {
+            return try renderNode(element, attributes: Attributes(
+                                    bold: attributes.bold,
+                                    italics: attributes.italics,
+                                    quote: attributes.quote || element.hasClass("quote"),
+                                    quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
+                                    spoiler: true,
+                                    href: attributes.href))
+            
         } else {
-            return [AnyView(Text(element.tagName()))]
+            return [Text(element.tagName()).toErasedView()]
         }
     }
     
@@ -116,6 +131,22 @@ struct RichTextView: View {
         
         if attributes.quote {
             text = text.foregroundColor(.green)
+        }
+        
+        if attributes.spoiler {
+            let view = text
+                .foregroundColor(.black)
+                .background(Color.black)
+                .onHover { hovering in
+                    if hovering {
+                        
+                    } else {
+                        
+                    }
+                }
+                .toErasedView()
+            
+            return view
         }
         
         if attributes.quoteLink,
@@ -152,9 +183,13 @@ That looks cool.<br>
 But I'm not digging it.
 """
     
+    private static let spoiler = """
+This is not a spoiler. <s>But this is</s>. And not this.
+"""
+    
     private static let quotes = "<span class=\"quote\">&gt;218664916</span><br>That looks cool."
     private static let empty = ""
-    private static let html = multiline
+    private static let html = spoiler
     
     static var previews: some View {
         HStack(alignment: .firstTextBaseline) {
