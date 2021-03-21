@@ -22,6 +22,8 @@
 		279CFF8625FFEC9000884724 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF8525FFEC9000884724 /* Thread.swift */; };
 		27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9C026057E09005D8183 /* SearchBarView.swift */; };
 		27BBC9C626058595005D8183 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C526058595005D8183 /* Introspect */; };
+		27BBC9CA26067D14005D8183 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C926067D14005D8183 /* SwiftSoup */; };
+		27BBC9CE2606C6BD005D8183 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9CD2606C6BD005D8183 /* View.swift */; };
 		27BBF1ED2604308700534CB7 /* RichTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EC2604308700534CB7 /* RichTextView.swift */; };
 		27BBF1F02604345100534CB7 /* OpenItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EF2604345100534CB7 /* OpenItemsView.swift */; };
 		27BBF1F3260436BF00534CB7 /* BoardListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */; };
@@ -48,6 +50,7 @@
 		279CFF7F25FFEA6900884724 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogView.swift; sourceTree = "<group>"; };
 		279CFF8525FFEC9000884724 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
 		27BBC9C026057E09005D8183 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
+		27BBC9CD2606C6BD005D8183 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		27BBF1EC2604308700534CB7 /* RichTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextView.swift; sourceTree = "<group>"; };
 		27BBF1EF2604345100534CB7 /* OpenItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenItemsView.swift; sourceTree = "<group>"; };
 		27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListCellView.swift; sourceTree = "<group>"; };
@@ -62,6 +65,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27BBC9C626058595005D8183 /* Introspect in Frameworks */,
+				27BBC9CA26067D14005D8183 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +91,7 @@
 		2799460825FD9E5A001DCCE3 /* Debiru */ = {
 			isa = PBXGroup;
 			children = (
+				27BBC9CC2606C6AA005D8183 /* Extensions */,
 				279CFF6E25FEBC2400884724 /* Network */,
 				2799462325FDA2DE001DCCE3 /* State */,
 				2799462125FDA1EF001DCCE3 /* System */,
@@ -161,6 +166,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		27BBC9CC2606C6AA005D8183 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				27BBC9CD2606C6BD005D8183 /* View.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -179,6 +192,7 @@
 			name = Debiru;
 			packageProductDependencies = (
 				27BBC9C526058595005D8183 /* Introspect */,
+				27BBC9C926067D14005D8183 /* SwiftSoup */,
 			);
 			productName = Debiru;
 			productReference = 2799460625FD9E5A001DCCE3 /* Debiru.app */;
@@ -209,6 +223,7 @@
 			mainGroup = 279945FD25FD9E5A001DCCE3;
 			packageReferences = (
 				27BBC9C426058595005D8183 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				27BBC9C826067D14005D8183 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			productRefGroup = 2799460725FD9E5A001DCCE3 /* Products */;
 			projectDirPath = "";
@@ -242,6 +257,7 @@
 				27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */,
 				27C568362602D83A00983ECD /* WebImage.swift in Sources */,
 				27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */,
+				27BBC9CE2606C6BD005D8183 /* View.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
 				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,
 				27BBF1ED2604308700534CB7 /* RichTextView.swift in Sources */,
@@ -451,6 +467,14 @@
 				minimumVersion = 0.1.3;
 			};
 		};
+		27BBC9C826067D14005D8183 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -458,6 +482,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 27BBC9C426058595005D8183 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = Introspect;
+		};
+		27BBC9C926067D14005D8183 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 27BBC9C826067D14005D8183 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

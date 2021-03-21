@@ -5,11 +5,12 @@
 //  Created by Mike Polan on 3/18/21.
 //
 
+import SwiftSoup
 import SwiftUI
 
 // MARK: - View
 
-struct RichTextView: NSViewRepresentable {
+struct RichTextView: View {
     
     private let html: String
     
@@ -17,33 +18,148 @@ struct RichTextView: NSViewRepresentable {
         self.html = html
     }
     
-    func makeNSView(context: Context) -> NSTextField {
-        let view = NSTextField()
-        view.isEditable = false
-        view.isBezeled = false
-        view.isSelectable = true
-        view.drawsBackground = false
-        view.textColor = NSColor.textColor
+    var body: some View {
+        let views = renderHTML()
         
-        DispatchQueue.main.async {
-            let data = Data(self.html.utf8)
+        VStack(spacing: 0) {
+            ForEach(0..<views.count, id: \.self) { i in
+                views[i]
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+    
+    private func renderHTML() -> [AnyView] {
+        do {
+            // remove <wbr> elements to avoid breaking links
+            let sanitized = html.replacingOccurrences(of: "<wbr>", with: "")
             
-            if let rendered = try? NSMutableAttributedString(
-                data: data,
-                options: [.documentType: NSAttributedString.DocumentType.html],
-                documentAttributes: nil) {
-                
-                let range = NSMakeRange(0, rendered.length)
-                let font = NSFont.preferredFont(forTextStyle: .body, options: [:])
-                rendered.addAttribute(.font, value: font, range: range)
-                rendered.addAttribute(.foregroundColor, value: NSColor.textColor, range: range)
-                view.attributedStringValue = rendered
+            let doc: Document = try SwiftSoup.parseBodyFragment(sanitized)
+            if let body = doc.body() {
+                return try renderNode(body, attributes: .empty)
+            } else {
+                return []
+            }
+        } catch let error {
+            print(error)
+            return [AnyView(Text(error.localizedDescription))]
+        }
+    }
+    
+    struct Attributes {
+        let bold: Bool
+        let italics: Bool
+        let quote: Bool
+        let quoteLink: Bool
+        let href: String?
+        
+        static var empty: Attributes {
+            return Attributes(
+                bold: false,
+                italics: false,
+                quote: false,
+                quoteLink: false,
+                href: nil)
+        }
+    }
+    
+    private func renderNode(_ node: Node, attributes: Attributes) throws -> [AnyView] {
+        var views: [AnyView] = []
+        try node.getChildNodes().forEach { child in
+            switch child {
+            case let n as TextNode:
+                views.append(renderTextNode(n, attributes: attributes))
+            case let e as Element:
+                views.append(contentsOf: try renderElement(e, attributes: attributes))
+            default:
+                views.append(AnyView(Text("unknown")))
             }
         }
         
-        return view
+        return views
     }
     
-    func updateNSView(_ nsView: NSTextField, context: Context) {
+    private func renderElement(_ element: Element, attributes: Attributes) throws -> [AnyView] {
+        if element.tagName() == "br" {
+            return []
+        } else if element.tagName() == "a" {
+            let href = try element.attr("href")
+            
+            return try renderNode(element, attributes: Attributes(
+                                    bold: attributes.bold,
+                                    italics: attributes.italics,
+                                    quote: attributes.quote,
+                                    quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
+                                    href: href))
+        } else if element.tagName() == "span" {
+            return try renderNode(element, attributes: Attributes(
+                                    bold: attributes.bold,
+                                    italics: attributes.italics,
+                                    quote: attributes.quote || element.hasClass("quote"),
+                                    quoteLink: attributes.quoteLink || element.hasClass("quoteLink"),
+                                    href: attributes.href))
+        } else {
+            return [AnyView(Text(element.tagName()))]
+        }
+    }
+    
+    private func renderTextNode(_ node: TextNode, attributes: Attributes) -> AnyView {
+        var text = Text(node.text())
+        
+        if attributes.bold {
+            text = text.bold()
+        }
+        
+        if attributes.italics {
+            text = text.italic()
+        }
+        
+        if attributes.quote {
+            text = text.foregroundColor(.green)
+        }
+        
+        if attributes.quoteLink,
+           let link = attributes.href {
+            return text
+                .foregroundColor(.blue)
+                .onTapGesture {
+                    print(link)
+                }
+                .toErasedView()
+        } else {
+            return text.toErasedView()
+        }
+    }
+}
+
+// MARK: - Preview
+
+struct RichTextView_Previews: PreviewProvider {
+    private static let plain = "Just some text"
+    
+    private static let multiline = """
+Text line 1<br>
+Text line 2<br>
+"""
+    
+    private static let single = "<span>this is my super long paragraph i sure hope it gets wrapped correctly</span>"
+    
+    private static let nested = "This is something<br><span class=\"quote\">&gt;this is my super long paragraph i sure hope it gets wrapped correctly</span>"
+    
+    private static let links = """
+<a href=\"#p218664916\" class=\"quotelink\">&gt;&gt;218664916</a><br>
+That looks cool.<br>
+But I'm not digging it.
+"""
+    
+    private static let quotes = "<span class=\"quote\">&gt;218664916</span><br>That looks cool."
+    private static let empty = ""
+    private static let html = multiline
+    
+    static var previews: some View {
+        HStack(alignment: .firstTextBaseline) {
+            RichTextView(html)
+        }
+        .frame(width: 300)
     }
 }
