@@ -42,8 +42,13 @@ struct RichTextView: NSViewRepresentable {
         view.autoresizingMask = .init([.width, .height])
         view.delegate = context.coordinator
         
-        if let string = makeString() {
-            view.textStorage?.setAttributedString(string)
+        makeString { result in
+            switch result {
+            case .success(let string):
+                view.textStorage?.setAttributedString(string)
+            case .failure(let error):
+                print("Cannot render content: \(error.localizedDescription)")
+            }
         }
         
         return view
@@ -51,25 +56,30 @@ struct RichTextView: NSViewRepresentable {
     
     func updateNSView(_ nsView: NSTextView, context: Context) { }
     
-    private func makeString() -> NSMutableAttributedString? {
-        guard let string = NSMutableAttributedString(
-                html: Data(html.utf8),
-                options: [.documentType: NSAttributedString.DocumentType.html],
-                documentAttributes: nil) else { return nil }
-        
-        let range = NSMakeRange(0, string.length)
-        string.addAttribute(.font, value: NSFont.preferredFont(forTextStyle: .body, options: [:]), range: range)
-        
-        return string
+    private func makeString(_ handler: @escaping(_: Result<NSMutableAttributedString, Error>) -> Void) -> Void {
+        DispatchQueue.main.async {
+            guard let string = NSMutableAttributedString(
+                    html: Data(html.utf8),
+                    options: [.documentType: NSAttributedString.DocumentType.html],
+                    documentAttributes: nil) else {
+                
+                handler(.failure(NSError()))
+                return
+            }
+            
+            let range = NSMakeRange(0, string.length)
+            string.addAttribute(.font, value: NSFont.preferredFont(forTextStyle: .body, options: [:]), range: range)
+            
+            handler(.success(string))
+        }
     }
 }
 
 // MARK: - Coordinator
 
 extension RichTextView {
-    class Coordinator: NSObject, NSTextViewDelegate, NSTextDelegate {
+    final class Coordinator: NSObject, NSTextViewDelegate, NSTextDelegate {
         func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-            
             return true
         }
     }
