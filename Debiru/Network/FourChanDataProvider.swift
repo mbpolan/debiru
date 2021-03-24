@@ -56,6 +56,7 @@ struct FourChanDataProvider: DataProvider {
                         return Thread(
                             id: thread.id,
                             poster: thread.poster,
+                            date: Date(timeIntervalSince1970: TimeInterval(thread.time)),
                             subject: thread.subject,
                             content: thread.content,
                             sticky: thread.sticky == 1,
@@ -168,6 +169,7 @@ fileprivate struct CatalogModel: Codable {
 
 fileprivate struct ThreadModel: Codable {
     let id: Int
+    let time: Int
     let subject: String?
     let poster: String
     let content: String?
@@ -183,6 +185,7 @@ fileprivate struct ThreadModel: Codable {
     
     private enum CodingKeys: String, CodingKey {
         case id = "no"
+        case time
         case subject = "sub"
         case poster = "name"
         case content = "com"

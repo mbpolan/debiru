@@ -30,13 +30,8 @@ struct CatalogView: View {
                              bounds: CGSize(width: 128.0, height: 128.0))
                 }
                 
-                VStack(alignment: .leading) {
-                    Text(thread.subject ?? "")
-                        .font(.title)
-                    
-                    RichTextView(html: thread.content ?? "")
-                        .frame(maxWidth: .infinity)
-                }
+                ThreadView(thread)
+                
                 Spacer()
             }
         }
@@ -124,6 +119,39 @@ class CatalogViewModel: ObservableObject {
     @Published var pendingThreads: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
+}
+
+// MARK: - ThreadView
+
+fileprivate struct ThreadView: View {
+    private let thread: Thread
+    
+    init(_ thread: Thread) {
+        self.thread = thread
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(thread.subject ?? "")
+                .font(.title)
+            
+            Text("Posted by ") +
+                Text(thread.poster).bold() +
+                Text(" on \(ThreadView.formatter.string(from: thread.date))")
+            
+            RichTextView(html: thread.content ?? "")
+                .frame(maxWidth: .infinity)
+        }
+    }
+    
+    private static var formatter: DateFormatter {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .medium
+        
+        return dateFormatter
+    }
 }
 
 // MARK: - Preview
