@@ -24,18 +24,22 @@ struct WebImage: View {
     }
     
     var body: some View {
+        let frame = getBounds()
+        
         Group {
             switch viewModel.state {
             case .done(let image):
                 makeImage(image)
+                
             case .error(let error):
                 Image(systemName: "exclamationmark.circle")
                     .help(error)
                     .imageScale(.large)
-                    .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
+                    .frame(width: frame.width, height: frame.height)
+                
             default:
                 Text("...")
-                    .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
+                    .frame(width: frame.width, height: frame.height)
             }
         }
         .onAppear(perform: self.load)
@@ -46,6 +50,14 @@ struct WebImage: View {
             self.viewModel.state = .loading
             self.viewModel.pending = dataProvider.getImage(for: asset, board: board, completion: handleCompletion)
         }
+    }
+    
+    private func getBounds() -> CGSize {
+        if let bounds = self.bounds {
+            return bounds
+        }
+        
+        return CGSize(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
     }
     
     private func makeImage(_ nsImage: NSImage) -> some View {
