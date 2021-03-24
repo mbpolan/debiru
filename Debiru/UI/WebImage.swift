@@ -43,7 +43,8 @@ struct WebImage: View {
                 .frame(width: frame.width, height: frame.height)
                 
             default:
-                Text("...")
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
                     .frame(width: frame.width, height: frame.height)
             }
         }
