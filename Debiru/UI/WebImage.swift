@@ -32,10 +32,15 @@ struct WebImage: View {
                 makeImage(image)
                 
             case .error(let error):
-                Image(systemName: "exclamationmark.circle")
-                    .help(error)
-                    .imageScale(.large)
-                    .frame(width: frame.width, height: frame.height)
+                VStack(alignment: .center) {
+                    Image(systemName: "exclamationmark.circle")
+                        .imageScale(.large)
+                    
+                    Text("\(asset.filename)\(asset.extension)")
+                        .font(.footnote)
+                }
+                .help(error)
+                .frame(width: frame.width, height: frame.height)
                 
             default:
                 Text("...")
