@@ -13,13 +13,11 @@ import SwiftUI
 struct WebImage: View {
     @StateObject private var viewModel: WebImageViewModel = WebImageViewModel()
     private let asset: Asset
-    private let board: Board
     private let dataProvider: DataProvider = FourChanDataProvider()
     private let bounds: CGSize?
     
-    init(_ asset: Asset, board: Board, bounds: CGSize? = nil) {
+    init(_ asset: Asset, bounds: CGSize? = nil) {
         self.asset = asset
-        self.board = board
         self.bounds = bounds
     }
     
@@ -54,7 +52,7 @@ struct WebImage: View {
     func load() {
         if viewModel.state == .empty {
             self.viewModel.state = .loading
-            self.viewModel.pending = dataProvider.getImage(for: asset, board: board, completion: handleCompletion)
+            self.viewModel.pending = dataProvider.getImage(for: asset, completion: handleCompletion)
         }
     }
     

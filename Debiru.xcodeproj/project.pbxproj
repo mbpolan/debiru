@@ -24,6 +24,8 @@
 		27BBC9C626058595005D8183 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C526058595005D8183 /* Introspect */; };
 		27BBC9CA26067D14005D8183 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C926067D14005D8183 /* SwiftSoup */; };
 		27BBC9CE2606C6BD005D8183 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9CD2606C6BD005D8183 /* View.swift */; };
+		27BBC9D5260AC265005D8183 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9D4260AC265005D8183 /* Post.swift */; };
+		27BBC9D8260AC67B005D8183 /* ThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9D7260AC67B005D8183 /* ThreadView.swift */; };
 		27BBF1ED2604308700534CB7 /* RichTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EC2604308700534CB7 /* RichTextView.swift */; };
 		27BBF1F02604345100534CB7 /* OpenItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EF2604345100534CB7 /* OpenItemsView.swift */; };
 		27BBF1F3260436BF00534CB7 /* BoardListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */; };
@@ -51,6 +53,8 @@
 		279CFF8525FFEC9000884724 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
 		27BBC9C026057E09005D8183 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
 		27BBC9CD2606C6BD005D8183 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		27BBC9D4260AC265005D8183 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		27BBC9D7260AC67B005D8183 /* ThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadView.swift; sourceTree = "<group>"; };
 		27BBF1EC2604308700534CB7 /* RichTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextView.swift; sourceTree = "<group>"; };
 		27BBF1EF2604345100534CB7 /* OpenItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenItemsView.swift; sourceTree = "<group>"; };
 		27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListCellView.swift; sourceTree = "<group>"; };
@@ -125,6 +129,7 @@
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
 				27BBC9C026057E09005D8183 /* SearchBarView.swift */,
+				27BBC9D7260AC67B005D8183 /* ThreadView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -162,6 +167,7 @@
 				2799462825FDA32D001DCCE3 /* Board.swift */,
 				279CFF8525FFEC9000884724 /* Thread.swift */,
 				27C568322602D2A000983ECD /* Asset.swift */,
+				27BBC9D4260AC265005D8183 /* Post.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -269,7 +275,9 @@
 				279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,
+				27BBC9D8260AC67B005D8183 /* ThreadView.swift in Sources */,
 				2799461B25FD9EE6001DCCE3 /* SidebarView.swift in Sources */,
+				27BBC9D5260AC265005D8183 /* Post.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

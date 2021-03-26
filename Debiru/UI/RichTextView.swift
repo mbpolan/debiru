@@ -9,8 +9,29 @@ import SwiftUI
 
 // MARK: - View
 
-struct RichTextView: NSViewRepresentable {
-    private let html: String
+struct RichTextView: View {
+    @State private var height: CGFloat?
+    let html: String
+    
+    var body: some View {
+//        let no = html.components(separatedBy: " ").first ?? "?"
+//        if no == "561987" {
+//            print("\(no) - \(height ?? -1)")
+//        }
+//
+        return GeometryReader { geo in
+            TextViewWrapper(html, width: geo.size.width, onUpdate: handleUpdate)
+        }.frame(height: height)
+    }
+    
+    private func handleUpdate(_ height: CGFloat) {
+        DispatchQueue.main.async {
+            self.height = height
+        }
+    }
+}
+
+fileprivate struct TextViewWrapper: NSViewRepresentable {
     private let styles = """
 <style>
 * {
@@ -26,8 +47,15 @@ struct RichTextView: NSViewRepresentable {
 </style>
 """
     
-    init(html: String) {
+    private let onUpdate: (_: CGFloat) -> Void
+    private let html: String
+    private let width: CGFloat
+    private var string: NSMutableAttributedString?
+    
+    init(_ html: String, width: CGFloat, onUpdate: @escaping(_: CGFloat) -> Void) {
         self.html = "\(styles)\(html)"
+        self.width = width
+        self.onUpdate = onUpdate
     }
     
     func makeCoordinator() -> Coordinator {
@@ -45,7 +73,10 @@ struct RichTextView: NSViewRepresentable {
         makeString { result in
             switch result {
             case .success(let string):
+                context.coordinator.string = string
                 view.textStorage?.setAttributedString(string)
+                
+                recalculateHeight(string)
             case .failure(let error):
                 print("Cannot render content: \(error.localizedDescription)")
             }
@@ -54,7 +85,19 @@ struct RichTextView: NSViewRepresentable {
         return view
     }
     
-    func updateNSView(_ nsView: NSTextView, context: Context) { }
+    func updateNSView(_ nsView: NSTextView, context: Context) {
+        if let string = context.coordinator.string {
+            recalculateHeight(string)
+        }
+    }
+    
+    private func recalculateHeight(_ string: NSMutableAttributedString) {
+        let rect = string.boundingRect(
+            with: NSMakeSize(width, .infinity),
+            options: [.usesLineFragmentOrigin, .usesFontLeading])
+        
+        onUpdate(ceil(rect.height))
+    }
     
     private func makeString(_ handler: @escaping(_: Result<NSMutableAttributedString, Error>) -> Void) -> Void {
         DispatchQueue.main.async {
@@ -77,8 +120,10 @@ struct RichTextView: NSViewRepresentable {
 
 // MARK: - Coordinator
 
-extension RichTextView {
-    final class Coordinator: NSObject, NSTextViewDelegate, NSTextDelegate {
+extension TextViewWrapper {
+    final class Coordinator: NSObject, NSTextViewDelegate {
+        var string: NSMutableAttributedString?
+        
         func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
             return true
         }

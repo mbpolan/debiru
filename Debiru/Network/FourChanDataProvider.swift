@@ -45,6 +45,7 @@ struct FourChanDataProvider: DataProvider {
                             
                             asset = Asset(
                                 id: id,
+                                boardId: board.id,
                                 width: width,
                                 height: height,
                                 thumbnailWidth: thumbWidth,
@@ -55,6 +56,7 @@ struct FourChanDataProvider: DataProvider {
                         
                         return Thread(
                             id: thread.id,
+                            boardId: board.id,
                             poster: thread.poster,
                             date: Date(timeIntervalSince1970: TimeInterval(thread.time)),
                             subject: thread.subject,
@@ -68,9 +70,47 @@ struct FourChanDataProvider: DataProvider {
             completion: completion)
     }
     
-    func getImage(for asset: Asset, board: Board, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
+    func getPosts(for thread: Thread, completion: @escaping(_: Result<[Post], Error>) -> Void) -> AnyCancellable? {
         
-        let key = "\(assetBaseUrl)/\(board.id)/\(asset.id)\(asset.extension)"
+        return getData(
+            url: "\(apiBaseUrl)/\(thread.boardId)/thread/\(thread.id).json",
+            mapper: { (value: ThreadPostsModel) in
+                return value.posts.map { post in
+                    var asset: Asset?
+                    if let id = post.assetId,
+                       let width = post.imageWidth,
+                       let height = post.imageHeight,
+                       let thumbWidth = post.thumbnailWidth,
+                       let thumbHeight = post.thumbnailHeight,
+                       let filename = post.filename,
+                       let ext = post.extension {
+                        
+                        asset = Asset(
+                            id: id,
+                            boardId: thread.boardId,
+                            width: width,
+                            height: height,
+                            thumbnailWidth: thumbWidth,
+                            thumbnailHeight: thumbHeight,
+                            filename: filename,
+                            extension: ext)
+                    }
+                    
+                    return Post(
+                        id: post.id,
+                        author: post.author,
+                        date: Date(timeIntervalSince1970: TimeInterval(post.time)),
+                        subject: post.subject,
+                        content: post.content,
+                        attachment: asset)
+                }
+            },
+            completion: completion)
+    }
+    
+    func getImage(for asset: Asset, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
+        
+        let key = "\(assetBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)"
         if let url = URL(string: key) {
             if let cachedImage = imageCache.get(forKey: key) {
                 print("CACHE HIT: \(key)")
@@ -191,6 +231,40 @@ fileprivate struct ThreadModel: Codable {
         case content = "com"
         case sticky
         case closed
+        case assetId = "tim"
+        case imageWidth = "w"
+        case imageHeight = "h"
+        case thumbnailWidth = "tn_w"
+        case thumbnailHeight = "tn_h"
+        case filename
+        case `extension` = "ext"
+    }
+}
+
+fileprivate struct ThreadPostsModel: Codable {
+    let posts: [PostModel]
+}
+
+fileprivate struct PostModel: Codable {
+    let id: Int
+    let time: Int
+    let subject: String?
+    let author: String
+    let content: String?
+    let assetId: Int?
+    let imageWidth: Int?
+    let imageHeight: Int?
+    let thumbnailWidth: Int?
+    let thumbnailHeight: Int?
+    let filename: String?
+    let `extension`: String?
+    
+    private enum CodingKeys: String, CodingKey {
+        case id = "no"
+        case time
+        case subject = "sub"
+        case author = "name"
+        case content = "com"
         case assetId = "tim"
         case imageWidth = "w"
         case imageHeight = "h"

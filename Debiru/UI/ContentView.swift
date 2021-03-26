@@ -16,6 +16,7 @@ struct ContentView: View {
     
     private let dataProvider: DataProvider
     private let showBoardPublisher = NotificationCenter.default.publisher(for: .showBoard)
+    private let showThreadPublisher = NotificationCenter.default.publisher(for: .showThread)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -28,6 +29,10 @@ struct ContentView: View {
             switch appState.currentItem {
             case .board(_):
                 CatalogView()
+            
+            case .thread(_):
+                ThreadView()
+                
             default:
                 if viewModel.pendingBoards != nil {
                     ProgressView("Loading")
@@ -43,6 +48,11 @@ struct ContentView: View {
         .onReceive(showBoardPublisher) { event in
             if let board = event.object as? Board {
                 handleShowBoard(board)
+            }
+        }
+        .onReceive(showThreadPublisher) { event in
+            if let thread = event.object as? Thread {
+                handleShowThread(thread)
             }
         }
         .sheet(item: $viewModel.error, onDismiss: {
@@ -67,6 +77,15 @@ struct ContentView: View {
         // add this board to our open items view, if it's not there already
         if !appState.openItems.contains(where: { $0 == .board(board) }) {
             appState.openItems.append(.board(board))
+        }
+    }
+    
+    private func handleShowThread(_ thread: Thread) {
+        appState.currentItem = .thread(thread)
+        
+        // add this thread to our open items view, if it's not there already
+        if !appState.openItems.contains(where: { $0 == .thread(thread) }) {
+            appState.openItems.append(.thread(thread))
         }
     }
     

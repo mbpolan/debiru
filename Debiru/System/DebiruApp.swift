@@ -22,4 +22,5 @@ struct DebiruApp: App {
 
 extension Notification.Name {
     static let showBoard = Notification.Name("showBoard")
+    static let showThread = Notification.Name("showThread")
 }

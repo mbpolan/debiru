@@ -7,6 +7,7 @@
 
 struct Asset: Identifiable, Hashable, Equatable {
     let id: Int
+    let boardId: String
     let width: Int
     let height: Int
     let thumbnailWidth: Int

@@ -1,19 +1,18 @@
 //
-//  CatalogView.swift
+//  ThreadView.swift
 //  Debiru
 //
-//  Created by Mike Polan on 3/15/21.
+//  Created by Mike Polan on 3/23/21.
 //
 
-import AppKit
 import Combine
 import SwiftUI
 
 // MARK: - View
 
-struct CatalogView: View {
+struct ThreadView: View {
     @EnvironmentObject private var appState: AppState
-    @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
+    @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
@@ -21,17 +20,14 @@ struct CatalogView: View {
     }
     
     var body: some View {
-        List(threads, id: \.self) { thread in
+        List(posts, id: \.self) { post in
             HStack {
-                if let asset = thread.attachment {
+                if let asset = post.attachment {
                     WebImage(asset,
                              bounds: CGSize(width: 128.0, height: 128.0))
                 }
                 
-                ThreadListItemView(thread)
-                    .onTapGesture {
-                        handleShowThread(thread)
-                    }
+                PostListItemView(post)
                 
                 Spacer()
             }
@@ -50,17 +46,17 @@ struct CatalogView: View {
         }
     }
     
-    private var threads: [Thread] {
+    private var posts: [Post] {
         if viewModel.searchExpanded && !viewModel.search.isEmpty {
             let query = viewModel.search.trimmingCharacters(in: .whitespaces)
             
-            return viewModel.threads.filter { thread in
-                if let subject = thread.subject,
+            return viewModel.posts.filter { post in
+                if let subject = post.subject,
                    subject.localizedCaseInsensitiveContains(query) {
                     return true
                 }
                 
-                if let content = thread.content,
+                if let content = post.content,
                    content.localizedCaseInsensitiveContains(query) {
                     return true
                 }
@@ -69,83 +65,79 @@ struct CatalogView: View {
             }
         }
         
-        return viewModel.threads
+        return viewModel.posts
     }
     
     private func getNavigationTitle() -> String {
-        if let board = getBoard(appState.currentItem) {
-            return "/\(board.id)/"
+        if let thread = getThread(appState.currentItem) {
+            return "/\(thread.boardId)/ - \(thread.id)"
         }
         
         return ""
     }
     
-    private func handleShowThread(_ thread: Thread) {
-        NotificationCenter.default.post(name: .showThread, object: thread)
-    }
-    
-    private func getBoard(_ item: ViewableItem?) -> Board? {
+    private func getThread(_ item: ViewableItem?) -> Thread? {
         switch item {
-        case .board(let board):
-            return board
+        case .thread(let thread):
+            return thread
         default:
             return nil
         }
     }
     
     private func reloadFromState() {
-        guard let board = getBoard(appState.currentItem) else { return }
-        reload(board)
+        guard let thread = getThread(appState.currentItem) else { return }
+        reload(thread)
     }
     
     private func reload(from item: ViewableItem?) {
-        guard let board = getBoard(item) else { return }
-        reload(board)
+        guard let thread = getThread(item) else { return }
+        reload(thread)
     }
     
-    private func reload(_ board: Board) {
-        viewModel.pendingThreads = dataProvider.getCatalog(for: board) { result in
+    private func reload(_ thread: Thread) {
+        viewModel.pendingPosts = dataProvider.getPosts(for: thread) { result in
             switch result {
-            case .success(let threads):
-                self.viewModel.threads = threads
+            case .success(let posts):
+                self.viewModel.posts = posts
             case .failure(let error):
                 print(error)
             }
             
-            self.viewModel.pendingThreads = nil
+            self.viewModel.pendingPosts = nil
         }
     }
 }
 
 // MARK: - View Model
 
-class CatalogViewModel: ObservableObject {
-    @Published var threads: [Thread] = []
-    @Published var pendingThreads: AnyCancellable?
+class ThreadViewModel: ObservableObject {
+    @Published var posts: [Post] = []
+    @Published var pendingPosts: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
 }
 
-// MARK: - ThreadListItemView
+// MARK: - PostListItemView
 
-fileprivate struct ThreadListItemView: View {
-    private let thread: Thread
+fileprivate struct PostListItemView: View {
+    private let post: Post
     
-    init(_ thread: Thread) {
-        self.thread = thread
+    init(_ post: Post) {
+        self.post = post
     }
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(thread.subject ?? "")
+            Text(post.subject ?? "")
                 .font(.title)
             
-            Text("Posted by ") +
-                Text(thread.poster).bold() +
-                Text(" on \(ThreadListItemView.formatter.string(from: thread.date))")
+            Text("\(post.id)").bold() +
+                Text("Posted by ") +
+                Text(post.author).bold() +
+                Text(" on \(PostListItemView.formatter.string(from: post.date))")
             
-            RichTextView(html: thread.content ?? "")
-                .frame(maxWidth: .infinity)
+            RichTextView(html: post.content ?? "")
         }
     }
     
@@ -161,17 +153,23 @@ fileprivate struct ThreadListItemView: View {
 
 // MARK: - Preview
 
-struct CatalogView_Previews: PreviewProvider {
-    private static let board = Board(
-        id: "f",
-        title: "Foobar",
-        description: "whatever")
+struct ThreadView_Previews: PreviewProvider {
+    private static let thread = Thread(
+        id: 123,
+        boardId: "/foo",
+        poster: "",
+        date: Date(),
+        subject: "foo",
+        content: nil,
+        sticky: false,
+        closed: false,
+        attachment: nil)
     
     static var previews: some View {
-        CatalogView()
+        ThreadView()
             .environmentObject(AppState(
-                                currentItem: .board(board),
-                                boards: [board],
+                                currentItem: .thread(thread),
+                                boards: [],
                                 openItems: []))
     }
 }
