@@ -155,7 +155,7 @@ fileprivate struct PostListItemView: View {
             Text(post.subject ?? "")
                 .font(.title)
             
-            Text("\(post.id)").bold() +
+            Text("#\(String(post.id)) ").bold() +
                 Text("Posted by ") +
                 Text(post.author).bold() +
                 Text(" on \(PostListItemView.formatter.string(from: post.date))")
