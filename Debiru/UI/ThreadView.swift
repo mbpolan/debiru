@@ -34,9 +34,17 @@ struct ThreadView: View {
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
-            SearchBarView(
-                expanded: $viewModel.searchExpanded,
-                search: $viewModel.search)
+            ToolbarItemGroup(placement: .navigation) {
+                Button(action: handleBackToCatalog) {
+                    Image(systemName: "chevron.backward")
+                }
+            }
+            
+            ToolbarItemGroup {
+                SearchBarView(
+                    expanded: $viewModel.searchExpanded,
+                    search: $viewModel.search)
+            }
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
@@ -68,6 +76,12 @@ struct ThreadView: View {
         return viewModel.posts
     }
     
+    private func handleBackToCatalog() {
+        if let board = getParentBoard(appState.currentItem) {
+            NotificationCenter.default.post(name: .showBoard, object: board)
+        }
+    }
+    
     private func getNavigationTitle() -> String {
         if let thread = getThread(appState.currentItem) {
             return "/\(thread.boardId)/ - \(thread.id)"
@@ -76,9 +90,18 @@ struct ThreadView: View {
         return ""
     }
     
+    private func getParentBoard(_ item: ViewableItem?) -> Board? {
+        switch item {
+        case .thread(let board, _):
+            return board
+        default:
+            return nil
+        }
+    }
+    
     private func getThread(_ item: ViewableItem?) -> Thread? {
         switch item {
-        case .thread(let thread):
+        case .thread(_, let thread):
             return thread
         default:
             return nil
@@ -168,7 +191,7 @@ struct ThreadView_Previews: PreviewProvider {
     static var previews: some View {
         ThreadView()
             .environmentObject(AppState(
-                                currentItem: .thread(thread),
+                                currentItem: .thread(nil, thread),
                                 boards: [],
                                 openItems: []))
     }

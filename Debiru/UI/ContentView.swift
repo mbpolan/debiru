@@ -30,14 +30,14 @@ struct ContentView: View {
             case .board(_):
                 CatalogView()
             
-            case .thread(_):
+            case .thread(_, _):
                 ThreadView()
                 
             default:
                 if viewModel.pendingBoards != nil {
                     ProgressView("Loading")
                 } else {
-                    Text("unknown?")
+                    EmptyView()
                 }
             }
         }
@@ -81,11 +81,15 @@ struct ContentView: View {
     }
     
     private func handleShowThread(_ thread: Thread) {
-        appState.currentItem = .thread(thread)
-        
-        // add this thread to our open items view, if it's not there already
-        if !appState.openItems.contains(where: { $0 == .thread(thread) }) {
-            appState.openItems.append(.thread(thread))
+        switch appState.currentItem {
+        case .board(let board):
+            appState.currentItem = .thread(board, thread)
+            
+            // add this thread to our open items view, if it's not there already
+            
+            
+        default:
+            break
         }
     }
     

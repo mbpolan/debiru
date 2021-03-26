@@ -26,13 +26,13 @@ class AppState: ObservableObject {
 
 enum ViewableItem: Identifiable, Hashable {
     case board(Board)
-    case thread(Thread)
+    case thread(Board?, Thread)
     
     var id: String {
         switch self {
         case .board(let board):
             return board.id
-        case .thread(let thread):
+        case .thread(_, let thread):
             return String(thread.id)
         }
     }

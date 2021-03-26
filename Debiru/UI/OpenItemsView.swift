@@ -23,8 +23,8 @@ struct OpenItemsView: View {
                     switch item {
                     case .board(let board):
                         BoardListCellView(board)
-                    case .thread(let thread):
-                        Text("")
+                    case .thread(_, let thread):
+                        ThreadListCellView(thread)
                     }
                 }
             }
