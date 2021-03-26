@@ -24,8 +24,12 @@ struct CatalogView: View {
         List(threads, id: \.self) { thread in
             HStack {
                 if let asset = thread.attachment {
-                    WebImage(asset,
-                             bounds: CGSize(width: 128.0, height: 128.0))
+                    VStack(alignment: .leading) {
+                        WebImage(asset,
+                                 bounds: CGSize(width: 128.0, height: 128.0))
+                        
+                        Spacer()
+                    }
                 }
                 
                 ThreadListItemView(thread)

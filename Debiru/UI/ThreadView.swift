@@ -23,8 +23,12 @@ struct ThreadView: View {
         List(posts, id: \.self) { post in
             HStack {
                 if let asset = post.attachment {
-                    WebImage(asset,
-                             bounds: CGSize(width: 128.0, height: 128.0))
+                    VStack(alignment: .leading) {
+                        WebImage(asset,
+                                 bounds: CGSize(width: 128.0, height: 128.0))
+                        
+                        Spacer()
+                    }
                 }
                 
                 PostListItemView(post)
