@@ -140,7 +140,8 @@ fileprivate struct ThreadListItemView: View {
             Text(thread.subject ?? "")
                 .font(.title)
             
-            Text("Posted by ") +
+            Text("#\(String(thread.id)) ").bold() +
+                Text("Posted by ") +
                 Text(thread.poster).bold() +
                 Text(" on \(ThreadListItemView.formatter.string(from: thread.date))")
             
