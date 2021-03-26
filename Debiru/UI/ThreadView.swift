@@ -161,6 +161,8 @@ fileprivate struct PostListItemView: View {
                 Text(" on \(PostListItemView.formatter.string(from: post.date))")
             
             RichTextView(html: post.content ?? "")
+            
+            Spacer()
         }
     }
     

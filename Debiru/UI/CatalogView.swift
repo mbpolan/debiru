@@ -146,7 +146,8 @@ fileprivate struct ThreadListItemView: View {
                 Text(" on \(ThreadListItemView.formatter.string(from: thread.date))")
             
             RichTextView(html: thread.content ?? "")
-                .frame(maxWidth: .infinity)
+            
+            Spacer()
         }
     }
     
