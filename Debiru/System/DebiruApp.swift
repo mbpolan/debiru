@@ -21,7 +21,6 @@ struct DebiruApp: App {
         WindowGroup("Image") {
             FullImageView()
                 .environmentObject(appState)
-                .padding()
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "*"))
         }
         .windowStyle(HiddenTitleBarWindowStyle())

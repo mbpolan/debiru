@@ -13,9 +13,14 @@ struct FullImageView: View {
     @EnvironmentObject private var appState: AppState
     
     var body: some View {
-        ScrollView {
-            Image(nsImage: image)
+        let image = self.image
+        
+        VStack {
+            ScrollView {
+                Image(nsImage: image)
+            }
         }
+        .frame(idealWidth: image.size.width, idealHeight: image.size.height)
     }
     
     private var image: NSImage {
