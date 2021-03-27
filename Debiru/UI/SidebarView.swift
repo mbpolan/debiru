@@ -14,23 +14,25 @@ struct SidebarView: View {
     
     var body: some View {
         VStack {
+            Divider()
+            
             HStack {
                 SubviewImageButton(
                     subview: .openItems,
                     toggled: viewModel.subview == .openItems,
                     action: handleShowOpenItems)
-                
+
                 SubviewImageButton(
                     subview: .allBoards,
                     toggled: viewModel.subview == .allBoards,
                     action: handleShowAllBoards)
-                
+
                 SubviewImageButton(
                     subview: .watchedThreads,
                     toggled: viewModel.subview == .watchedThreads,
                     action: handleShowWatchedThreads)
             }
-            .padding(5)
+            .padding(1)
             
             Divider()
             
@@ -42,14 +44,9 @@ struct SidebarView: View {
             case .watchedThreads:
                 WatchedThreadsView()
             }
-//            if viewModel.subview == .allBoards {
-//                BoardListView()
-//            } else if viewModel.subview == .watchedThreads {
-//                WatchedThreadsView()
-//            }
         }
         .toolbar {
-            ToolbarItem(placement: .automatic) {
+            ToolbarItemGroup(placement: .automatic) {
                 Button(action: handleToggleSidebar) {
                     Image(systemName: "sidebar.left")
                 }

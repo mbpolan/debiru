@@ -16,7 +16,7 @@ struct DebiruApp: App {
             ContentView()
                 .environmentObject(appState)
         }
-        .windowToolbarStyle(UnifiedWindowToolbarStyle())
+        .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
     }
 }
 
