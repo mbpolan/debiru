@@ -16,11 +16,17 @@ struct WebImage: View {
     private let dataProvider: DataProvider = FourChanDataProvider()
     private let saveLocation: URL
     private let bounds: CGSize?
+    private let onOpen: (_: Data) -> Void
     
-    init(_ asset: Asset, saveLocation: URL, bounds: CGSize? = nil) {
+    init(_ asset: Asset,
+         saveLocation: URL,
+         bounds: CGSize? = nil,
+         onOpen: @escaping(_: Data) -> Void) {
+        
         self.asset = asset
         self.saveLocation = saveLocation
         self.bounds = bounds
+        self.onOpen = onOpen
     }
     
     var body: some View {
@@ -64,6 +70,11 @@ struct WebImage: View {
         }
         .onTapGesture(count: 2) {
             handleSaveImage()
+        }
+        .onTapGesture(count: 1) {
+            if let data = viewModel.imageData {
+                onOpen(data)
+            }
         }
         .onAppear(perform: self.load)
     }

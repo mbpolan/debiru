@@ -11,6 +11,7 @@ class AppState: ObservableObject {
     @Published var currentItem: ViewableItem?
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
+    @Published var openImageData: Data?
     
     init() {
         self.boards = []

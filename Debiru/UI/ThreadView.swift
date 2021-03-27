@@ -28,7 +28,8 @@ struct ThreadView: View {
                     VStack(alignment: .leading) {
                         WebImage(asset,
                                  saveLocation: defaultImageLocation,
-                                 bounds: CGSize(width: 128.0, height: 128.0))
+                                 bounds: CGSize(width: 128.0, height: 128.0),
+                                 onOpen: handleOpenImage)
                         
                         Spacer()
                     }
@@ -81,6 +82,10 @@ struct ThreadView: View {
         }
         
         return viewModel.posts
+    }
+    
+    private func handleOpenImage(_ data: Data) {
+        NotificationCenter.default.post(name: .showImage, object: data)
     }
     
     private func handleBackToCatalog() {

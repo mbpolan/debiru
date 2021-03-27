@@ -11,12 +11,14 @@ import SwiftUI
 // MARK: - View
 
 struct ContentView: View {
+    @Environment(\.openURL) private var openURL
     @EnvironmentObject private var appState: AppState
     @ObservedObject private var viewModel: ContentViewModel = ContentViewModel()
     
     private let dataProvider: DataProvider
     private let showBoardPublisher = NotificationCenter.default.publisher(for: .showBoard)
     private let showThreadPublisher = NotificationCenter.default.publisher(for: .showThread)
+    private let showImagePublisher = NotificationCenter.default.publisher(for: .showImage)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -55,6 +57,11 @@ struct ContentView: View {
                 handleShowThread(thread)
             }
         }
+        .onReceive(showImagePublisher) { event in
+            if let data = event.object as? Data {
+                handleShowImage(data)
+            }
+        }
         .sheet(item: $viewModel.error, onDismiss: {
             viewModel.error = nil
         }) { error in
@@ -90,6 +97,13 @@ struct ContentView: View {
             
         default:
             break
+        }
+    }
+    
+    private func handleShowImage(_ data: Data) {
+        if let url = URL(string: "Debiru://image") {
+            appState.openImageData = data
+            openURL(url)
         }
     }
     

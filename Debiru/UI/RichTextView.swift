@@ -14,12 +14,7 @@ struct RichTextView: View {
     let html: String
     
     var body: some View {
-//        let no = html.components(separatedBy: " ").first ?? "?"
-//        if no == "561987" {
-//            print("\(no) - \(height ?? -1)")
-//        }
-//
-        return GeometryReader { geo in
+        GeometryReader { geo in
             TextViewWrapper(html, width: geo.size.width, onUpdate: handleUpdate)
         }.frame(height: height)
     }
@@ -43,6 +38,11 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
 .quotelink {
   color: blue;
   cursor: pointer;
+}
+s {
+  color: black;
+  background-color: black;
+  text-decoration: none;
 }
 </style>
 """

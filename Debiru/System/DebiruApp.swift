@@ -18,6 +18,15 @@ struct DebiruApp: App {
         }
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
         
+        WindowGroup("Image") {
+            FullImageView()
+                .environmentObject(appState)
+                .padding()
+                .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "*"))
+        }
+        .windowStyle(HiddenTitleBarWindowStyle())
+        .handlesExternalEvents(matching: Set(arrayLiteral: "image"))
+        
         Settings {
             SettingsView()
         }
@@ -38,4 +47,5 @@ struct StorageKeys {
 extension Notification.Name {
     static let showBoard = Notification.Name("showBoard")
     static let showThread = Notification.Name("showThread")
+    static let showImage = Notification.Name("showImage")
 }
