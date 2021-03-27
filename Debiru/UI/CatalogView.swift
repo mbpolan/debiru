@@ -36,7 +36,7 @@ struct CatalogView: View {
                     }
                 }
                 
-                ThreadListItemView(thread)
+                PostView(thread.toPostContent())
                     .onTapGesture {
                         handleShowThread(thread)
                     }
@@ -136,41 +136,6 @@ class CatalogViewModel: ObservableObject {
     @Published var pendingThreads: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
-}
-
-// MARK: - ThreadListItemView
-
-fileprivate struct ThreadListItemView: View {
-    private let thread: Thread
-    
-    init(_ thread: Thread) {
-        self.thread = thread
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(thread.subject ?? "")
-                .font(.title)
-            
-            Text("#\(String(thread.id)) ").bold() +
-                Text("Posted by ") +
-                Text(thread.poster).bold() +
-                Text(" on \(ThreadListItemView.formatter.string(from: thread.date))")
-            
-            RichTextView(html: thread.content ?? "")
-            
-            Spacer()
-        }
-    }
-    
-    private static var formatter: DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.current
-        dateFormatter.dateStyle = .long
-        dateFormatter.timeStyle = .medium
-        
-        return dateFormatter
-    }
 }
 
 // MARK: - Preview

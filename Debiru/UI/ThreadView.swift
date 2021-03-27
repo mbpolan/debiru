@@ -35,7 +35,7 @@ struct ThreadView: View {
                     }
                 }
                 
-                PostListItemView(post)
+                PostView(post.toPostContent())
                 
                 Spacer()
             }
@@ -151,41 +151,6 @@ class ThreadViewModel: ObservableObject {
     @Published var pendingPosts: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
-}
-
-// MARK: - PostListItemView
-
-fileprivate struct PostListItemView: View {
-    private let post: Post
-    
-    init(_ post: Post) {
-        self.post = post
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(post.subject ?? "")
-                .font(.title)
-            
-            Text("#\(String(post.id)) ").bold() +
-                Text("Posted by ") +
-                Text(post.author).bold() +
-                Text(" on \(PostListItemView.formatter.string(from: post.date))")
-            
-            RichTextView(html: post.content ?? "")
-            
-            Spacer()
-        }
-    }
-    
-    private static var formatter: DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.current
-        dateFormatter.dateStyle = .long
-        dateFormatter.timeStyle = .medium
-        
-        return dateFormatter
-    }
 }
 
 // MARK: - Preview

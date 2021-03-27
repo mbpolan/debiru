@@ -96,13 +96,22 @@ struct FourChanDataProvider: DataProvider {
                             extension: ext)
                     }
                     
+                    var archivedDate: Date? = nil
+                    if let archiveTime = post.archiveTime {
+                        archivedDate = Date(timeIntervalSince1970: TimeInterval(archiveTime))
+                    }
+                    
                     return Post(
                         id: post.id,
                         author: post.author,
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
                         subject: post.subject,
                         content: post.content,
-                        attachment: asset)
+                        sticky: post.sticky == 1,
+                        closed: post.closed == 1,
+                        attachment: asset,
+                        archived: post.archived == 1,
+                        archivedDate: archivedDate)
                 }
             },
             completion: completion)
@@ -251,6 +260,8 @@ fileprivate struct PostModel: Codable {
     let subject: String?
     let author: String
     let content: String?
+    let sticky: Int?
+    let closed: Int?
     let assetId: Int?
     let imageWidth: Int?
     let imageHeight: Int?
@@ -258,6 +269,8 @@ fileprivate struct PostModel: Codable {
     let thumbnailHeight: Int?
     let filename: String?
     let `extension`: String?
+    let archived: Int?
+    let archiveTime: Int?
     
     private enum CodingKeys: String, CodingKey {
         case id = "no"
@@ -265,6 +278,8 @@ fileprivate struct PostModel: Codable {
         case subject = "sub"
         case author = "name"
         case content = "com"
+        case sticky
+        case closed
         case assetId = "tim"
         case imageWidth = "w"
         case imageHeight = "h"
@@ -272,5 +287,7 @@ fileprivate struct PostModel: Codable {
         case thumbnailHeight = "tn_h"
         case filename
         case `extension` = "ext"
+        case archived
+        case archiveTime = "archived_on"
     }
 }
