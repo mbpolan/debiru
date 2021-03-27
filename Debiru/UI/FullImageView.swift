@@ -20,7 +20,9 @@ struct FullImageView: View {
                 Image(nsImage: image)
             }
         }
-        .frame(idealWidth: image.size.width, idealHeight: image.size.height)
+        .frame(
+            idealWidth: min(image.size.width, NSScreen.main?.frame.maxX ?? .infinity),
+            idealHeight: min(image.size.height, NSScreen.main?.frame.maxY ?? .infinity))
     }
     
     private var image: NSImage {
