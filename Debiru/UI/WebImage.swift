@@ -46,6 +46,22 @@ struct WebImage: View {
                     .frame(width: frame.width, height: frame.height)
             }
         }
+        .popover(item: $viewModel.popoverType, arrowEdge: .leading) { item in
+            HStack {
+                if item == .success {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.green)
+                } else {
+                    Image(systemName: "exclamationmark.circle")
+                        .foregroundColor(.red)
+                }
+
+                Text(viewModel.popoverMessage ?? "Something went wrong!")
+            }
+        }
+        .onTapGesture(count: 2) {
+            handleSaveImage()
+        }
         .onAppear(perform: self.load)
     }
     
@@ -53,6 +69,28 @@ struct WebImage: View {
         if viewModel.state == .empty {
             self.viewModel.state = .loading
             self.viewModel.pending = dataProvider.getImage(for: asset, completion: handleCompletion)
+        }
+    }
+    
+    private func handleSaveImage() {
+        if let data = viewModel.imageData {
+            do {
+                // default to the user's pictures directory
+                let url = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
+                try data.write(to: url.appendingPathComponent(asset.fullName))
+                
+                viewModel.popoverMessage = "Saved \(asset.fullName) to \(url.path)"
+                viewModel.popoverType = .success
+                
+                // dismiss the popover after a few seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    viewModel.popoverMessage = nil
+                    viewModel.popoverType = nil
+                }
+            } catch (let error) {
+                viewModel.popoverMessage = error.localizedDescription
+                viewModel.popoverType = .error
+            }
         }
     }
     
@@ -74,11 +112,11 @@ struct WebImage: View {
             result = AnyView(
                 image
                     .clipShape(RoundedRectangle(cornerRadius: 5.0))
-                .frame(width: bounds.width, height: bounds.height))
+                    .frame(width: bounds.width, height: bounds.height))
         } else {
             result = AnyView(
                 image
-                .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight)))
+                    .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight)))
         }
         
         return result
@@ -87,6 +125,9 @@ struct WebImage: View {
     private func handleCompletion(_ result: Result<Data, Error>) {
         switch result {
         case .success(let data):
+            // save the data regardless if it is something we can render
+            viewModel.imageData = data
+            
             if let image = NSImage(data: data) {
                 self.viewModel.state = .done(image)
             } else {
@@ -105,6 +146,16 @@ struct WebImage: View {
 class WebImageViewModel: ObservableObject {
     @Published var pending: AnyCancellable?
     @Published var state: State = .empty
+    @Published var imageData: Data?
+    @Published var popoverType: PopoverType?
+    @Published var popoverMessage: String?
+    
+    enum PopoverType: Identifiable {
+        var id: Int { hashValue }
+        
+        case success
+        case error
+    }
     
     enum State: Equatable {
         case empty

@@ -14,4 +14,8 @@ struct Asset: Identifiable, Hashable, Equatable {
     let thumbnailHeight: Int
     let filename: String
     let `extension`: String
+    
+    var fullName: String {
+        return "\(filename)\(`extension`)"
+    }
 }
