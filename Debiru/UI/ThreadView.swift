@@ -11,6 +11,8 @@ import SwiftUI
 // MARK: - View
 
 struct ThreadView: View {
+    @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
+    
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
@@ -25,6 +27,7 @@ struct ThreadView: View {
                 if let asset = post.attachment {
                     VStack(alignment: .leading) {
                         WebImage(asset,
+                                 saveLocation: defaultImageLocation,
                                  bounds: CGSize(width: 128.0, height: 128.0))
                         
                         Spacer()

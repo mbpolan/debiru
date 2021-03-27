@@ -12,6 +12,8 @@ import SwiftUI
 // MARK: - View
 
 struct CatalogView: View {
+    @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
+    
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
     private let dataProvider: DataProvider
@@ -26,6 +28,7 @@ struct CatalogView: View {
                 if let asset = thread.attachment {
                     VStack(alignment: .leading) {
                         WebImage(asset,
+                                 saveLocation: defaultImageLocation,
                                  bounds: CGSize(width: 128.0, height: 128.0))
                         
                         Spacer()

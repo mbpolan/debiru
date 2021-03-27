@@ -17,7 +17,22 @@ struct DebiruApp: App {
                 .environmentObject(appState)
         }
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
+        
+        Settings {
+            SettingsView()
+        }
     }
+}
+
+extension UserDefaults {
+    func defaultImageLocation() -> URL {
+        self.url(forKey: StorageKeys.defaultImageLocation) ??
+            FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
+    }
+}
+
+struct StorageKeys {
+    static let defaultImageLocation = "defaultImageLocation"
 }
 
 extension Notification.Name {

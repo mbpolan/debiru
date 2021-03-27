@@ -14,10 +14,12 @@ struct WebImage: View {
     @StateObject private var viewModel: WebImageViewModel = WebImageViewModel()
     private let asset: Asset
     private let dataProvider: DataProvider = FourChanDataProvider()
+    private let saveLocation: URL
     private let bounds: CGSize?
     
-    init(_ asset: Asset, bounds: CGSize? = nil) {
+    init(_ asset: Asset, saveLocation: URL, bounds: CGSize? = nil) {
         self.asset = asset
+        self.saveLocation = saveLocation
         self.bounds = bounds
     }
     
@@ -58,6 +60,7 @@ struct WebImage: View {
 
                 Text(viewModel.popoverMessage ?? "Something went wrong!")
             }
+            .padding()
         }
         .onTapGesture(count: 2) {
             handleSaveImage()
@@ -76,10 +79,9 @@ struct WebImage: View {
         if let data = viewModel.imageData {
             do {
                 // default to the user's pictures directory
-                let url = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
-                try data.write(to: url.appendingPathComponent(asset.fullName))
+                try data.write(to: saveLocation.appendingPathComponent(asset.fullName))
                 
-                viewModel.popoverMessage = "Saved \(asset.fullName) to \(url.path)"
+                viewModel.popoverMessage = "Saved \(asset.fullName) to \(saveLocation.path)"
                 viewModel.popoverType = .success
                 
                 // dismiss the popover after a few seconds
