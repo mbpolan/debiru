@@ -34,7 +34,10 @@ struct ThreadListCellView_Previews: PreviewProvider {
         ThreadListCellView(Thread(
                             id: 123,
                             boardId: "/foo",
-                            poster: "Anonymous",
+                            author: User(
+                                name: "Anonymous",
+                                tripCode: nil,
+                                isSecure: false),
                             date: Date(),
                             subject: nil,
                             content: nil,

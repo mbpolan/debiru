@@ -67,6 +67,11 @@ struct ThreadView: View {
             }
             
             ToolbarItemGroup {
+                Button(action: handleRefresh) {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .help("Refresh the thread")
+                
                 SearchBarView(
                     expanded: $viewModel.searchExpanded,
                     search: $viewModel.search)
@@ -168,6 +173,10 @@ struct ThreadView: View {
         }
     }
     
+    private func handleRefresh() {
+        
+    }
+    
     private func getNavigationTitle() -> String {
         if let thread = getThread(appState.currentItem) {
             return "/\(thread.boardId)/ - \(thread.id)"
@@ -246,7 +255,10 @@ struct ThreadView_Previews: PreviewProvider {
     private static let thread = Thread(
         id: 123,
         boardId: "/foo",
-        poster: "",
+        author: User(
+            name: "Anonymous",
+            tripCode: nil,
+            isSecure: false),
         date: Date(),
         subject: "foo",
         content: nil,

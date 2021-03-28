@@ -40,7 +40,7 @@ struct PostView: View {
                 
                 Text("#\(String(content.id)) ").bold() +
                     Text("Posted by ") +
-                    Text(content.author).bold() +
+                    makeAuthorText(content.author) +
                     Text(" on \(PostView.formatter.string(from: content.date))")
             }
             
@@ -61,13 +61,23 @@ struct PostView: View {
         
         return dateFormatter
     }
+    
+    private func makeAuthorText(_ user: User) -> Text {
+        if let name = user.name {
+            return Text(name).bold()
+        } else if let trip = user.tripCode {
+            return Text(trip).bold()
+        } else {
+            return Text("")
+        }
+    }
 }
 
 // MARK: - PostContent
 
 struct PostContent {
     let id: Int
-    let author: String
+    let author: User
     let date: Date
     let subject: String?
     let content: String?
@@ -84,7 +94,7 @@ extension Thread {
     func toPostContent() -> PostContent {
         return PostContent(
             id: self.id,
-            author: self.poster,
+            author: self.author,
             date: self.date,
             subject: self.subject,
             content: self.content,
@@ -121,7 +131,10 @@ struct PostView_Previews: PreviewProvider {
     static var previews: some View {
         PostView(PostContent(
                     id: 123,
-                    author: "Anonymous",
+                    author: User(
+                        name: "Anonymous",
+                        tripCode: nil,
+                        isSecure: false),
                     date: Date(),
                     subject: "Something",
                     content: "Ain't this cool?",

@@ -12,7 +12,7 @@ struct Post: Identifiable, Hashable {
     let boardId: String
     let threadId: Int
     let isRoot: Bool
-    let author: String
+    let author: User
     let date: Date
     let subject: String?
     let content: String?

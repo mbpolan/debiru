@@ -57,7 +57,10 @@ struct FourChanDataProvider: DataProvider {
                         return Thread(
                             id: thread.id,
                             boardId: board.id,
-                            poster: thread.poster,
+                            author: User(
+                                name: thread.author,
+                                tripCode: thread.trip,
+                                isSecure: thread.trip?.starts(with: "!!") ?? false),
                             date: Date(timeIntervalSince1970: TimeInterval(thread.time)),
                             subject: thread.subject,
                             content: thread.content,
@@ -124,7 +127,10 @@ struct FourChanDataProvider: DataProvider {
                         boardId: thread.boardId,
                         threadId: thread.id,
                         isRoot: post.replyTo == 0, // indicates original poster
-                        author: post.author,
+                        author: User(
+                            name: post.author,
+                            tripCode: post.trip,
+                            isSecure: post.trip?.starts(with: "!!") ?? false),
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
                         subject: post.subject,
                         content: post.content,
@@ -242,7 +248,8 @@ fileprivate struct ThreadModel: Codable {
     let id: Int
     let time: Int
     let subject: String?
-    let poster: String
+    let author: String?
+    let trip: String?
     let content: String?
     let sticky: Int?
     let closed: Int?
@@ -263,7 +270,8 @@ fileprivate struct ThreadModel: Codable {
         case id = "no"
         case time
         case subject = "sub"
-        case poster = "name"
+        case author = "name"
+        case trip
         case content = "com"
         case sticky
         case closed
@@ -291,7 +299,8 @@ fileprivate struct PostModel: Codable {
     let replyTo: Int
     let time: Int
     let subject: String?
-    let author: String
+    let author: String?
+    let trip: String?
     let content: String?
     let sticky: Int?
     let closed: Int?
@@ -316,6 +325,7 @@ fileprivate struct PostModel: Codable {
         case time
         case subject = "sub"
         case author = "name"
+        case trip
         case content = "com"
         case sticky
         case closed
