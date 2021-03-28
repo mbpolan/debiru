@@ -41,7 +41,7 @@ struct PostView: View {
                 Text("#\(String(content.id)) ").bold() +
                     Text("Posted by ") +
                     makeAuthorText(content.author) +
-                    Text(" on \(PostView.formatter.string(from: content.date))")
+                    Text(" on \(DateFormatter.standard().string(from: content.date))")
             }
             
             RichTextView(
@@ -51,15 +51,6 @@ struct PostView: View {
             
             Spacer()
         }
-    }
-    
-    private static var formatter: DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.current
-        dateFormatter.dateStyle = .long
-        dateFormatter.timeStyle = .medium
-        
-        return dateFormatter
     }
     
     private func makeAuthorText(_ user: User) -> Text {

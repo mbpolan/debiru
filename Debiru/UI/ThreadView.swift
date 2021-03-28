@@ -13,8 +13,15 @@ import SwiftUI
 struct ThreadView: View {
     // a default number formatter for human readable statistics
     private static let numberFormatter: NumberFormatter = {
-       let formatter = NumberFormatter()
+        let formatter = NumberFormatter()
         formatter.numberStyle = .none
+        return formatter
+    }()
+    
+    private static let intervalFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.second, .minute, .hour]
+        formatter.unitsStyle = .abbreviated
         return formatter
     }()
     
@@ -23,9 +30,11 @@ struct ThreadView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
+    private let timer: Publishers.Autoconnect<Timer.TimerPublisher>
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
+        self.timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     }
     
     var body: some View {
@@ -70,12 +79,16 @@ struct ThreadView: View {
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
+                .disabled(viewModel.pendingPosts != nil)
                 .help("Refresh the thread")
                 
                 SearchBarView(
                     expanded: $viewModel.searchExpanded,
                     search: $viewModel.search)
             }
+        }
+        .onReceive(timer) { value in
+            viewModel.lastChecked = value
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
@@ -137,6 +150,15 @@ struct ThreadView: View {
         return Text(text ?? "?")
     }
     
+    private func makeLastUpdateText() -> Text {
+        let diff = viewModel.lastChecked.timeIntervalSince(viewModel.lastUpdate)
+        let interval = diff <= 0
+            ? "Just a moment"
+            : ThreadView.intervalFormatter.string(from: diff) ?? "?"
+        
+        return Text("\(interval) ago")
+    }
+    
     private func makeFooter(_ statistics: ThreadViewModel.Statistics) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Group {
@@ -158,9 +180,14 @@ struct ThreadView: View {
             .help("Number of unique posters in this thread")
                 
             Spacer()
+            
+            Group {
+                Image(systemName: "clock.arrow.circlepath")
+                makeLastUpdateText()
+            }
+            .help("Time since thread was refreshed")
         }
-        .padding(.bottom, 5)
-        .padding(.leading, 5)
+        .padding([.bottom, .leading, .trailing], 5)
     }
     
     private func handleOpenImage(_ data: Data) {
@@ -171,10 +198,6 @@ struct ThreadView: View {
         if let board = getParentBoard(appState.currentItem) {
             NotificationCenter.default.post(name: .showBoard, object: board)
         }
-    }
-    
-    private func handleRefresh() {
-        
     }
     
     private func getNavigationTitle() -> String {
@@ -218,6 +241,7 @@ struct ThreadView: View {
             switch result {
             case .success(let posts):
                 self.viewModel.posts = posts
+                self.viewModel.lastUpdate = Date()
             case .failure(let error):
                 print(error)
             }
@@ -234,6 +258,8 @@ class ThreadViewModel: ObservableObject {
     @Published var pendingPosts: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
+    @Published var lastUpdate: Date = Date()
+    @Published var lastChecked: Date = Date()
     
     struct Statistics {
         let replies: Int?
