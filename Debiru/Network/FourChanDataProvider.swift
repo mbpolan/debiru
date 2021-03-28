@@ -103,6 +103,8 @@ struct FourChanDataProvider: DataProvider {
                     
                     return Post(
                         id: post.id,
+                        boardId: thread.boardId,
+                        threadId: thread.id,
                         author: post.author,
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
                         subject: post.subject,

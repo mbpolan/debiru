@@ -36,7 +36,10 @@ struct CatalogView: View {
                     }
                 }
                 
-                PostView(thread.toPostContent())
+                PostView(
+                    thread.toPostContent(),
+                    boardId: thread.boardId,
+                    threadId: thread.id)
                     .onTapGesture {
                         handleShowThread(thread)
                     }

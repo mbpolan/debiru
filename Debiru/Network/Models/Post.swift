@@ -9,6 +9,8 @@ import Foundation
 
 struct Post: Identifiable, Hashable {
     let id: Int
+    let boardId: String
+    let threadId: Int
     let author: String
     let date: Date
     let subject: String?

@@ -11,9 +11,13 @@ import SwiftUI
 
 struct PostView: View {
     private let content: PostContent
+    private let boardId: String
+    private let threadId: Int
     
-    init(_ content: PostContent) {
+    init(_ content: PostContent, boardId: String, threadId: Int) {
         self.content = content
+        self.boardId = boardId
+        self.threadId = threadId
     }
     
     var body: some View {
@@ -40,7 +44,10 @@ struct PostView: View {
                     Text(" on \(PostView.formatter.string(from: content.date))")
             }
             
-            RichTextView(html: content.content ?? "")
+            RichTextView(
+                content.content ?? "",
+                boardId: boardId,
+                threadId: threadId)
             
             Spacer()
         }
@@ -122,6 +129,8 @@ struct PostView_Previews: PreviewProvider {
                     sticky: false,
                     closed: false,
                     archived: false,
-                    archivedDate: nil))
+                    archivedDate: nil),
+                 boardId: "f",
+                 threadId: 321)
     }
 }

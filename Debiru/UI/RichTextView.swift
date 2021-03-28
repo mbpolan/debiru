@@ -11,12 +11,30 @@ import SwiftUI
 
 struct RichTextView: View {
     @State private var height: CGFloat?
-    let html: String
+    private let html: String
+    private let boardId: String
+    private let threadId: Int
+    
+    init(_ html: String, boardId: String, threadId: Int) {
+        let normalized = RichTextView.updateLinks(html, boardId: boardId, threadId: threadId)
+        
+        self.html = normalized
+        self.boardId = boardId
+        self.threadId = threadId
+    }
     
     var body: some View {
         GeometryReader { geo in
             TextViewWrapper(html, width: geo.size.width, onUpdate: handleUpdate)
         }.frame(height: height)
+    }
+    
+    private static func updateLinks(_ html: String, boardId: String, threadId: Int) -> String {
+        // expand relative post links with their full path including board and thread ids
+        return html.replacingOccurrences(
+            of: "\"(#p[0-9]+)\"",
+            with: "/\(boardId)/thread/\(String(threadId))/#$1",
+            options: .regularExpression)
     }
     
     private func handleUpdate(_ height: CGFloat) {
@@ -26,34 +44,58 @@ struct RichTextView: View {
     }
 }
 
-fileprivate struct TextViewWrapper: NSViewRepresentable {
-    private let styles = """
-<style>
-* {
-  color: white;
-}
-.quote {
-  color: green;
-}
-.quotelink {
-  color: blue;
-  cursor: pointer;
-}
-s {
-  color: black;
-  background-color: black;
-  text-decoration: none;
-}
-</style>
-"""
+fileprivate struct TextStyles {
+    private static let baseStyles = """
+        <style>
+        * {
+          color: white;
+        }
+        .quote {
+          color: green;
+        }
+        s {
+          color: black;
+          background-color: black;
+          text-decoration: none;
+        }
+        </style>
+    """
     
+    private let styles: String
+    
+    init() {
+        self.styles = TextStyles.baseStyles
+            .replacingOccurrences(of: "green", with: TextStyles.color(NSColor.systemGreen))
+    }
+    
+    func applyTo(_ html: String) -> String {
+        return "\(styles)\(html)"
+    }
+    
+    private static func color(_ nsColor: NSColor) -> String {
+        // convert an NSColor into a css hex string in the rgb colorspace
+        if let color = CIColor(color: nsColor) {
+            let r = Int(round(color.red * 0xFF))
+            let g = Int(round(color.green * 0xFF))
+            let b = Int(round(color.blue * 0xFF))
+            
+            return NSString(format: "#%02X%02X%02X", r, g, b) as String
+        }
+        
+        // default to inheritied color
+        return "inherit"
+    }
+}
+
+fileprivate struct TextViewWrapper: NSViewRepresentable {
+    private static let styles: TextStyles = TextStyles()
     private let onUpdate: (_: CGFloat) -> Void
     private let html: String
     private let width: CGFloat
     private var string: NSMutableAttributedString?
     
     init(_ html: String, width: CGFloat, onUpdate: @escaping(_: CGFloat) -> Void) {
-        self.html = "\(styles)\(html)"
+        self.html = TextViewWrapper.styles.applyTo(html)
         self.width = width
         self.onUpdate = onUpdate
     }
@@ -160,7 +202,7 @@ This is not a spoiler. <s>But this is</s>. And not this.
     
     static var previews: some View {
         HStack(alignment: .firstTextBaseline) {
-            RichTextView(html: html)
+            RichTextView(html, boardId: "f", threadId: 123)
         }
         .frame(width: 300)
     }

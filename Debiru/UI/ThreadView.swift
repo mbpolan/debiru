@@ -35,7 +35,10 @@ struct ThreadView: View {
                     }
                 }
                 
-                PostView(post.toPostContent())
+                PostView(
+                    post.toPostContent(),
+                    boardId: post.boardId,
+                    threadId: post.threadId)
                 
                 Spacer()
             }
