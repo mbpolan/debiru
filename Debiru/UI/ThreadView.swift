@@ -67,7 +67,7 @@ struct ThreadView: View {
             }
             
             ToolbarItemGroup {
-                Button(action: handleRefresh) {
+                Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
                 .help("Refresh the thread")
