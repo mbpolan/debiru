@@ -11,6 +11,13 @@ import SwiftUI
 // MARK: - View
 
 struct ThreadView: View {
+    // a default number formatter for human readable statistics
+    private static let numberFormatter: NumberFormatter = {
+       let formatter = NumberFormatter()
+        formatter.numberStyle = .none
+        return formatter
+    }()
+    
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
     
     @EnvironmentObject private var appState: AppState
@@ -22,26 +29,34 @@ struct ThreadView: View {
     }
     
     var body: some View {
-        List(posts, id: \.self) { post in
-            HStack {
-                if let asset = post.attachment {
-                    VStack(alignment: .leading) {
-                        WebImage(asset,
-                                 saveLocation: defaultImageLocation,
-                                 bounds: CGSize(width: 128.0, height: 128.0),
-                                 onOpen: handleOpenImage)
-                        
-                        Spacer()
+        let statistics = self.statistics
+        
+        VStack {
+            List(posts, id: \.self) { post in
+                HStack {
+                    if let asset = post.attachment {
+                        VStack(alignment: .leading) {
+                            WebImage(asset,
+                                     saveLocation: defaultImageLocation,
+                                     bounds: CGSize(width: 128.0, height: 128.0),
+                                     onOpen: handleOpenImage)
+                            
+                            Spacer()
+                        }
                     }
+                    
+                    PostView(
+                        post.toPostContent(),
+                        boardId: post.boardId,
+                        threadId: post.threadId)
+                    
+                    Spacer()
                 }
-                
-                PostView(
-                    post.toPostContent(),
-                    boardId: post.boardId,
-                    threadId: post.threadId)
-                
-                Spacer()
             }
+            
+            Divider()
+            
+            makeFooter(statistics)
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
@@ -65,6 +80,27 @@ struct ThreadView: View {
         }
     }
     
+    private var statistics: ThreadViewModel.Statistics {
+        // use the most up to date original post data
+        // otherwise, use the thread-level data we have on hand
+        if let root = viewModel.posts.first(where: { $0.isRoot }),
+           let stats = root.threadStatistics {
+            return ThreadViewModel.Statistics(
+                replies: stats.replies,
+                images: stats.images,
+                uniquePosters: stats.uniquePosters)
+            
+        } else if let thread = getThread(appState.currentItem) {
+            return ThreadViewModel.Statistics(
+                replies: thread.statistics.replies,
+                images: thread.statistics.images,
+                uniquePosters: thread.statistics.uniquePosters)
+        }
+        
+        // nothing to show!
+        return .empty
+    }
+    
     private var posts: [Post] {
         if viewModel.searchExpanded && !viewModel.search.isEmpty {
             let query = viewModel.search.trimmingCharacters(in: .whitespaces)
@@ -85,6 +121,41 @@ struct ThreadView: View {
         }
         
         return viewModel.posts
+    }
+    
+    private func makeNumberText(_ number: Int?) -> Text {
+        var text: String?
+        if let number = number {
+            text = ThreadView.numberFormatter.string(from: NSNumber(value: number))
+        }
+        
+        return Text(text ?? "?")
+    }
+    
+    private func makeFooter(_ statistics: ThreadViewModel.Statistics) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Group {
+                Image(systemName: "message.fill")
+                makeNumberText(statistics.replies)
+            }
+            .help("Number of replies to original post")
+            
+            Group {
+                Image(systemName: "photo.fill")
+                makeNumberText(statistics.images)
+            }
+            .help("Number of replies containing images")
+            
+            Group {
+                Image(systemName: "person.2.fill")
+                makeNumberText(statistics.uniquePosters)
+            }
+            .help("Number of unique posters in this thread")
+                
+            Spacer()
+        }
+        .padding(.bottom, 5)
+        .padding(.leading, 5)
     }
     
     private func handleOpenImage(_ data: Data) {
@@ -154,6 +225,19 @@ class ThreadViewModel: ObservableObject {
     @Published var pendingPosts: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
+    
+    struct Statistics {
+        let replies: Int?
+        let images: Int?
+        let uniquePosters: Int?
+        
+        static var empty: Statistics {
+            return Statistics(
+                replies: nil,
+                images: nil,
+                uniquePosters: nil)
+        }
+    }
 }
 
 // MARK: - Preview
@@ -168,7 +252,13 @@ struct ThreadView_Previews: PreviewProvider {
         content: nil,
         sticky: false,
         closed: false,
-        attachment: nil)
+        attachment: nil,
+        statistics: ThreadStatistics(
+            replies: 1,
+            images: 1,
+            uniquePosters: 1,
+            bumpLimit: false,
+            imageLimit: false))
     
     static var previews: some View {
         ThreadView()

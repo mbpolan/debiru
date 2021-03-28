@@ -63,7 +63,13 @@ struct FourChanDataProvider: DataProvider {
                             content: thread.content,
                             sticky: thread.sticky == 1,
                             closed: thread.closed == 1,
-                            attachment: asset)
+                            attachment: asset,
+                            statistics: ThreadStatistics(
+                                replies: thread.replies,
+                                images: thread.images,
+                                uniquePosters: thread.uniqueUsers,
+                                bumpLimit: thread.bumpLimit == 1,
+                                imageLimit: thread.imageLimit == 1))
                     }
                 }.reduce([], +)
             },
@@ -96,6 +102,18 @@ struct FourChanDataProvider: DataProvider {
                             extension: ext)
                     }
                     
+                    var threadStatistics: ThreadStatistics?
+                    if let replies = post.replies,
+                       let images = post.images,
+                       let uniquePosters = post.uniqueUsers {
+                        threadStatistics = ThreadStatistics(
+                            replies: replies,
+                            images: images,
+                            uniquePosters: uniquePosters,
+                            bumpLimit: post.bumpLimit == 1,
+                            imageLimit: post.imageLimit == 1)
+                    }
+                    
                     var archivedDate: Date? = nil
                     if let archiveTime = post.archiveTime {
                         archivedDate = Date(timeIntervalSince1970: TimeInterval(archiveTime))
@@ -105,6 +123,7 @@ struct FourChanDataProvider: DataProvider {
                         id: post.id,
                         boardId: thread.boardId,
                         threadId: thread.id,
+                        isRoot: post.replyTo == 0, // indicates original poster
                         author: post.author,
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
                         subject: post.subject,
@@ -112,6 +131,7 @@ struct FourChanDataProvider: DataProvider {
                         sticky: post.sticky == 1,
                         closed: post.closed == 1,
                         attachment: asset,
+                        threadStatistics: threadStatistics,
                         archived: post.archived == 1,
                         archivedDate: archivedDate)
                 }
@@ -233,6 +253,11 @@ fileprivate struct ThreadModel: Codable {
     let thumbnailHeight: Int?
     let filename: String?
     let `extension`: String?
+    let replies: Int
+    let images: Int
+    let uniqueUsers: Int?
+    let bumpLimit: Int?
+    let imageLimit: Int?
     
     private enum CodingKeys: String, CodingKey {
         case id = "no"
@@ -249,6 +274,11 @@ fileprivate struct ThreadModel: Codable {
         case thumbnailHeight = "tn_h"
         case filename
         case `extension` = "ext"
+        case replies
+        case images
+        case uniqueUsers = "unique_ips"
+        case bumpLimit
+        case imageLimit
     }
 }
 
@@ -258,6 +288,7 @@ fileprivate struct ThreadPostsModel: Codable {
 
 fileprivate struct PostModel: Codable {
     let id: Int
+    let replyTo: Int
     let time: Int
     let subject: String?
     let author: String
@@ -271,11 +302,17 @@ fileprivate struct PostModel: Codable {
     let thumbnailHeight: Int?
     let filename: String?
     let `extension`: String?
+    let replies: Int?
+    let images: Int?
+    let uniqueUsers: Int?
+    let bumpLimit: Int?
+    let imageLimit: Int?
     let archived: Int?
     let archiveTime: Int?
     
     private enum CodingKeys: String, CodingKey {
         case id = "no"
+        case replyTo = "resto"
         case time
         case subject = "sub"
         case author = "name"
@@ -289,6 +326,11 @@ fileprivate struct PostModel: Codable {
         case thumbnailHeight = "tn_h"
         case filename
         case `extension` = "ext"
+        case replies
+        case images
+        case uniqueUsers = "unique_ips"
+        case bumpLimit
+        case imageLimit
         case archived
         case archiveTime = "archived_on"
     }

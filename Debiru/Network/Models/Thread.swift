@@ -17,4 +17,13 @@ struct Thread: Identifiable, Hashable {
     let sticky: Bool
     let closed: Bool
     let attachment: Asset?
+    let statistics: ThreadStatistics
+}
+
+struct ThreadStatistics: Equatable, Hashable {
+    let replies: Int
+    let images: Int
+    let uniquePosters: Int?
+    let bumpLimit: Bool
+    let imageLimit: Bool
 }

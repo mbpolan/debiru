@@ -11,6 +11,7 @@ struct Post: Identifiable, Hashable {
     let id: Int
     let boardId: String
     let threadId: Int
+    let isRoot: Bool
     let author: String
     let date: Date
     let subject: String?
@@ -18,6 +19,7 @@ struct Post: Identifiable, Hashable {
     let sticky: Bool
     let closed: Bool
     let attachment: Asset?
+    let threadStatistics: ThreadStatistics?
     let archived: Bool
     let archivedDate: Date?
 }

@@ -40,6 +40,12 @@ struct ThreadListCellView_Previews: PreviewProvider {
                             content: nil,
                             sticky: false,
                             closed: false,
-                            attachment: nil))
+                            attachment: nil,
+                            statistics: ThreadStatistics(
+                                replies: 1,
+                                images: 1,
+                                uniquePosters: 1,
+                                bumpLimit: false,
+                                imageLimit: false)))
     }
 }
