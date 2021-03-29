@@ -65,9 +65,17 @@ struct CatalogView: View {
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
-            SearchBarView(
-                expanded: $viewModel.searchExpanded,
-                search: $viewModel.search)
+            ToolbarItemGroup {
+                Button(action: reloadFromState) {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .disabled(viewModel.pendingThreads != nil)
+                .help("Refresh the catalog")
+                
+                SearchBarView(
+                    expanded: $viewModel.searchExpanded,
+                    search: $viewModel.search)
+            }
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
