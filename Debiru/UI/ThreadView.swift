@@ -99,13 +99,17 @@ struct ThreadView: View {
             return ThreadViewModel.Statistics(
                 replies: stats.replies,
                 images: stats.images,
-                uniquePosters: stats.uniquePosters)
+                uniquePosters: stats.uniquePosters,
+                bumpLimit: stats.bumpLimit,
+                imageLimit: stats.imageLimit)
             
         } else if let thread = getThread(appState.currentItem) {
             return ThreadViewModel.Statistics(
                 replies: thread.statistics.replies,
                 images: thread.statistics.images,
-                uniquePosters: thread.statistics.uniquePosters)
+                uniquePosters: thread.statistics.uniquePosters,
+                bumpLimit: thread.statistics.bumpLimit,
+                imageLimit: thread.statistics.imageLimit)
         }
         
         // nothing to show!
@@ -149,6 +153,8 @@ struct ThreadView: View {
                 replies: statistics.replies,
                 images: statistics.images,
                 uniquePosters: statistics.uniquePosters,
+                bumpLimit: statistics.bumpLimit,
+                imageLimit: statistics.imageLimit,
                 metrics: .all)
             
             Spacer()
@@ -237,12 +243,16 @@ class ThreadViewModel: ObservableObject {
         let replies: Int?
         let images: Int?
         let uniquePosters: Int?
+        let bumpLimit: Bool
+        let imageLimit: Bool
         
         static var empty: Statistics {
             return Statistics(
                 replies: nil,
                 images: nil,
-                uniquePosters: nil)
+                uniquePosters: nil,
+                bumpLimit: false,
+                imageLimit: false)
         }
     }
 }

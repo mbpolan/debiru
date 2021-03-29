@@ -41,6 +41,8 @@ struct CatalogView: View {
                         replies: thread.statistics.replies,
                         images: thread.statistics.images,
                         uniquePosters: thread.statistics.uniquePosters,
+                        bumpLimit: thread.statistics.bumpLimit,
+                        imageLimit: thread.statistics.imageLimit,
                         metrics: [.replies, .images])
                         .padding(.leading, 5)
                 }

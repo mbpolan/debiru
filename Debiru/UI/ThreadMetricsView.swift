@@ -30,14 +30,18 @@ struct ThreadMetricsView: View {
     let replies: Int?
     let images: Int?
     let uniquePosters: Int?
+    let bumpLimit: Bool
+    let imageLimit: Bool
     var metrics: Metric
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             makeMetricView(.replies, icon: "message.fill", value: replies)
+                .foregroundColor(Color(bumpLimit ? NSColor.systemRed : NSColor.textColor))
                 .help("Number of replies to original post")
             
             makeMetricView(.images, icon: "photo.fill", value: images)
+                .foregroundColor(Color(imageLimit ? NSColor.systemRed : NSColor.textColor))
                 .help("Number of replies containing images")
             
             makeMetricView(.uniquePosters, icon: "person.2.fill", value: uniquePosters)
@@ -50,7 +54,8 @@ struct ThreadMetricsView: View {
             return Group {
                 Image(systemName: icon)
                 makeNumberText(value)
-            }.toErasedView()
+            }
+            .toErasedView()
         } else {
             return EmptyView().toErasedView()
         }
@@ -73,6 +78,8 @@ struct ThreadMetricsView_Previews: PreviewProvider {
         ThreadMetricsView(replies: 1,
                           images: 2,
                           uniquePosters: 1,
+                          bumpLimit: true,
+                          imageLimit: false,
                           metrics: .all)
     }
 }
