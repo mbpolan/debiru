@@ -145,7 +145,10 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         DispatchQueue.main.async {
             guard let string = NSMutableAttributedString(
                     html: Data(html.utf8),
-                    options: [.documentType: NSAttributedString.DocumentType.html],
+                    options: [
+                        .documentType: NSAttributedString.DocumentType.html,
+                        .characterEncoding: String.Encoding.utf8.rawValue
+                    ],
                     documentAttributes: nil) else {
                 
                 handler(.failure(NSError()))
