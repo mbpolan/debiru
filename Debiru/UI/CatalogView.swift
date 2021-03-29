@@ -23,35 +23,45 @@ struct CatalogView: View {
     }
     
     var body: some View {
-        List(threads, id: \.self) { thread in
-            HStack {
-                if let asset = thread.attachment {
-                    VStack(alignment: .leading) {
-                        WebImage(asset,
-                                 saveLocation: defaultImageLocation,
-                                 bounds: CGSize(width: 128.0, height: 128.0),
-                                 onOpen: handleOpenImage)
-                        
-                        Spacer()
+        VStack {
+            List(threads, id: \.self) { thread in
+                HStack {
+                    if let asset = thread.attachment {
+                        VStack(alignment: .leading) {
+                            WebImage(asset,
+                                     saveLocation: defaultImageLocation,
+                                     bounds: CGSize(width: 128.0, height: 128.0),
+                                     onOpen: handleOpenImage)
+                            
+                            Spacer()
+                        }
                     }
+                    
+                    PostView(thread.toPostContent(), boardId: thread.boardId, threadId: thread.id) {
+                        ThreadMetricsView(
+                            replies: thread.statistics.replies,
+                            images: thread.statistics.images,
+                            uniquePosters: thread.statistics.uniquePosters,
+                            bumpLimit: thread.statistics.bumpLimit,
+                            imageLimit: thread.statistics.imageLimit,
+                            metrics: [.replies, .images])
+                            .padding(.leading, 5)
+                    }
+                    .onTapGesture {
+                        handleShowThread(thread)
+                    }
+                    
+                    Spacer()
                 }
-                
-                PostView(thread.toPostContent(), boardId: thread.boardId, threadId: thread.id) {
-                    ThreadMetricsView(
-                        replies: thread.statistics.replies,
-                        images: thread.statistics.images,
-                        uniquePosters: thread.statistics.uniquePosters,
-                        bumpLimit: thread.statistics.bumpLimit,
-                        imageLimit: thread.statistics.imageLimit,
-                        metrics: [.replies, .images])
-                        .padding(.leading, 5)
-                }
-                .onTapGesture {
-                    handleShowThread(thread)
-                }
-                
-                Spacer()
             }
+            
+            Divider()
+            
+            HStack(alignment: .firstTextBaseline) {
+                Spacer()
+                RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
+            }
+            .padding([.bottom, .leading, .trailing], 5)
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
@@ -129,6 +139,7 @@ struct CatalogView: View {
             switch result {
             case .success(let threads):
                 self.viewModel.threads = threads
+                self.viewModel.lastUpdate = Date()
             case .failure(let error):
                 print(error)
             }
@@ -145,6 +156,7 @@ class CatalogViewModel: ObservableObject {
     @Published var pendingThreads: AnyCancellable?
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
+    @Published var lastUpdate: Date = Date()
 }
 
 // MARK: - Preview

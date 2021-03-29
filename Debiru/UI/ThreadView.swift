@@ -11,23 +11,14 @@ import SwiftUI
 // MARK: - View
 
 struct ThreadView: View {
-    private static let intervalFormatter: DateComponentsFormatter = {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.second, .minute, .hour]
-        formatter.unitsStyle = .abbreviated
-        return formatter
-    }()
-    
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
     
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
-    private let timer: Publishers.Autoconnect<Timer.TimerPublisher>
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
-        self.timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     }
     
     var body: some View {
@@ -79,9 +70,6 @@ struct ThreadView: View {
                     expanded: $viewModel.searchExpanded,
                     search: $viewModel.search)
             }
-        }
-        .onReceive(timer) { value in
-            viewModel.lastChecked = value
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
@@ -138,15 +126,6 @@ struct ThreadView: View {
         return viewModel.posts
     }
     
-    private func makeLastUpdateText() -> Text {
-        let diff = viewModel.lastChecked.timeIntervalSince(viewModel.lastUpdate)
-        let interval = diff <= 0
-            ? "Just a moment"
-            : ThreadView.intervalFormatter.string(from: diff) ?? "?"
-        
-        return Text("\(interval) ago")
-    }
-    
     private func makeFooter(_ statistics: ThreadViewModel.Statistics) -> some View {
         HStack(alignment: .firstTextBaseline) {
             ThreadMetricsView(
@@ -159,11 +138,7 @@ struct ThreadView: View {
             
             Spacer()
             
-            Group {
-                Image(systemName: "clock.arrow.circlepath")
-                makeLastUpdateText()
-            }
-            .help("Time since thread was refreshed")
+            RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
         }
         .padding([.bottom, .leading, .trailing], 5)
     }
@@ -237,7 +212,6 @@ class ThreadViewModel: ObservableObject {
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
-    @Published var lastChecked: Date = Date()
     
     struct Statistics {
         let replies: Int?
