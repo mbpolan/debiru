@@ -9,15 +9,19 @@ import SwiftUI
 
 // MARK: - View
 
-struct PostView: View {
+struct PostView<T>: View where T: View {
     private let content: PostContent
     private let boardId: String
     private let threadId: Int
+    private let headerContent: (() -> T)?
     
-    init(_ content: PostContent, boardId: String, threadId: Int) {
+    init(_ content: PostContent, boardId: String, threadId: Int,
+         headerContent: (() -> T)? = nil) {
+        
         self.content = content
         self.boardId = boardId
         self.threadId = threadId
+        self.headerContent = headerContent
     }
     
     var body: some View {
@@ -42,6 +46,10 @@ struct PostView: View {
                     Text("Posted by ") +
                     makeAuthorText(content.author) +
                     Text(" on \(DateFormatter.standard().string(from: content.date))")
+                
+                if let headerContent = self.headerContent {
+                    headerContent()
+                }
             }
             
             RichTextView(
@@ -77,6 +85,17 @@ struct PostContent {
     let closed: Bool
     let archived: Bool
     let archivedDate: Date?
+}
+
+// MARK: - Extensions
+extension PostView where T == EmptyView {
+    init(_ content: PostContent, boardId: String, threadId: Int) {
+        self.init(
+            content,
+            boardId: boardId,
+            threadId: threadId,
+            headerContent: nil)
+    }
 }
 
 // MARK: - Thread Extensions

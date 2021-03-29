@@ -11,13 +11,6 @@ import SwiftUI
 // MARK: - View
 
 struct ThreadView: View {
-    // a default number formatter for human readable statistics
-    private static let numberFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .none
-        return formatter
-    }()
-    
     private static let intervalFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second, .minute, .hour]
@@ -141,15 +134,6 @@ struct ThreadView: View {
         return viewModel.posts
     }
     
-    private func makeNumberText(_ number: Int?) -> Text {
-        var text: String?
-        if let number = number {
-            text = ThreadView.numberFormatter.string(from: NSNumber(value: number))
-        }
-        
-        return Text(text ?? "?")
-    }
-    
     private func makeLastUpdateText() -> Text {
         let diff = viewModel.lastChecked.timeIntervalSince(viewModel.lastUpdate)
         let interval = diff <= 0
@@ -161,24 +145,12 @@ struct ThreadView: View {
     
     private func makeFooter(_ statistics: ThreadViewModel.Statistics) -> some View {
         HStack(alignment: .firstTextBaseline) {
-            Group {
-                Image(systemName: "message.fill")
-                makeNumberText(statistics.replies)
-            }
-            .help("Number of replies to original post")
+            ThreadMetricsView(
+                replies: statistics.replies,
+                images: statistics.images,
+                uniquePosters: statistics.uniquePosters,
+                metrics: .all)
             
-            Group {
-                Image(systemName: "photo.fill")
-                makeNumberText(statistics.images)
-            }
-            .help("Number of replies containing images")
-            
-            Group {
-                Image(systemName: "person.2.fill")
-                makeNumberText(statistics.uniquePosters)
-            }
-            .help("Number of unique posters in this thread")
-                
             Spacer()
             
             Group {

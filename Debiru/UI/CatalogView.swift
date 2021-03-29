@@ -36,13 +36,17 @@ struct CatalogView: View {
                     }
                 }
                 
-                PostView(
-                    thread.toPostContent(),
-                    boardId: thread.boardId,
-                    threadId: thread.id)
-                    .onTapGesture {
-                        handleShowThread(thread)
-                    }
+                PostView(thread.toPostContent(), boardId: thread.boardId, threadId: thread.id) {
+                    ThreadMetricsView(
+                        replies: thread.statistics.replies,
+                        images: thread.statistics.images,
+                        uniquePosters: thread.statistics.uniquePosters,
+                        metrics: [.replies, .images])
+                        .padding(.leading, 5)
+                }
+                .onTapGesture {
+                    handleShowThread(thread)
+                }
                 
                 Spacer()
             }
