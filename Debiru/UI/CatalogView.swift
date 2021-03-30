@@ -37,7 +37,12 @@ struct CatalogView: View {
                         }
                     }
                     
-                    PostView(thread.toPostContent(), boardId: thread.boardId, threadId: thread.id) {
+                    PostView(
+                        thread.toPostContent(),
+                        boardId: thread.boardId,
+                        threadId: thread.id,
+                        onLink: handleLink) {
+                        
                         ThreadMetricsView(
                             replies: thread.statistics.replies,
                             images: thread.statistics.images,
@@ -121,6 +126,10 @@ struct CatalogView: View {
     
     private func handleShowThread(_ thread: Thread) {
         NotificationCenter.default.post(name: .showThread, object: thread)
+    }
+    
+    private func handleLink(_ link: Link) {
+        // TODO
     }
     
     private func getBoard(_ item: ViewableItem?) -> Board? {

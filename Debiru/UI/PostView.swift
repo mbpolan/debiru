@@ -13,14 +13,19 @@ struct PostView<T>: View where T: View {
     private let content: PostContent
     private let boardId: String
     private let threadId: Int
+    private let onLink: (_: Link) -> Void
     private let headerContent: (() -> T)?
     
-    init(_ content: PostContent, boardId: String, threadId: Int,
+    init(_ content: PostContent,
+         boardId: String,
+         threadId: Int,
+         onLink: @escaping(_: Link) -> Void,
          headerContent: (() -> T)? = nil) {
         
         self.content = content
         self.boardId = boardId
         self.threadId = threadId
+        self.onLink = onLink
         self.headerContent = headerContent
     }
     
@@ -55,7 +60,8 @@ struct PostView<T>: View where T: View {
             RichTextView(
                 content.content ?? "",
                 boardId: boardId,
-                threadId: threadId)
+                threadId: threadId,
+                onLink: handleLink)
             
             Spacer()
         }
@@ -69,6 +75,52 @@ struct PostView<T>: View where T: View {
         } else {
             return Text("")
         }
+    }
+    
+    private func handleLink(_ url: URL) -> Void {
+        var link: Link? = nil
+        
+        switch url.scheme {
+        // links to a board or post
+        case "applewebdata":
+            link = handleInternalLink(url)
+            
+        default:
+            print("Unknown URL scheme: \(url.scheme ?? "nil")")
+        }
+        
+        if let link = link {
+            onLink(link)
+        }
+    }
+    
+    private func handleInternalLink(_ url: URL) -> Link? {
+        let parts = url.path
+            .components(separatedBy: "/")
+            .filter { !$0.isEmpty }
+        
+        // if there are four segments, this indicates a link to post
+        // otherwise, a single segment is a link to a board
+        if parts.count == 4,
+           let boardId = parts.first,
+           let threadId = Int(parts[2]),
+           let postId = Int(parts.last ?? "") {
+            
+            return PostLink(
+                url: url,
+                boardId: boardId,
+                threadId: threadId,
+                postId: postId)
+        } else if parts.count == 1,
+                  let boardId = parts.first {
+            
+            return BoardLink(
+                url: url,
+                boardId: boardId)
+        }
+        
+        print("Unknown link: \(url.path)")
+        return nil
     }
 }
 
@@ -89,11 +141,16 @@ struct PostContent {
 
 // MARK: - Extensions
 extension PostView where T == EmptyView {
-    init(_ content: PostContent, boardId: String, threadId: Int) {
+    init(_ content: PostContent,
+         boardId: String,
+         threadId: Int,
+         onLink: @escaping(_: Link) -> Void) {
+        
         self.init(
             content,
             boardId: boardId,
             threadId: threadId,
+            onLink: onLink,
             headerContent: nil)
     }
 }
@@ -154,6 +211,7 @@ struct PostView_Previews: PreviewProvider {
                     archived: false,
                     archivedDate: nil),
                  boardId: "f",
-                 threadId: 321)
+                 threadId: 321,
+                 onLink: { _ in })
     }
 }

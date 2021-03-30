@@ -14,26 +14,32 @@ struct RichTextView: View {
     private let html: String
     private let boardId: String
     private let threadId: Int
+    private let onLink: (_: URL) -> Void
     
-    init(_ html: String, boardId: String, threadId: Int) {
+    init(_ html: String, boardId: String, threadId: Int, onLink: @escaping(_: URL) -> Void) {
         let normalized = RichTextView.updateLinks(html, boardId: boardId, threadId: threadId)
         
         self.html = normalized
         self.boardId = boardId
         self.threadId = threadId
+        self.onLink = onLink
     }
     
     var body: some View {
         GeometryReader { geo in
-            TextViewWrapper(html, width: geo.size.width, onUpdate: handleUpdate)
+            TextViewWrapper(
+                html,
+                width: geo.size.width,
+                onLink: onLink,
+                onUpdate: handleUpdate)
         }.frame(height: height)
     }
     
     private static func updateLinks(_ html: String, boardId: String, threadId: Int) -> String {
         // expand relative post links with their full path including board and thread ids
         return html.replacingOccurrences(
-            of: "\"(#p[0-9]+)\"",
-            with: "/\(boardId)/thread/\(String(threadId))/#$1",
+            of: "\"#p([0-9]+)\"",
+            with: "/\(boardId)/thread/\(String(threadId))/$1",
             options: .regularExpression)
     }
     
@@ -43,6 +49,8 @@ struct RichTextView: View {
         }
     }
 }
+
+// MARK: - Styles
 
 fileprivate struct TextStyles {
     private static let baseStyles = """
@@ -89,19 +97,25 @@ fileprivate struct TextStyles {
 
 fileprivate struct TextViewWrapper: NSViewRepresentable {
     private static let styles: TextStyles = TextStyles()
+    private let onLink: (_: URL) -> Void
     private let onUpdate: (_: CGFloat) -> Void
     private let html: String
     private let width: CGFloat
     private var string: NSMutableAttributedString?
     
-    init(_ html: String, width: CGFloat, onUpdate: @escaping(_: CGFloat) -> Void) {
+    init(_ html: String,
+         width: CGFloat,
+         onLink: @escaping(_: URL) -> Void,
+         onUpdate: @escaping(_: CGFloat) -> Void) {
+        
         self.html = TextViewWrapper.styles.applyTo(html)
         self.width = width
+        self.onLink = onLink
         self.onUpdate = onUpdate
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(onLink: onLink)
     }
     
     func makeNSView(context: Context) -> NSTextView {
@@ -168,8 +182,18 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
 extension TextViewWrapper {
     final class Coordinator: NSObject, NSTextViewDelegate {
         var string: NSMutableAttributedString?
+        let onLink: (_: URL) -> Void
+        
+        init(onLink: @escaping(_: URL) -> Void) {
+            self.onLink = onLink
+        }
         
         func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+            if let nsURL = link as? NSURL,
+               let url = nsURL.absoluteURL {
+                onLink(url)
+            }
+            
             return true
         }
     }
@@ -205,7 +229,11 @@ This is not a spoiler. <s>But this is</s>. And not this.
     
     static var previews: some View {
         HStack(alignment: .firstTextBaseline) {
-            RichTextView(html, boardId: "f", threadId: 123)
+            RichTextView(
+                html,
+                boardId: "f",
+                threadId: 123,
+                onLink: { _ in })
         }
         .frame(width: 300)
     }

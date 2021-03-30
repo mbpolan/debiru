@@ -24,32 +24,38 @@ struct ThreadView: View {
     var body: some View {
         let statistics = self.statistics
         
-        VStack {
-            List(posts, id: \.self) { post in
-                HStack {
-                    if let asset = post.attachment {
-                        VStack(alignment: .leading) {
-                            WebImage(asset,
-                                     saveLocation: defaultImageLocation,
-                                     bounds: CGSize(width: 128.0, height: 128.0),
-                                     onOpen: handleOpenImage)
-                            
-                            Spacer()
+        ScrollViewReader { scroll in
+            VStack {
+                List(posts, id: \.self) { post in
+                    HStack {
+                        if let asset = post.attachment {
+                            VStack(alignment: .leading) {
+                                WebImage(asset,
+                                         saveLocation: defaultImageLocation,
+                                         bounds: CGSize(width: 128.0, height: 128.0),
+                                         onOpen: handleOpenImage)
+                                
+                                Spacer()
+                            }
                         }
+                        
+                        PostView(
+                            post.toPostContent(),
+                            boardId: post.boardId,
+                            threadId: post.threadId,
+                            onLink: { link in
+                                handleLink(link, scrollProxy: scroll)
+                            })
+                        
+                        Spacer()
                     }
-                    
-                    PostView(
-                        post.toPostContent(),
-                        boardId: post.boardId,
-                        threadId: post.threadId)
-                    
-                    Spacer()
+                    .id(post)
                 }
+                
+                Divider()
+                
+                makeFooter(statistics)
             }
-            
-            Divider()
-            
-            makeFooter(statistics)
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
@@ -150,6 +156,16 @@ struct ThreadView: View {
     private func handleBackToCatalog() {
         if let board = getParentBoard(appState.currentItem) {
             NotificationCenter.default.post(name: .showBoard, object: board)
+        }
+    }
+    
+    private func handleLink(_ link: Link, scrollProxy: ScrollViewProxy) {
+        // if this link refers to a post in this thread, we can scroll to it right away
+        if let thread = getThread(appState.currentItem),
+           let postLink = link as? PostLink,
+           postLink.threadId == thread.id {
+            
+            scrollProxy.scrollTo(postLink.postId)
         }
     }
     
