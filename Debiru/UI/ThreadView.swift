@@ -163,9 +163,13 @@ struct ThreadView: View {
         // if this link refers to a post in this thread, we can scroll to it right away
         if let thread = getThread(appState.currentItem),
            let postLink = link as? PostLink,
-           postLink.threadId == thread.id {
+           postLink.threadId == thread.id,
+           let targetPost = posts.first(where: { $0.id == postLink.postId }) {
             
-            scrollProxy.scrollTo(postLink.postId)
+            // this must be the same post object we used in the list
+            withAnimation {
+                scrollProxy.scrollTo(targetPost)
+            }
         }
     }
     
