@@ -43,6 +43,7 @@ struct ThreadView: View {
                             post.toPostContent(),
                             boardId: post.boardId,
                             threadId: post.threadId,
+                            onActivate: { },
                             onLink: { link in
                                 handleLink(link, scrollProxy: scroll)
                             })

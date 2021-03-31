@@ -13,18 +13,21 @@ struct PostView<T>: View where T: View {
     private let content: PostContent
     private let boardId: String
     private let threadId: Int
+    private let onActivate: () -> Void
     private let onLink: (_: Link) -> Void
     private let headerContent: (() -> T)?
     
     init(_ content: PostContent,
          boardId: String,
          threadId: Int,
+         onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void,
          headerContent: (() -> T)? = nil) {
         
         self.content = content
         self.boardId = boardId
         self.threadId = threadId
+        self.onActivate = onActivate
         self.onLink = onLink
         self.headerContent = headerContent
     }
@@ -33,6 +36,7 @@ struct PostView<T>: View where T: View {
         VStack(alignment: .leading) {
             Text(content.subject ?? "")
                 .font(.title)
+                .onTapGesture(perform: onActivate)
             
             HStack(alignment: .firstTextBaseline, spacing: 3.0) {
                 if content.sticky {
@@ -47,10 +51,16 @@ struct PostView<T>: View where T: View {
                         .help("This thread is locked")
                 }
                 
-                Text("#\(String(content.id)) ").bold() +
+                Group {
+                    Text("#\(String(content.id)) ")
+                        .bold()
+                        .hoverEffect()
+                        .onTapGesture(perform: onActivate)
+                    
                     Text("Posted by ") +
-                    makeAuthorText(content.author) +
-                    Text(" on \(DateFormatter.standard().string(from: content.date))")
+                        makeAuthorText(content.author) +
+                        Text(" on \(DateFormatter.standard().string(from: content.date))")
+                }
                 
                 if let headerContent = self.headerContent {
                     headerContent()
@@ -144,12 +154,14 @@ extension PostView where T == EmptyView {
     init(_ content: PostContent,
          boardId: String,
          threadId: Int,
+         onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void) {
         
         self.init(
             content,
             boardId: boardId,
             threadId: threadId,
+            onActivate: onActivate,
             onLink: onLink,
             headerContent: nil)
     }
@@ -212,6 +224,7 @@ struct PostView_Previews: PreviewProvider {
                     archivedDate: nil),
                  boardId: "f",
                  threadId: 321,
+                 onActivate: { },
                  onLink: { _ in })
     }
 }

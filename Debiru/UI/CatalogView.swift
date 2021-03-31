@@ -41,6 +41,7 @@ struct CatalogView: View {
                         thread.toPostContent(),
                         boardId: thread.boardId,
                         threadId: thread.id,
+                        onActivate: { handleShowThread(thread) },
                         onLink: handleLink) {
                         
                         ThreadMetricsView(
@@ -51,9 +52,6 @@ struct CatalogView: View {
                             imageLimit: thread.statistics.imageLimit,
                             metrics: [.replies, .images])
                             .padding(.leading, 5)
-                    }
-                    .onTapGesture {
-                        handleShowThread(thread)
                     }
                     
                     Spacer()

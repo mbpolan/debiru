@@ -42,6 +42,7 @@
 		27C0560F2611535F0037A91B /* ThreadMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0560E2611535F0037A91B /* ThreadMetricsView.swift */; };
 		27C0561226128DCB0037A91B /* RefreshTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0561126128DCB0037A91B /* RefreshTimerView.swift */; };
 		27C056152612998D0037A91B /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056142612998D0037A91B /* Link.swift */; };
+		27C056192612C1900037A91B /* HoverText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056182612C1900037A91B /* HoverText.swift */; };
 		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
 		27C568362602D83A00983ECD /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568352602D83A00983ECD /* WebImage.swift */; };
 /* End PBXBuildFile section */
@@ -83,6 +84,7 @@
 		27C0560E2611535F0037A91B /* ThreadMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadMetricsView.swift; sourceTree = "<group>"; };
 		27C0561126128DCB0037A91B /* RefreshTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshTimerView.swift; sourceTree = "<group>"; };
 		27C056142612998D0037A91B /* Link.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
+		27C056182612C1900037A91B /* HoverText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverText.swift; sourceTree = "<group>"; };
 		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		27C568352602D83A00983ECD /* WebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -150,20 +152,21 @@
 				279CFF7C25FFE06400884724 /* BoardListView.swift */,
 				279CFF7F25FFEA6900884724 /* CatalogView.swift */,
 				2799460B25FD9E5A001DCCE3 /* ContentView.swift */,
+				27C055FF260FBC130037A91B /* FullImageView.swift */,
+				27C055FB260F8CF10037A91B /* GeneralSettingsView.swift */,
+				27C056182612C1900037A91B /* HoverText.swift */,
 				27BBF1EF2604345100534CB7 /* OpenItemsView.swift */,
+				27C05604260FF8470037A91B /* PostView.swift */,
+				27C0561126128DCB0037A91B /* RefreshTimerView.swift */,
 				27BBF1EC2604308700534CB7 /* RichTextView.swift */,
+				27BBC9C026057E09005D8183 /* SearchBarView.swift */,
+				27C055F8260F8C0D0037A91B /* SettingsView.swift */,
 				2799461A25FD9EE6001DCCE3 /* SidebarView.swift */,
+				27C055EC260E8D250037A91B /* ThreadListCellView.swift */,
+				27C0560E2611535F0037A91B /* ThreadMetricsView.swift */,
+				27BBC9D7260AC67B005D8183 /* ThreadView.swift */,
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
-				27BBC9C026057E09005D8183 /* SearchBarView.swift */,
-				27BBC9D7260AC67B005D8183 /* ThreadView.swift */,
-				27C055EC260E8D250037A91B /* ThreadListCellView.swift */,
-				27C055F8260F8C0D0037A91B /* SettingsView.swift */,
-				27C055FB260F8CF10037A91B /* GeneralSettingsView.swift */,
-				27C055FF260FBC130037A91B /* FullImageView.swift */,
-				27C05604260FF8470037A91B /* PostView.swift */,
-				27C0560E2611535F0037A91B /* ThreadMetricsView.swift */,
-				27C0561126128DCB0037A91B /* RefreshTimerView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -314,6 +317,7 @@
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				27C0561226128DCB0037A91B /* RefreshTimerView.swift in Sources */,
 				27C055FC260F8CF10037A91B /* GeneralSettingsView.swift in Sources */,
+				27C056192612C1900037A91B /* HoverText.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
 				27C568332602D2A000983ECD /* Asset.swift in Sources */,
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
