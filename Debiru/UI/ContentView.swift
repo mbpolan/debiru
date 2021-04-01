@@ -91,17 +91,13 @@ struct ContentView: View {
         switch appState.currentItem {
         case .board(let board):
             appState.currentItem = .thread(board, thread)
-            
-            // add this thread to our open items view, if it's not there already
-            
-            
         default:
             break
         }
     }
     
     private func handleShowImage(_ data: Data) {
-        if let url = URL(string: "Debiru://image") {
+        if let url = URL(string: "debiru://image") {
             appState.openImageData = data
             openURL(url)
         }

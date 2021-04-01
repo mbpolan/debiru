@@ -18,13 +18,13 @@ struct DebiruApp: App {
         }
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
         
-        WindowGroup("Image") {
+        WindowGroup {
             FullImageView()
                 .environmentObject(appState)
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "*"))
         }
         .windowStyle(HiddenTitleBarWindowStyle())
-        .handlesExternalEvents(matching: Set(arrayLiteral: "image"))
+        .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
         
         Settings {
             SettingsView()
