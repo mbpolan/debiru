@@ -141,7 +141,8 @@ struct ThreadView: View {
                 uniquePosters: statistics.uniquePosters,
                 bumpLimit: statistics.bumpLimit,
                 imageLimit: statistics.imageLimit,
-                metrics: .all)
+                page: nil,
+                metrics: [.images, .replies, .uniquePosters])
             
             Spacer()
             
@@ -273,7 +274,8 @@ struct ThreadView_Previews: PreviewProvider {
             images: 1,
             uniquePosters: 1,
             bumpLimit: false,
-            imageLimit: false))
+            imageLimit: false,
+            page: 0))
     
     static var previews: some View {
         ThreadView()

@@ -49,6 +49,7 @@ struct ThreadListCellView_Previews: PreviewProvider {
                                 images: 1,
                                 uniquePosters: 1,
                                 bumpLimit: false,
-                                imageLimit: false)))
+                                imageLimit: false,
+                                page: 0)))
     }
 }

@@ -26,4 +26,5 @@ struct ThreadStatistics: Equatable, Hashable {
     let uniquePosters: Int?
     let bumpLimit: Bool
     let imageLimit: Bool
+    let page: Int?
 }

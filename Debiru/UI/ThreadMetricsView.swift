@@ -23,8 +23,9 @@ struct ThreadMetricsView: View {
         static let replies = Metric(rawValue: 1 << 0)
         static let images = Metric(rawValue: 1 << 1)
         static let uniquePosters = Metric(rawValue: 1 << 2)
+        static let page = Metric(rawValue: 1 << 3)
         
-        static let all: Metric = [.replies, .images, .uniquePosters]
+        static let all: Metric = [.replies, .images, .uniquePosters, .page]
     }
     
     let replies: Int?
@@ -32,6 +33,7 @@ struct ThreadMetricsView: View {
     let uniquePosters: Int?
     let bumpLimit: Bool
     let imageLimit: Bool
+    let page: Int?
     var metrics: Metric
     
     var body: some View {
@@ -46,6 +48,9 @@ struct ThreadMetricsView: View {
             
             makeMetricView(.uniquePosters, icon: "person.2.fill", value: uniquePosters)
                 .help("Number of unique posters in this thread")
+            
+            makeMetricView(.page, icon: "text.book.closed.fill", value: page)
+                .help("The page this thread is currently on in the catalog")
         }
     }
     
@@ -80,6 +85,7 @@ struct ThreadMetricsView_Previews: PreviewProvider {
                           uniquePosters: 1,
                           bumpLimit: true,
                           imageLimit: false,
+                          page: 0,
                           metrics: .all)
     }
 }

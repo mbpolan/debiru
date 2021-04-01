@@ -72,7 +72,8 @@ struct FourChanDataProvider: DataProvider {
                                 images: thread.images,
                                 uniquePosters: thread.uniqueUsers,
                                 bumpLimit: thread.bumpLimit == 1,
-                                imageLimit: thread.imageLimit == 1))
+                                imageLimit: thread.imageLimit == 1,
+                                page: page.page))
                     }
                 }.reduce([], +)
             },
@@ -114,7 +115,8 @@ struct FourChanDataProvider: DataProvider {
                             images: images,
                             uniquePosters: uniquePosters,
                             bumpLimit: post.bumpLimit == 1,
-                            imageLimit: post.imageLimit == 1)
+                            imageLimit: post.imageLimit == 1,
+                            page: nil)
                     }
                     
                     var archivedDate: Date? = nil
