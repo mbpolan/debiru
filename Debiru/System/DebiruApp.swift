@@ -16,6 +16,9 @@ struct DebiruApp: App {
             ContentView()
                 .environmentObject(appState)
         }
+        .commands {
+            AppCommands(onShowQuickSearch: handleShowQuickSearch)
+        }
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
         
         WindowGroup {
@@ -28,6 +31,25 @@ struct DebiruApp: App {
         
         Settings {
             SettingsView()
+        }
+    }
+    
+    private func handleShowQuickSearch() {
+        appState.quickSearchOpen = !appState.quickSearchOpen
+    }
+}
+
+struct AppCommands: Commands {
+    let onShowQuickSearch: () -> Void
+    
+    var body: some Commands {
+        CommandGroup(before: .sidebar) {
+            Button("Toggle Quick Search") {
+                onShowQuickSearch()
+            }
+            .keyboardShortcut(.space, modifiers: .option)
+            
+            Divider()
         }
     }
 }

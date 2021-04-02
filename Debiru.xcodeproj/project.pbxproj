@@ -43,6 +43,7 @@
 		27C0561226128DCB0037A91B /* RefreshTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0561126128DCB0037A91B /* RefreshTimerView.swift */; };
 		27C056152612998D0037A91B /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056142612998D0037A91B /* Link.swift */; };
 		27C056192612C1900037A91B /* HoverText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056182612C1900037A91B /* HoverText.swift */; };
+		27C05624261694130037A91B /* QuickSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C05623261694130037A91B /* QuickSearchView.swift */; };
 		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
 		27C568362602D83A00983ECD /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568352602D83A00983ECD /* WebImage.swift */; };
 /* End PBXBuildFile section */
@@ -85,6 +86,7 @@
 		27C0561126128DCB0037A91B /* RefreshTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshTimerView.swift; sourceTree = "<group>"; };
 		27C056142612998D0037A91B /* Link.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
 		27C056182612C1900037A91B /* HoverText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverText.swift; sourceTree = "<group>"; };
+		27C05623261694130037A91B /* QuickSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSearchView.swift; sourceTree = "<group>"; };
 		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		27C568352602D83A00983ECD /* WebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -167,6 +169,7 @@
 				27BBC9D7260AC67B005D8183 /* ThreadView.swift */,
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
+				27C05623261694130037A91B /* QuickSearchView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -309,6 +312,7 @@
 				27C0560F2611535F0037A91B /* ThreadMetricsView.swift in Sources */,
 				27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */,
 				27BBC9CE2606C6BD005D8183 /* View.swift in Sources */,
+				27C05624261694130037A91B /* QuickSearchView.swift in Sources */,
 				27C056152612998D0037A91B /* Link.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
 				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,

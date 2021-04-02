@@ -47,6 +47,9 @@ struct ContentView: View {
         .onAppear {
             viewModel.pendingBoards = dataProvider.getBoards(handleBoards)
         }
+        .onChange(of: appState.quickSearchOpen) { open in
+            viewModel.openSheet = open ? .quickSearch : nil
+        }
         .onReceive(showBoardPublisher) { event in
             if let board = event.object as? Board {
                 handleShowBoard(board)
@@ -62,20 +65,45 @@ struct ContentView: View {
                 handleShowImage(data)
             }
         }
-        .sheet(item: $viewModel.error, onDismiss: {
-            viewModel.error = nil
-        }) { error in
-            VStack {
-                Text(error.message)
-                HStack {
-                    Spacer()
-                    Button("OK") {
-                        viewModel.error = nil
-                    }
+        .sheet(item: $viewModel.openSheet, onDismiss: handleSheetDismiss) { sheet in
+            makeSheet(sheet)
+        }
+    }
+    
+    private func makeSheet(_ sheet: ContentViewModel.Sheet) -> some View {
+        switch sheet {
+        case .error:
+            return makeErrorSheet()
+                .toErasedView()
+        case .quickSearch:
+            return QuickSearchView(shown: $appState.quickSearchOpen)
+                .toErasedView()
+        }
+    }
+    
+    private func makeErrorSheet() -> some View {
+        VStack {
+            Text(viewModel.error?.message ?? "Unknown")
+            HStack {
+                Spacer()
+                Button("OK") {
+                    viewModel.openSheet = nil
+                    viewModel.error = nil
                 }
             }
-            .padding()
         }
+        .padding()
+    }
+    
+    private func handleSheetDismiss() {
+        switch viewModel.openSheet {
+        case .error:
+            viewModel.error = nil
+        default:
+            break
+        }
+        
+        viewModel.openSheet = nil
     }
     
     private func handleShowBoard(_ board: Board) {
@@ -118,8 +146,18 @@ struct ContentView: View {
 // MARK: - View Model
 
 class ContentViewModel: ObservableObject {
+    @Published var openSheet: Sheet?
     @Published var pendingBoards: AnyCancellable?
     @Published var error: ViewError?
+    
+    enum Sheet: Identifiable {
+        case error
+        case quickSearch
+        
+        var id: Int {
+            hashValue
+        }
+    }
     
     struct ViewError: Identifiable {
         let message: String

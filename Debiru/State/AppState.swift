@@ -8,6 +8,7 @@
 import SwiftUI
 
 class AppState: ObservableObject {
+    @Published var quickSearchOpen: Bool = false
     @Published var currentItem: ViewableItem?
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
