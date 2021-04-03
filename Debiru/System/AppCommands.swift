@@ -19,6 +19,11 @@ struct AppCommands: Commands {
             }
             .keyboardShortcut(.space, modifiers: .option)
             
+            Button("Refresh Current View") {
+                NotificationCenter.default.post(name: .refreshView, object: nil)
+            }
+            .keyboardShortcut(KeyEquivalent("r"), modifiers: .command)
+            
             Divider()
         }
     }

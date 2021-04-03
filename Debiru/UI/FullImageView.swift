@@ -15,11 +15,10 @@ struct FullImageView: View {
     var body: some View {
         let image = self.image
         
-        VStack {
-            ScrollView {
-                Image(nsImage: image)
-            }
+        ScrollView {
+            Image(nsImage: image)
         }
+        .edgesIgnoringSafeArea(.top)
         .frame(
             idealWidth: min(image.size.width, NSScreen.main?.frame.maxX ?? .infinity),
             idealHeight: min(image.size.height, NSScreen.main?.frame.maxY ?? .infinity))
@@ -31,7 +30,9 @@ struct FullImageView: View {
             return image
         }
         
-        return NSImage(systemSymbolName: "exclamationmark.circle", accessibilityDescription: nil) ?? NSImage()
+        return NSImage(
+            systemSymbolName: "exclamationmark.circle",
+            accessibilityDescription: nil) ?? NSImage()
     }
 }
 

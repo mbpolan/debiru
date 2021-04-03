@@ -17,6 +17,7 @@ struct CatalogView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
     private let dataProvider: DataProvider
+    private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -80,6 +81,9 @@ struct CatalogView: View {
                     expanded: $viewModel.searchExpanded,
                     search: $viewModel.search)
             }
+        }
+        .onReceive(refreshViewPublisher) { _ in
+            reloadFromState()
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
