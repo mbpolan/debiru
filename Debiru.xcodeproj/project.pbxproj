@@ -44,6 +44,9 @@
 		27C056152612998D0037A91B /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056142612998D0037A91B /* Link.swift */; };
 		27C056192612C1900037A91B /* HoverText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056182612C1900037A91B /* HoverText.swift */; };
 		27C05624261694130037A91B /* QuickSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C05623261694130037A91B /* QuickSearchView.swift */; };
+		27C0562D2618D49B0037A91B /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0562C2618D49B0037A91B /* AppCommands.swift */; };
+		27C056302618D4FC0037A91B /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0562F2618D4FC0037A91B /* UserDefaults.swift */; };
+		27C056332618D5170037A91B /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056322618D5170037A91B /* Notification.swift */; };
 		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
 		27C568362602D83A00983ECD /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568352602D83A00983ECD /* WebImage.swift */; };
 /* End PBXBuildFile section */
@@ -87,6 +90,9 @@
 		27C056142612998D0037A91B /* Link.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
 		27C056182612C1900037A91B /* HoverText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverText.swift; sourceTree = "<group>"; };
 		27C05623261694130037A91B /* QuickSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSearchView.swift; sourceTree = "<group>"; };
+		27C0562C2618D49B0037A91B /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
+		27C0562F2618D4FC0037A91B /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		27C056322618D5170037A91B /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		27C568352602D83A00983ECD /* WebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -178,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				2799460925FD9E5A001DCCE3 /* DebiruApp.swift */,
+				27C0562C2618D49B0037A91B /* AppCommands.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -218,6 +225,8 @@
 			children = (
 				27BBC9CD2606C6BD005D8183 /* View.swift */,
 				27C0560B261123FD0037A91B /* DateFormatter.swift */,
+				27C0562F2618D4FC0037A91B /* UserDefaults.swift */,
+				27C056322618D5170037A91B /* Notification.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -312,6 +321,7 @@
 				27C0560F2611535F0037A91B /* ThreadMetricsView.swift in Sources */,
 				27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */,
 				27BBC9CE2606C6BD005D8183 /* View.swift in Sources */,
+				27C0562D2618D49B0037A91B /* AppCommands.swift in Sources */,
 				27C05624261694130037A91B /* QuickSearchView.swift in Sources */,
 				27C056152612998D0037A91B /* Link.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
@@ -320,12 +330,14 @@
 				27BBF1F02604345100534CB7 /* OpenItemsView.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				27C0561226128DCB0037A91B /* RefreshTimerView.swift in Sources */,
+				27C056332618D5170037A91B /* Notification.swift in Sources */,
 				27C055FC260F8CF10037A91B /* GeneralSettingsView.swift in Sources */,
 				27C056192612C1900037A91B /* HoverText.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
 				27C568332602D2A000983ECD /* Asset.swift in Sources */,
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
 				27C05600260FBC130037A91B /* FullImageView.swift in Sources */,
+				27C056302618D4FC0037A91B /* UserDefaults.swift in Sources */,
 				279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,

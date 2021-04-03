@@ -12,17 +12,16 @@ import SwiftUI
 // MARK: - View
 
 struct QuickSearchView: View {
+    @AppStorage(StorageKeys.maxQuickSearchResults) var maxResults: Int =
+        UserDefaults.standard.maxQuickSearchResults()
+    
     @EnvironmentObject private var appState: AppState
-    @State private var text: String = ""
-    @State private var selected: Int = 0
-    @State private var monitor: Any?
-    @State private var matches: [ViewableItem] = []
+    @StateObject private var viewModel: QuickSearchViewModel = QuickSearchViewModel()
     @Binding var shown: Bool
-    private let maxResults: Int = 5
     
     var body: some View {
         return VStack {
-            TextField("Search", text: $text)
+            TextField("Search", text: $viewModel.text)
                 .textFieldStyle(PlainTextFieldStyle())
                 .font(.largeTitle)
                 .padding(.top, 10)
@@ -37,37 +36,61 @@ struct QuickSearchView: View {
             
             Divider()
             
-            ForEach(0..<matches.count, id: \.self) { i in
-                makeResultText(matches[i], index: i)
+            ForEach(0..<viewModel.matches.count, id: \.self) { i in
+                makeResultText(viewModel.matches[i], index: i)
             }
             
-            if !text.isEmpty && matches.isEmpty {
+            if !viewModel.text.isEmpty && viewModel.matches.isEmpty {
                 Text("No matches found")
+                    .padding(.bottom, 5)
             }
         }
         .onAppear {
-            self.monitor = NSEvent.addLocalMonitorForEvents(
+            viewModel.monitor = NSEvent.addLocalMonitorForEvents(
                 matching: .keyDown,
                 handler: handleKeyDown)
         }
         .onDisappear {
-            if let monitor = self.monitor {
+            if let monitor = viewModel.monitor {
                 NSEvent.removeMonitor(monitor)
             }
         }
-        .onChange(of: text) { filter in
+        .onChange(of: viewModel.text) { filter in
             // update matching results and update selected index if it's no longer
             // in range of the next set of data
-            self.matches = filterResults(filter)
-            self.selected = selected >= matches.count ? 0 : selected
+            viewModel.matches = filterResults(filter)
+            viewModel.selected = viewModel.selected >= viewModel.matches.count
+                ? 0
+                : viewModel.selected
         }
         .frame(minWidth: 400)
         .edgesIgnoringSafeArea(.top)
     }
     
+    private func makeResultText(_ match: ViewableItem, index: Int) -> some View {
+        let text: Text
+        switch match {
+        case .board(let board):
+            text = Text("/\(board.id)/ - \(board.title)")
+        case .thread(_, let thread):
+            text = Text("\(thread.id) - \(thread.subject ?? thread.content ?? "")")
+        }
+        
+        return HStack {
+            Spacer()
+            text.font(.title)
+            Spacer()
+            
+        }
+        .background(viewModel.selected == index
+                        ? Color(NSColor.selectedTextBackgroundColor)
+                        : Color.clear)
+        .frame(maxWidth: .infinity)
+    }
+    
     private func handleActivate() {
         // hide the view and post a notification to open the selected item
-        switch matches[selected] {
+        switch viewModel.matches[viewModel.selected] {
         case .board(let board):
             self.shown = false
             NotificationCenter.default.post(name: .showBoard, object: board)
@@ -88,7 +111,7 @@ struct QuickSearchView: View {
             return nil
             
         case kVK_Return:
-            guard !matches.isEmpty else { return event }
+            guard !viewModel.matches.isEmpty else { return event }
             handleActivate()
             return nil
             
@@ -99,30 +122,9 @@ struct QuickSearchView: View {
     
     private func cycleSelectedResult(_ delta: Int) {
         DispatchQueue.main.async {
-            let next = (selected + delta) % matches.count
-            self.selected = next < 0 ? matches.count - 1 : next
+            let next = (viewModel.selected + delta) % viewModel.matches.count
+            viewModel.selected = next < 0 ? viewModel.matches.count - 1 : next
         }
-    }
-    
-    private func makeResultText(_ match: ViewableItem, index: Int) -> some View {
-        let text: Text
-        switch match {
-        case .board(let board):
-            text = Text("/\(board.id)/ - \(board.title)")
-        case .thread(_, let thread):
-            text = Text("\(thread.id) - \(thread.subject ?? thread.content ?? "")")
-        }
-        
-        return HStack {
-            Spacer()
-            text.font(.title)
-            Spacer()
-            
-        }
-        .background(selected == index
-                        ? Color(NSColor.selectedTextBackgroundColor)
-                        : Color.clear)
-        .frame(maxWidth: .infinity)
     }
     
     private func filterResults(_ text: String) -> [ViewableItem] {
@@ -155,6 +157,15 @@ struct QuickSearchView: View {
         
         return Array(matches.prefix(maxResults))
     }
+}
+
+// MARK: - View Model
+
+class QuickSearchViewModel: ObservableObject {
+    @Published var text: String = ""
+    @Published var selected: Int = 0
+    @Published var matches: [ViewableItem] = []
+    @Published var monitor: Any?
 }
 
 // MARK: - Preview

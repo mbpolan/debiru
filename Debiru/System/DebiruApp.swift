@@ -39,34 +39,7 @@ struct DebiruApp: App {
     }
 }
 
-struct AppCommands: Commands {
-    let onShowQuickSearch: () -> Void
-    
-    var body: some Commands {
-        CommandGroup(before: .sidebar) {
-            Button("Toggle Quick Search") {
-                onShowQuickSearch()
-            }
-            .keyboardShortcut(.space, modifiers: .option)
-            
-            Divider()
-        }
-    }
-}
-
-extension UserDefaults {
-    func defaultImageLocation() -> URL {
-        self.url(forKey: StorageKeys.defaultImageLocation) ??
-            FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
-    }
-}
-
 struct StorageKeys {
     static let defaultImageLocation = "defaultImageLocation"
-}
-
-extension Notification.Name {
-    static let showBoard = Notification.Name("showBoard")
-    static let showThread = Notification.Name("showThread")
-    static let showImage = Notification.Name("showImage")
+    static let maxQuickSearchResults = "maxQuickSearchResults"
 }

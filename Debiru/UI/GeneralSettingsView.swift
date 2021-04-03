@@ -12,13 +12,25 @@ import SwiftUI
 struct GeneralSettingsView: View {
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation: URL =
         FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
+    @AppStorage(StorageKeys.maxQuickSearchResults) private var maxQuickSearchResults: Int =
+        UserDefaults.standard.maxQuickSearchResults()
     
     var body: some View {
+        let maxQuickSearchResultsBinding = Binding<String>(
+            get: { String(maxQuickSearchResults) },
+            set: { value in
+                guard let number = Int(value) else { return }
+                maxQuickSearchResults = number
+            })
         Form {
             LazyVGrid(columns: [
                 GridItem(.fixed(200)),
                 GridItem(.fixed(100), spacing: 0.0, alignment: .trailing),
             ], alignment: .leading) {
+                Text("Maximum quick search results")
+                
+                TextField("", text: maxQuickSearchResultsBinding)
+                
                 Text("Default location to save images")
                 
                 Button(action: handleChooseSaveLocation) {
