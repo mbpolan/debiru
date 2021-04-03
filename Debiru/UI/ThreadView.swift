@@ -17,6 +17,7 @@ struct ThreadView: View {
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
     private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
+    private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -81,6 +82,12 @@ struct ThreadView: View {
         }
         .onReceive(refreshViewPublisher) { _ in
             reloadFromState()
+        }
+        .onReceive(openInBrowserPublisher) { _ in
+            guard let thread = getThread(appState.currentItem),
+                  let url = dataProvider.getURL(for: thread) else { return }
+            
+            NSWorkspace.shared.open(url)
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)

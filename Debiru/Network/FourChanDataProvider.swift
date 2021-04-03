@@ -9,6 +9,8 @@ import Combine
 import Foundation
 
 struct FourChanDataProvider: DataProvider {
+    private let webBaseUrl = "https://4chan.org"
+    private let webBoardsBaseUrl = "https://boards.4chan.org"
     private let apiBaseUrl = "https://a.4cdn.org"
     private let assetBaseUrl = "https://i.4cdn.org"
     private let imageCache: DataCache = DataCache()
@@ -184,6 +186,14 @@ struct FourChanDataProvider: DataProvider {
         }
         
         return nil
+    }
+    
+    func getURL(for board: Board) -> URL? {
+        return URL(string: "\(webBaseUrl)/\(board.id)/")
+    }
+    
+    func getURL(for thread: Thread) -> URL? {
+        return URL(string: "\(webBoardsBaseUrl)/\(thread.boardId)/thread/\(thread.id)")
     }
     
     private func getData<S: Decodable, T>(

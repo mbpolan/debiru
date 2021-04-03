@@ -18,6 +18,7 @@ struct CatalogView: View {
     @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
     private let dataProvider: DataProvider
     private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
+    private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -84,6 +85,12 @@ struct CatalogView: View {
         }
         .onReceive(refreshViewPublisher) { _ in
             reloadFromState()
+        }
+        .onReceive(openInBrowserPublisher) { _ in
+            guard let board = getBoard(appState.currentItem),
+                  let url = dataProvider.getURL(for: board) else { return }
+            
+            NSWorkspace.shared.open(url)
         }
         .onChange(of: appState.currentItem) { item in
             reload(from: item)

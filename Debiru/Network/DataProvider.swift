@@ -17,6 +17,10 @@ protocol DataProvider {
     func getPosts(for thread: Thread, completion: @escaping(_: Result<[Post], Error>) -> Void) -> AnyCancellable?
     
     func getImage(for asset: Asset, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?
+    
+    func getURL(for board: Board) -> URL?
+    
+    func getURL(for thread: Thread) -> URL?
 }
 
 enum NetworkError: Error {

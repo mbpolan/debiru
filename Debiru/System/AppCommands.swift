@@ -24,6 +24,11 @@ struct AppCommands: Commands {
             }
             .keyboardShortcut(KeyEquivalent("r"), modifiers: .command)
             
+            Button("Open In Browser") {
+                NotificationCenter.default.post(name: .openInBrowser, object: nil)
+            }
+            .keyboardShortcut(KeyEquivalent("b"), modifiers: .command)
+            
             Divider()
         }
     }
