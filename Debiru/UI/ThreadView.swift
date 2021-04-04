@@ -30,6 +30,8 @@ struct ThreadView: View {
         
         ScrollViewReader { scroll in
             VStack {
+                makeHeader()
+                
                 List(posts, id: \.self) { post in
                     HStack {
                         if let asset = post.attachment {
@@ -154,6 +156,25 @@ struct ThreadView: View {
         }
         
         return viewModel.posts
+    }
+    
+    private func makeHeader() -> some View {
+        VStack {
+            if let op = posts.first, op.archived {
+                HStack(alignment: .firstTextBaseline) {
+                    Spacer()
+                    
+                    Image(systemName: "exclamationmark.triangle")
+                    Text("This thread has been archived")
+                        .font(.callout)
+                    
+                    Spacer()
+                }
+                .padding()
+                
+                Divider()
+            }
+        }
     }
     
     private func makeFooter(_ statistics: ThreadViewModel.Statistics) -> some View {
