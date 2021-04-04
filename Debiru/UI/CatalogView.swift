@@ -19,55 +19,69 @@ struct CatalogView: View {
     private let dataProvider: DataProvider
     private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
     private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
+    private let goToTopPublisher = NotificationCenter.default.publisher(for: .goToTop)
+    private let goToBottomPublisher = NotificationCenter.default.publisher(for: .goToBottom)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
     }
     
     var body: some View {
-        VStack {
-            List(threads, id: \.self) { thread in
-                HStack {
-                    if let asset = thread.attachment {
-                        VStack(alignment: .leading) {
-                            WebImage(asset,
-                                     saveLocation: defaultImageLocation,
-                                     bounds: CGSize(width: 128.0, height: 128.0),
-                                     onOpen: handleOpenImage)
-                            
-                            Spacer()
+        ScrollViewReader { scroll in
+            VStack {
+                List(threads, id: \.self) { thread in
+                    HStack {
+                        if let asset = thread.attachment {
+                            VStack(alignment: .leading) {
+                                WebImage(asset,
+                                         saveLocation: defaultImageLocation,
+                                         bounds: CGSize(width: 128.0, height: 128.0),
+                                         onOpen: handleOpenImage)
+                                
+                                Spacer()
+                            }
                         }
-                    }
-                    
-                    PostView(
-                        thread.toPostContent(),
-                        boardId: thread.boardId,
-                        threadId: thread.id,
-                        onActivate: { handleShowThread(thread) },
-                        onLink: handleLink) {
                         
-                        ThreadMetricsView(
-                            replies: thread.statistics.replies,
-                            images: thread.statistics.images,
-                            uniquePosters: thread.statistics.uniquePosters,
-                            bumpLimit: thread.statistics.bumpLimit,
-                            imageLimit: thread.statistics.imageLimit,
-                            page: thread.statistics.page,
-                            metrics: [.replies, .images, .page])
-                            .padding(.leading, 5)
+                        PostView(
+                            thread.toPostContent(),
+                            boardId: thread.boardId,
+                            threadId: thread.id,
+                            onActivate: { handleShowThread(thread) },
+                            onLink: handleLink) {
+                            
+                            ThreadMetricsView(
+                                replies: thread.statistics.replies,
+                                images: thread.statistics.images,
+                                uniquePosters: thread.statistics.uniquePosters,
+                                bumpLimit: thread.statistics.bumpLimit,
+                                imageLimit: thread.statistics.imageLimit,
+                                page: thread.statistics.page,
+                                metrics: [.replies, .images, .page])
+                                .padding(.leading, 5)
+                        }
+                        
+                        Spacer()
                     }
-                    
+                }
+                
+                Divider()
+                
+                HStack(alignment: .firstTextBaseline) {
                     Spacer()
+                    RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
+                }
+                .padding([.bottom, .leading, .trailing], 5)
+            }
+            .onReceive(goToTopPublisher) { _ in
+                if let first = threads.first {
+                    scroll.scrollTo(first)
                 }
             }
-            
-            Divider()
-            
-            HStack(alignment: .firstTextBaseline) {
-                Spacer()
-                RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
+            .onReceive(goToBottomPublisher) { _ in
+                if let last = threads.last {
+                    scroll.scrollTo(last)
+                }
             }
-            .padding([.bottom, .leading, .trailing], 5)
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {

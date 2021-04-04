@@ -18,6 +18,8 @@ struct ThreadView: View {
     private let dataProvider: DataProvider
     private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
     private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
+    private let goToTopPublisher = NotificationCenter.default.publisher(for: .goToTop)
+    private let goToBottomPublisher = NotificationCenter.default.publisher(for: .goToBottom)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -58,6 +60,16 @@ struct ThreadView: View {
                 Divider()
                 
                 makeFooter(statistics)
+            }
+            .onReceive(goToTopPublisher) { _ in
+                if let first = posts.first {
+                    scroll.scrollTo(first)
+                }
+            }
+            .onReceive(goToBottomPublisher) { _ in
+                if let last = posts.last {
+                    scroll.scrollTo(last)
+                }
             }
         }
         .navigationTitle(getNavigationTitle())

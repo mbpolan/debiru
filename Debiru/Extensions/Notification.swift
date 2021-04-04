@@ -13,4 +13,6 @@ extension Notification.Name {
     static let showImage = Notification.Name("showImage")
     static let openInBrowser = Notification.Name("openInBrowser")
     static let refreshView = Notification.Name("refreshView")
+    static let goToTop = Notification.Name("goToTop")
+    static let goToBottom = Notification.Name("goToBottom")
 }

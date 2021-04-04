@@ -14,6 +14,18 @@ struct AppCommands: Commands {
     
     var body: some Commands {
         CommandGroup(before: .sidebar) {
+            Button("Go to Top") {
+                NotificationCenter.default.post(name: .goToTop, object: nil)
+            }
+            .keyboardShortcut(.upArrow, modifiers: .command)
+            
+            Button("Go to Bottom") {
+                NotificationCenter.default.post(name: .goToBottom, object: nil)
+            }
+            .keyboardShortcut(.downArrow, modifiers: .command)
+            
+            Divider()
+            
             Button("Toggle Quick Search") {
                 onShowQuickSearch()
             }
