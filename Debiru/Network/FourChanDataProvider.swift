@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SwiftSoup
 
 struct FourChanDataProvider: DataProvider {
     private let webBaseUrl = "https://4chan.org"
@@ -87,6 +88,19 @@ struct FourChanDataProvider: DataProvider {
         return getData(
             url: "\(apiBaseUrl)/\(thread.boardId)/thread/\(thread.id).json",
             mapper: { (value: ThreadPostsModel) in
+                var postsToReplies: [Int: [Int]] = [:]
+                
+                // find all posts that this post references in its thread
+                value.posts.forEach { post in
+                    parseRepliesTo(post.content ?? "").forEach { reply in
+                        if var existing = postsToReplies[reply] {
+                            existing.append(post.id)
+                        } else {
+                            postsToReplies[reply] = [post.id]
+                        }
+                    }
+                }
+                
                 return value.posts.map { post in
                     var asset: Asset?
                     if let id = post.assetId,
@@ -143,7 +157,8 @@ struct FourChanDataProvider: DataProvider {
                         attachment: asset,
                         threadStatistics: threadStatistics,
                         archived: post.archived == 1,
-                        archivedDate: archivedDate)
+                        archivedDate: archivedDate,
+                        replies: postsToReplies[post.id] ?? [])
                 }
             },
             completion: completion)
@@ -230,6 +245,20 @@ struct FourChanDataProvider: DataProvider {
         }
         
         return nil
+    }
+    
+    private func parseRepliesTo(_ content: String) -> [Int] {
+        guard let links = try? SwiftSoup.parseBodyFragment(content).select("a[href]") else {
+            return []
+        }
+        
+        return links.compactMap { link in
+            if let href = try? link.attr("href"), href.starts(with: "#p") {
+                return Int(href.dropFirst(2))
+            }
+            
+            return nil
+        }
     }
 }
 

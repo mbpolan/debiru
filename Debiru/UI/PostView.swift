@@ -67,6 +67,30 @@ struct PostView<T>: View where T: View {
                 }
             }
             
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
+                ForEach(content.replies, id: \.self) { replyId in
+                    Text(">>\(String(replyId))")
+                        .foregroundColor(Color(NSColor.linkColor))
+                        .underline()
+                        .onTapGesture {
+                            guard let url = PostLink.makeURL(
+                                    boardId: boardId,
+                                    threadId: threadId,
+                                    postId: content.id) else { return }
+                            
+                            guard let link = handleInternalLink(url) else { return }
+                            onLink(link)
+                        }
+                        .onHover { hover in
+                            if hover {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
+                }
+            }
+            
             RichTextView(
                 content.content ?? "",
                 boardId: boardId,
@@ -147,6 +171,7 @@ struct PostContent {
     let closed: Bool
     let archived: Bool
     let archivedDate: Date?
+    let replies: [Int]
     
     func getSubject() -> String? {
         if let subject = self.subject {
@@ -189,7 +214,8 @@ extension Thread {
             sticky: self.sticky,
             closed: self.closed,
             archived: false,
-            archivedDate: nil)
+            archivedDate: nil,
+            replies: [])
     }
 }
 
@@ -208,7 +234,8 @@ extension Post {
             sticky: self.sticky,
             closed: self.closed,
             archived: self.archived,
-            archivedDate: self.archivedDate)
+            archivedDate: self.archivedDate,
+            replies: self.replies)
     }
 }
 
@@ -229,7 +256,8 @@ struct PostView_Previews: PreviewProvider {
                     sticky: false,
                     closed: false,
                     archived: false,
-                    archivedDate: nil),
+                    archivedDate: nil,
+                    replies: []),
                  boardId: "f",
                  threadId: 321,
                  onActivate: { },

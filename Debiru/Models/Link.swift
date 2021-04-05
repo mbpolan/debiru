@@ -26,3 +26,9 @@ struct PostLink: Link {
     let threadId: Int
     let postId: Int
 }
+
+extension PostLink {
+    static func makeURL(boardId: String, threadId: Int, postId: Int) -> URL? {
+        return URL(string: "/\(boardId)/thread/\(String(threadId))/\(postId)")
+    }
+}

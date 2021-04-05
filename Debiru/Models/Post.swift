@@ -22,4 +22,5 @@ struct Post: Identifiable, Hashable {
     let threadStatistics: ThreadStatistics?
     let archived: Bool
     let archivedDate: Date?
+    let replies: [Int]
 }
