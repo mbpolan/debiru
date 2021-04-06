@@ -13,6 +13,7 @@ class AppState: ObservableObject {
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
     @Published var openImageData: Data?
+    @Published var autoRefresh: Bool = false
     
     init() {
         self.boards = []

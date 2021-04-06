@@ -83,6 +83,8 @@ struct ThreadView: View {
             }
             
             ToolbarItemGroup {
+                Toggle("Auto-Refresh", isOn: $appState.autoRefresh)
+                
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -106,8 +108,20 @@ struct ThreadView: View {
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
         }
+        .onChange(of: appState.autoRefresh) { refresh in
+            if refresh {
+                startRefreshTimer()
+            } else {
+                viewModel.refreshTimer?.invalidate()
+                viewModel.refreshTimer = nil
+            }
+        }
         .onAppear {
             reloadFromState()
+            
+            if appState.autoRefresh {
+                startRefreshTimer()
+            }
         }
     }
     
@@ -245,6 +259,12 @@ struct ThreadView: View {
         }
     }
     
+    private func startRefreshTimer() {
+        viewModel.refreshTimer = Timer.scheduledTimer(
+            withTimeInterval: 10,
+            repeats: true) { _ in reloadFromState() }
+    }
+    
     private func reloadFromState() {
         guard let thread = getThread(appState.currentItem) else { return }
         reload(thread)
@@ -278,6 +298,7 @@ class ThreadViewModel: ObservableObject {
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
+    @Published var refreshTimer: Timer?
     
     struct Statistics {
         let replies: Int?

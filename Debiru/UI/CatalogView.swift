@@ -82,10 +82,20 @@ struct CatalogView: View {
                     scroll.scrollTo(last)
                 }
             }
+            .onChange(of: appState.autoRefresh) { refresh in
+                if refresh {
+                    startRefreshTimer()
+                } else {
+                    viewModel.refreshTimer?.invalidate()
+                    viewModel.refreshTimer = nil
+                }
+            }
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
             ToolbarItemGroup {
+                Toggle("Auto-Refresh", isOn: $appState.autoRefresh)
+                
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -111,6 +121,10 @@ struct CatalogView: View {
         }
         .onAppear {
             reloadFromState()
+            
+            if appState.autoRefresh {
+                startRefreshTimer()
+            }
         }
     }
     
@@ -156,6 +170,12 @@ struct CatalogView: View {
         // TODO
     }
     
+    private func startRefreshTimer() {
+        viewModel.refreshTimer = Timer.scheduledTimer(
+            withTimeInterval: 10,
+            repeats: true) { _ in reloadFromState() }
+    }
+    
     private func getBoard(_ item: ViewableItem?) -> Board? {
         switch item {
         case .board(let board):
@@ -198,6 +218,7 @@ class CatalogViewModel: ObservableObject {
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
+    @Published var refreshTimer: Timer?
 }
 
 // MARK: - Preview
