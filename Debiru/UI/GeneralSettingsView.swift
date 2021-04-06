@@ -10,6 +10,8 @@ import SwiftUI
 // MARK: - View
 
 struct GeneralSettingsView: View {
+    @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout: Int =
+        UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation: URL =
         FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
     @AppStorage(StorageKeys.maxQuickSearchResults) private var maxQuickSearchResults: Int =
@@ -22,11 +24,23 @@ struct GeneralSettingsView: View {
                 guard let number = Int(value) else { return }
                 maxQuickSearchResults = number
             })
+        
+        let refreshTimeoutBinding = Binding<String>(
+            get: { String(refreshTimeout) },
+            set: { value in
+                guard let number = Int(value) else { return }
+                refreshTimeout = number
+            })
+        
         Form {
             LazyVGrid(columns: [
                 GridItem(.fixed(200)),
                 GridItem(.fixed(100), spacing: 0.0, alignment: .trailing),
             ], alignment: .leading) {
+                Text("Seconds to wait between automatic refreshes")
+                
+                TextField("", text: refreshTimeoutBinding)
+                
                 Text("Maximum quick search results")
                 
                 TextField("", text: maxQuickSearchResultsBinding)

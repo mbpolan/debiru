@@ -12,6 +12,7 @@ import SwiftUI
 // MARK: - View
 
 struct CatalogView: View {
+    @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout = UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
     
     @EnvironmentObject private var appState: AppState
@@ -173,7 +174,7 @@ struct CatalogView: View {
     
     private func startRefreshTimer() {
         viewModel.refreshTimer = Timer.scheduledTimer(
-            withTimeInterval: 10,
+            withTimeInterval: TimeInterval(refreshTimeout),
             repeats: true) { _ in reloadFromState() }
     }
     

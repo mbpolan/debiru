@@ -8,6 +8,13 @@
 import Foundation
 
 extension UserDefaults {
+    /// Returns the default auto-refresh timeout.
+    ///
+    /// - Returns: The timeout, in seconds.
+    func refreshTimeout() -> Int {
+        return 10
+    }
+    
     /// Returns the default location to save images.
     ///
     /// - Returns: A URL.
