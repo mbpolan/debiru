@@ -59,6 +59,7 @@ struct CatalogView: View {
                                 metrics: [.replies, .images, .page])
                                 .padding(.leading, 5)
                         }
+                        .padding(.leading, 10)
                         
                         Spacer()
                     }

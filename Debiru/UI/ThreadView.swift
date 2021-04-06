@@ -53,6 +53,7 @@ struct ThreadView: View {
                             onLink: { link in
                                 handleLink(link, scrollProxy: scroll)
                             })
+                            .padding(.leading, 10)
                         
                         Spacer()
                     }
