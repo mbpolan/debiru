@@ -9,11 +9,21 @@ import Foundation
 
 typealias DataCache = NSCache<CacheKey, CacheData>
 
-class CacheKey {
+class CacheKey: NSObject {
     private let key: String
     
     init(_ key: String) {
         self.key = key
+    }
+    
+    override var hash: Int {
+        return self.key.hashValue
+    }
+    
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? CacheKey else { return false }
+        
+        return self.key == other.key
     }
 }
 

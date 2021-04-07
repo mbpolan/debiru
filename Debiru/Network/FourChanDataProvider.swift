@@ -10,11 +10,11 @@ import Foundation
 import SwiftSoup
 
 struct FourChanDataProvider: DataProvider {
+    private static let imageCache: DataCache = DataCache()
     private let webBaseUrl = "https://4chan.org"
     private let webBoardsBaseUrl = "https://boards.4chan.org"
     private let apiBaseUrl = "https://a.4cdn.org"
     private let assetBaseUrl = "https://i.4cdn.org"
-    private let imageCache: DataCache = DataCache()
     
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable? {
         return getData(
@@ -168,8 +168,7 @@ struct FourChanDataProvider: DataProvider {
         
         let key = "\(assetBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)"
         if let url = URL(string: key) {
-            if let cachedImage = imageCache.get(forKey: key) {
-                print("CACHE HIT: \(key)")
+            if let cachedImage = FourChanDataProvider.imageCache.get(forKey: key) {
                 completion(.success(cachedImage))
                 return nil
             }
@@ -195,7 +194,7 @@ struct FourChanDataProvider: DataProvider {
                         completion(.failure(error))
                     }
                 }, receiveValue: { (value: Data) in
-                    imageCache.set(key, value: value)
+                    FourChanDataProvider.imageCache.set(key, value: value)
                     completion(.success(value))
                 })
         }
