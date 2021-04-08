@@ -14,7 +14,7 @@ struct BoardListView: View {
     
     var body: some View {
         List(appState.boards, id: \.self) { board in
-            BoardListCellView(board)
+            BoardListItemView(board)
                 .onTapGesture {
                     handleSelectBoard(board)
                 }

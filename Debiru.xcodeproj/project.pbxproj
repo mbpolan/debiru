@@ -20,6 +20,7 @@
 		279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7C25FFE06400884724 /* BoardListView.swift */; };
 		279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF7F25FFEA6900884724 /* CatalogView.swift */; };
 		279CFF8625FFEC9000884724 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CFF8525FFEC9000884724 /* Thread.swift */; };
+		27B5E76C261FC24200178F1B /* ThreadListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B5E76B261FC24200178F1B /* ThreadListItemView.swift */; };
 		27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9C026057E09005D8183 /* SearchBarView.swift */; };
 		27BBC9C626058595005D8183 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C526058595005D8183 /* Introspect */; };
 		27BBC9CA26067D14005D8183 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C926067D14005D8183 /* SwiftSoup */; };
@@ -28,7 +29,7 @@
 		27BBC9D8260AC67B005D8183 /* ThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9D7260AC67B005D8183 /* ThreadView.swift */; };
 		27BBF1ED2604308700534CB7 /* RichTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EC2604308700534CB7 /* RichTextView.swift */; };
 		27BBF1F02604345100534CB7 /* OpenItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1EF2604345100534CB7 /* OpenItemsView.swift */; };
-		27BBF1F3260436BF00534CB7 /* BoardListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */; };
+		27BBF1F3260436BF00534CB7 /* BoardListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F2260436BF00534CB7 /* BoardListItemView.swift */; };
 		27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBF1F626043CA000534CB7 /* DataCache.swift */; };
 		27C055ED260E8D250037A91B /* ThreadListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C055EC260E8D250037A91B /* ThreadListCellView.swift */; };
 		27C055F5260EA00B0037A91B /* screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 27C055F3260EA00B0037A91B /* screenshot.png */; };
@@ -68,13 +69,14 @@
 		279CFF7C25FFE06400884724 /* BoardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListView.swift; sourceTree = "<group>"; };
 		279CFF7F25FFEA6900884724 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogView.swift; sourceTree = "<group>"; };
 		279CFF8525FFEC9000884724 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
+		27B5E76B261FC24200178F1B /* ThreadListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadListItemView.swift; sourceTree = "<group>"; };
 		27BBC9C026057E09005D8183 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
 		27BBC9CD2606C6BD005D8183 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		27BBC9D4260AC265005D8183 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		27BBC9D7260AC67B005D8183 /* ThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadView.swift; sourceTree = "<group>"; };
 		27BBF1EC2604308700534CB7 /* RichTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextView.swift; sourceTree = "<group>"; };
 		27BBF1EF2604345100534CB7 /* OpenItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenItemsView.swift; sourceTree = "<group>"; };
-		27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListCellView.swift; sourceTree = "<group>"; };
+		27BBF1F2260436BF00534CB7 /* BoardListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardListItemView.swift; sourceTree = "<group>"; };
 		27BBF1F626043CA000534CB7 /* DataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCache.swift; sourceTree = "<group>"; };
 		27C055EC260E8D250037A91B /* ThreadListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadListCellView.swift; sourceTree = "<group>"; };
 		27C055F3260EA00B0037A91B /* screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screenshot.png; sourceTree = "<group>"; };
@@ -156,7 +158,7 @@
 		2799462025FDA1E8001DCCE3 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				27BBF1F2260436BF00534CB7 /* BoardListCellView.swift */,
+				27BBF1F2260436BF00534CB7 /* BoardListItemView.swift */,
 				279CFF7C25FFE06400884724 /* BoardListView.swift */,
 				279CFF7F25FFEA6900884724 /* CatalogView.swift */,
 				2799460B25FD9E5A001DCCE3 /* ContentView.swift */,
@@ -176,6 +178,7 @@
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
 				27C05623261694130037A91B /* QuickSearchView.swift */,
+				27B5E76B261FC24200178F1B /* ThreadListItemView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -311,8 +314,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */,
+				27B5E76C261FC24200178F1B /* ThreadListItemView.swift in Sources */,
 				27C055F9260F8C0D0037A91B /* SettingsView.swift in Sources */,
-				27BBF1F3260436BF00534CB7 /* BoardListCellView.swift in Sources */,
+				27BBF1F3260436BF00534CB7 /* BoardListItemView.swift in Sources */,
 				279CFF8625FFEC9000884724 /* Thread.swift in Sources */,
 				27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */,
 				27C056092610F5130037A91B /* User.swift in Sources */,

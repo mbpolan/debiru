@@ -22,7 +22,7 @@ struct OpenItemsView: View {
                 List(appState.openItems, id: \.self) { item in
                     switch item {
                     case .board(let board):
-                        BoardListCellView(board)
+                        BoardListItemView(board)
                     case .thread(_, let thread):
                         ThreadListCellView(thread)
                     }

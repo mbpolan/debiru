@@ -1,5 +1,5 @@
 //
-//  BoardListCellView.swift
+//  BoardListItemView.swift
 //  Debiru
 //
 //  Created by Mike Polan on 3/18/21.
@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - View
 
-struct BoardListCellView: View {
+struct BoardListItemView: View {
     private let board: Board
     
     init(_ board: Board) {
@@ -29,9 +29,9 @@ struct BoardListCellView: View {
 
 // MARK: - Preview
 
-struct BoardListViewCell_Previews: PreviewProvider {
+struct BoardListItemView_Previews: PreviewProvider {
     static var previews: some View {
-        BoardListCellView(Board(
+        BoardListItemView(Board(
                             id: "f",
                             title: "Foobar",
                             description: "The board for all things foobar"))

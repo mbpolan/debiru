@@ -87,6 +87,11 @@ struct ThreadView: View {
             ToolbarItemGroup {
                 Toggle("Auto-Refresh", isOn: $appState.autoRefresh)
                 
+                Button(action: handleToggleWatched) {
+                    Image(systemName: isWatched ? "star.fill" : "star")
+                }
+                .help("Watch this thread")
+                
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -124,6 +129,14 @@ struct ThreadView: View {
             if appState.autoRefresh {
                 startRefreshTimer()
             }
+        }
+    }
+    
+    private var isWatched: Bool {
+        guard let thread = getThread(appState.currentItem) else { return false }
+        
+        return appState.watchedThreads.contains {
+            return $0.boardId == thread.boardId && $0.id == thread.id
         }
     }
     
@@ -218,6 +231,20 @@ struct ThreadView: View {
     private func handleBackToCatalog() {
         if let board = getParentBoard(appState.currentItem) {
             NotificationCenter.default.post(name: .showBoard, object: board)
+        }
+    }
+    
+    private func handleToggleWatched() {
+        guard let thread = getThread(appState.currentItem) else { return }
+        
+        if isWatched,
+           let index = appState.watchedThreads.firstIndex(where: {
+            return $0.boardId == thread.boardId && $0.id == thread.id
+           }) {
+            
+            appState.watchedThreads.remove(at: index)
+        } else {
+            appState.watchedThreads.append(thread)
         }
     }
     

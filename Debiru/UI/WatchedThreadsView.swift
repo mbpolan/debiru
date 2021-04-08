@@ -23,17 +23,25 @@ struct WatchedThreadsView: View {
                 }
             }
             
-            if viewModel.watchedThreads.isEmpty {
+            if watchedThreads.isEmpty {
                 Spacer()
                 Text("No watched threads")
                 Spacer()
             } else {
-                List(viewModel.watchedThreads, id: \.self) { thread in
-                    Text("\(thread)")
+                List(watchedThreads, id: \.self) { thread in
+                    ThreadListItemView(thread)
                 }
             }
         }
         .padding()
+    }
+    
+    private var watchedThreads: [Thread] {
+        if let boardId = viewModel.selectedBoard {
+            return appState.watchedThreads.filter { $0.boardId == boardId }
+        }
+        
+        return appState.watchedThreads
     }
 }
 
@@ -41,7 +49,6 @@ struct WatchedThreadsView: View {
 
 class WatchedThreadsViewModel: ObservableObject {
     @Published var selectedBoard: String?
-    @Published var watchedThreads: [String] = []
 }
 
 // MARK: - Preview
