@@ -16,8 +16,14 @@ struct WatchedThreadsView: View {
     var body: some View {
         VStack {
             Picker(selection: $viewModel.selectedBoard, label: Text("")) {
-                ForEach(appState.boards, id: \.self) { board in
-                    Text(board.title)
+                Text("All")
+                    .frame(maxWidth: .infinity)
+                    .tag("")
+                
+                Divider()
+                
+                ForEach(selectableBoards, id: \.self) { board in
+                    Text("/\(board.id)/ - \(board.title)")
                         .frame(maxWidth: .infinity)
                         .tag(board.id)
                 }
@@ -33,12 +39,16 @@ struct WatchedThreadsView: View {
                 }
             }
         }
-        .padding()
+        .padding(1)
+    }
+    
+    private var selectableBoards: [Board] {
+        return appState.boards.sorted(by: { $0.id < $1.id })
     }
     
     private var watchedThreads: [Thread] {
-        if let boardId = viewModel.selectedBoard {
-            return appState.watchedThreads.filter { $0.boardId == boardId }
+        if !viewModel.selectedBoard.isEmpty {
+            return appState.watchedThreads.filter { $0.boardId == viewModel.selectedBoard }
         }
         
         return appState.watchedThreads
@@ -48,7 +58,7 @@ struct WatchedThreadsView: View {
 // MARK: - View Model
 
 class WatchedThreadsViewModel: ObservableObject {
-    @Published var selectedBoard: String?
+    @Published var selectedBoard: String = ""
 }
 
 // MARK: - Preview

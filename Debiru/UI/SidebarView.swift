@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - View
 
 struct SidebarView: View {
-    @ObservedObject private var viewModel: SidebarViewModel = SidebarViewModel()
+    @StateObject private var viewModel: SidebarViewModel = SidebarViewModel()
     
     var body: some View {
         VStack {
