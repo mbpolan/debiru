@@ -34,31 +34,45 @@ struct ThreadView: View {
                 makeHeader()
                 
                 List(posts, id: \.self) { post in
-                    HStack {
-                        if let asset = post.attachment {
-                            VStack(alignment: .leading) {
-                                WebImage(asset,
-                                         saveLocation: defaultImageLocation,
-                                         bounds: CGSize(width: 128.0, height: 128.0),
-                                         onOpen: handleOpenImage)
-                                
-                                Spacer()
+                    VStack {
+                        HStack {
+                            if let asset = post.attachment {
+                                VStack(alignment: .leading) {
+                                    WebImage(asset,
+                                             saveLocation: defaultImageLocation,
+                                             bounds: CGSize(width: 128.0, height: 128.0),
+                                             onOpen: handleOpenImage)
+                                    
+                                    Spacer()
+                                }
                             }
+                            
+                            PostView(
+                                post.toPostContent(),
+                                boardId: post.boardId,
+                                threadId: post.threadId,
+                                onActivate: { },
+                                onLink: { link in
+                                    handleLink(link, scrollProxy: scroll)
+                                })
+                                .padding(.leading, 10)
+                            
+                            Spacer()
                         }
                         
-                        PostView(
-                            post.toPostContent(),
-                            boardId: post.boardId,
-                            threadId: post.threadId,
-                            onActivate: { },
-                            onLink: { link in
-                                handleLink(link, scrollProxy: scroll)
-                            })
-                            .padding(.leading, 10)
-                        
-                        Spacer()
+                        if shouldShowNewPostDividerAfter(post) {
+                            TextDivider("New Posts", color: .red)
+                                .onAppear {
+                                    // schedule an update to reset the new post marker
+                                    Timer.scheduledTimer(
+                                        withTimeInterval: TimeInterval(5),
+                                        repeats: false,
+                                        block: { _ in handleUpdateLastPost() })
+                                }
+                        }
                     }
                     .id(post)
+                    
                 }
                 
                 Divider()
@@ -133,11 +147,7 @@ struct ThreadView: View {
     }
     
     private var isWatched: Bool {
-        guard let thread = getThread(appState.currentItem) else { return false }
-        
-        return appState.watchedThreads.contains {
-            return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
-        }
+        return getWatchedThread() != nil
     }
     
     private var statistics: ThreadViewModel.Statistics {
@@ -264,12 +274,44 @@ struct ThreadView: View {
         }
     }
     
+    private func handleUpdateLastPost() {
+        // reset the new post count for the watched thread
+        guard let watchedThread = getWatchedThread(),
+              let index = appState.watchedThreads.firstIndex(of: watchedThread),
+              let firstPost = viewModel.posts.first,
+              let lastPost = viewModel.posts.last else { return }
+        
+        appState.watchedThreads[index] = WatchedThread(
+            thread: watchedThread.thread,
+            lastPostId: lastPost.id,
+            totalNewPosts: 0,
+            nowArchived: firstPost.archived,
+            nowDeleted: watchedThread.nowDeleted)
+    }
+    
+    private func shouldShowNewPostDividerAfter(_ post: Post) -> Bool {
+        guard let watchedThread = getWatchedThread(),
+              let postIndex = viewModel.posts.firstIndex(of: post) else { return false }
+        
+        // show dividers only if there are new posts after this one
+        return watchedThread.lastPostId == post.id &&
+            postIndex < viewModel.posts.endIndex - 1
+    }
+    
     private func getNavigationTitle() -> String {
         if let thread = getThread(appState.currentItem) {
             return "/\(thread.boardId)/ - \(thread.id)"
         }
         
         return ""
+    }
+    
+    private func getWatchedThread() -> WatchedThread? {
+        guard let thread = getThread(appState.currentItem) else { return nil }
+        
+        return appState.watchedThreads.first {
+            return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
+        }
     }
     
     private func getParentBoard(_ item: ViewableItem?) -> Board? {
