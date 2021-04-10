@@ -14,6 +14,7 @@ class AppState: ObservableObject, Codable {
     @Published var openItems: [ViewableItem]
     @Published var openImageData: Data?
     @Published var autoRefresh: Bool = false
+    @Published var targettedPostId: Int?
     @Published var watchedThreads: [WatchedThread] = []
     
     init() {

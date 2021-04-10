@@ -63,6 +63,8 @@ struct ContentView: View {
         .onReceive(showThreadPublisher) { event in
             if let thread = event.object as? Thread {
                 handleShowThread(thread)
+            } else if let watchedThread = event.object as? WatchedThread {
+                handleShowWatchedThread(watchedThread)
             }
         }
         .onReceive(showImagePublisher) { event in
@@ -127,6 +129,11 @@ struct ContentView: View {
         default:
             break
         }
+    }
+    
+    private func handleShowWatchedThread(_ watchedThread: WatchedThread) {
+        appState.currentItem = .thread(nil, watchedThread.thread)
+        appState.targettedPostId = watchedThread.lastPostId
     }
     
     private func handleShowImage(_ data: Data) {

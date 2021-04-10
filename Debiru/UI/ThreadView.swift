@@ -89,6 +89,14 @@ struct ThreadView: View {
                     scroll.scrollTo(last)
                 }
             }
+            .onChange(of: viewModel.targettedPostId) { targettedPostId in
+                if let targettedPostId = targettedPostId,
+                   let post = viewModel.posts.first(where: { $0.id == targettedPostId }) {
+                    
+                    scroll.scrollTo(post)
+                    appState.targettedPostId = nil
+                }
+            }
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
@@ -354,6 +362,11 @@ struct ThreadView: View {
             case .success(let posts):
                 self.viewModel.posts = posts
                 self.viewModel.lastUpdate = Date()
+                
+                // pop the targetted post id from the app state
+                self.viewModel.targettedPostId = appState.targettedPostId
+                appState.targettedPostId = nil
+                
             case .failure(let error):
                 print(error)
             }
@@ -372,6 +385,7 @@ class ThreadViewModel: ObservableObject {
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
     @Published var refreshTimer: Timer?
+    @Published var targettedPostId: Int?
     
     struct Statistics {
         let replies: Int?

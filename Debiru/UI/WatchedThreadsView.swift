@@ -42,6 +42,9 @@ struct WatchedThreadsView: View {
                         
                         makeBadge(watchedThread)
                     }
+                    .onTapGesture {
+                        handleShowThread(watchedThread)
+                    }
                 }
             }
         }
@@ -86,6 +89,10 @@ struct WatchedThreadsView: View {
         
         return badge?.frame(width: 20, height: 20)
             .toErasedView()
+    }
+    
+    private func handleShowThread(_ watchedThread: WatchedThread) {
+        NotificationCenter.default.post(name: .showThread, object: watchedThread)
     }
 }
 
