@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Thread: Identifiable, Hashable {
+struct Thread: Identifiable, Hashable, Codable {
     let id: Int
     let boardId: String
     let author: User
@@ -20,16 +20,26 @@ struct Thread: Identifiable, Hashable {
     let statistics: ThreadStatistics
 }
 
-struct ThreadStatistics: Equatable, Hashable {
+struct ThreadStatistics: Equatable, Hashable, Codable {
     let replies: Int
     let images: Int
     let uniquePosters: Int?
     let bumpLimit: Bool
     let imageLimit: Bool
     let page: Int?
+    
+    static var unknown: ThreadStatistics {
+        return ThreadStatistics(
+            replies: 0,
+            images: 0,
+            uniquePosters: nil,
+            bumpLimit: false,
+            imageLimit: false,
+            page: nil)
+    }
 }
 
-struct WatchedThread: Identifiable, Hashable {
+struct WatchedThread: Identifiable, Hashable, Codable {
     let thread: Thread
     let lastPostId: Int
     let totalNewPosts: Int

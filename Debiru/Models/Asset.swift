@@ -5,7 +5,7 @@
 //  Created by Mike Polan on 3/17/21.
 //
 
-struct Asset: Identifiable, Hashable, Equatable {
+struct Asset: Identifiable, Hashable, Equatable, Codable {
     let id: Int
     let boardId: String
     let width: Int

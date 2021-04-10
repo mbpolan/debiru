@@ -15,4 +15,5 @@ extension Notification.Name {
     static let refreshView = Notification.Name("refreshView")
     static let goToTop = Notification.Name("goToTop")
     static let goToBottom = Notification.Name("goToBottom")
+    static let saveAppState = Notification.Name("saveAppState")
 }

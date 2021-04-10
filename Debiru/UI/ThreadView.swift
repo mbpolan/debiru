@@ -246,6 +246,8 @@ struct ThreadView: View {
         } else {
             appState.watchedThreads.append(.initial(thread, posts: posts))
         }
+        
+        NotificationCenter.default.post(name: .saveAppState, object: nil)
     }
     
     private func handleLink(_ link: Link, scrollProxy: ScrollViewProxy) {
