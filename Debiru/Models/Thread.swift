@@ -28,3 +28,26 @@ struct ThreadStatistics: Equatable, Hashable {
     let imageLimit: Bool
     let page: Int?
 }
+
+struct WatchedThread: Identifiable, Hashable {
+    let thread: Thread
+    let lastPostId: Int
+    let totalNewPosts: Int
+    let nowArchived: Bool
+    let nowDeleted: Bool
+    
+    var id: Int {
+        return thread.id
+    }
+}
+
+extension WatchedThread {
+    static func initial(_ thread: Thread, posts: [Post]) -> WatchedThread {
+        return WatchedThread(
+            thread: thread,
+            lastPostId: posts.last?.id ?? 0,
+            totalNewPosts: 0,
+            nowArchived: posts.first?.archived ?? false,
+            nowDeleted: false)
+    }
+}

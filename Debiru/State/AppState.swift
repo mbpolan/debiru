@@ -14,7 +14,7 @@ class AppState: ObservableObject {
     @Published var openItems: [ViewableItem]
     @Published var openImageData: Data?
     @Published var autoRefresh: Bool = false
-    @Published var watchedThreads: [Thread] = []
+    @Published var watchedThreads: [WatchedThread] = []
     
     init() {
         self.boards = []

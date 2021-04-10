@@ -13,7 +13,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var appState: AppState
-    @ObservedObject private var viewModel: ContentViewModel = ContentViewModel()
+    @StateObject private var viewModel: ContentViewModel = ContentViewModel()
     
     private let dataProvider: DataProvider
     private let showBoardPublisher = NotificationCenter.default.publisher(for: .showBoard)
@@ -46,6 +46,11 @@ struct ContentView: View {
         .environmentObject(appState)
         .onAppear {
             viewModel.pendingBoards = dataProvider.getBoards(handleBoards)
+            viewModel.threadWatcher = scheduleNextThreadCheck()
+        }
+        .onDisappear {
+            viewModel.threadWatcher?.invalidate()
+            viewModel.threadWatcher = nil
         }
         .onChange(of: appState.quickSearchOpen) { open in
             viewModel.openSheet = open ? .quickSearch : nil
@@ -141,6 +146,67 @@ struct ContentView: View {
         
         viewModel.pendingBoards = nil
     }
+    
+    private func handleCheckWatchedThreads(_ timer: Timer) {
+        let group = DispatchGroup()
+        var updatedWatchedThreads: [WatchedThread] = []
+        var tasks: [AnyCancellable] = []
+        
+        appState.watchedThreads.forEach { watchedThread in
+            group.enter()
+            
+            print("Checking: \(watchedThread.thread.boardId) - \(watchedThread.id)")
+            
+            // fetch posts for this thread
+            let task = dataProvider.getPosts(for: watchedThread.thread) { result in
+                switch result {
+                case .success(let posts):
+                    // has the thread been archived since the last time we checked?
+                    let archived = posts.first?.archived ?? false
+                    
+                    // are there any new posts since the last known post was checked?
+                    let lastKnownIndex = posts
+                        .firstIndex { $0.id == watchedThread.lastPostId } ?? 0
+                    
+                    let newPosts = posts.count - lastKnownIndex - 1
+                    print("New: \(watchedThread.thread.boardId) - \(watchedThread.id) = \(newPosts)")
+                    
+                    updatedWatchedThreads.append(WatchedThread(
+                                                    thread: watchedThread.thread,
+                                                    lastPostId: watchedThread.lastPostId,
+                                                    totalNewPosts: newPosts,
+                                                    nowArchived: archived,
+                                                    nowDeleted: false))
+                    
+                case .failure(let error):
+                    print("*** ERROR: \(error.localizedDescription)")
+                    // TODO: handle errors and edge cases where the thread has been deleted
+                }
+                
+                group.leave()
+            }
+            
+            if let task = task {
+                tasks.append(task)
+            }
+        }
+        
+        group.notify(queue: .main) { [tasks] in
+            print("**** Update sweep finished for \(tasks.count) threads")
+            
+            // update the app state with our newly gathered thread statistics, and schedule
+            // the next iteration
+            appState.watchedThreads = updatedWatchedThreads
+            viewModel.threadWatcher = scheduleNextThreadCheck()
+        }
+    }
+    
+    private func scheduleNextThreadCheck() -> Timer {
+        return Timer.scheduledTimer(
+            withTimeInterval: TimeInterval(10),
+            repeats: false,
+            block: handleCheckWatchedThreads)
+    }
 }
 
 // MARK: - View Model
@@ -149,6 +215,7 @@ class ContentViewModel: ObservableObject {
     @Published var openSheet: Sheet?
     @Published var pendingBoards: AnyCancellable?
     @Published var error: ViewError?
+    @Published var threadWatcher: Timer?
     
     enum Sheet: Identifiable {
         case error

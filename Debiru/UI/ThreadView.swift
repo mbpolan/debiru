@@ -136,7 +136,7 @@ struct ThreadView: View {
         guard let thread = getThread(appState.currentItem) else { return false }
         
         return appState.watchedThreads.contains {
-            return $0.boardId == thread.boardId && $0.id == thread.id
+            return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
         }
     }
     
@@ -239,12 +239,12 @@ struct ThreadView: View {
         
         if isWatched,
            let index = appState.watchedThreads.firstIndex(where: {
-            return $0.boardId == thread.boardId && $0.id == thread.id
+            return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
            }) {
             
             appState.watchedThreads.remove(at: index)
         } else {
-            appState.watchedThreads.append(thread)
+            appState.watchedThreads.append(.initial(thread, posts: posts))
         }
     }
     
