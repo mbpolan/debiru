@@ -5,6 +5,7 @@
 //  Created by Mike Polan on 3/27/21.
 //
 
+import FlagKit
 import SwiftUI
 
 // MARK: - View
@@ -58,6 +59,7 @@ struct PostView<T>: View where T: View {
                         .onTapGesture(perform: onActivate)
                     
                     makeAuthorText(content.author)
+                    
                     Text("\(DateFormatter.standard().string(from: content.date))")
                 }
                 
@@ -136,10 +138,35 @@ struct PostView<T>: View where T: View {
             break
         }
         
-        return Text(username)
-            .bold()
-            .foregroundColor(color ?? Color(NSColor.textColor))
-            .help(help ?? username)
+        return HStack {
+            Text(username)
+                .bold()
+                .foregroundColor(color ?? Color(NSColor.textColor))
+                .help(help ?? username)
+            
+            if let country = user.country {
+                makeCountryFlag(country)
+            }
+        }
+    }
+    
+    private func makeCountryFlag(_ country: User.Country) -> AnyView {
+        switch country {
+        case .code(let code, let name):
+            if let image = Flag(countryCode: code)?.originalImage {
+                return Image(nsImage: image)
+                    .help(name)
+                    .toErasedView()
+            } else {
+                return Image(systemName: "flag")
+                    .help(name)
+                    .toErasedView()
+            }
+        default:
+            return Image(systemName: "flag")
+                .help("Unknown country")
+                .toErasedView()
+        }
     }
     
     private func handleLink(_ url: URL) -> Void {
@@ -287,7 +314,8 @@ struct PostView_Previews: PreviewProvider {
                         name: "Anonymous",
                         tripCode: nil,
                         isSecure: false,
-                        tag: nil),
+                        tag: nil,
+                        country: nil),
                     date: Date(),
                     subject: "Something",
                     content: "Ain't this cool?",

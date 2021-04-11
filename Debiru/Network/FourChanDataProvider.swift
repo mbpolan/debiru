@@ -57,6 +57,13 @@ struct FourChanDataProvider: DataProvider {
                                 extension: ext)
                         }
                         
+                        var country: User.Country?
+                        if let code = thread.countryCode,
+                           let name = thread.countryName {
+                            // XX indicates an unknown country code
+                            country = code == "XX" ? .unknown : .code(code: code, name: name)
+                        }
+                        
                         return Thread(
                             id: thread.id,
                             boardId: board.id,
@@ -64,7 +71,8 @@ struct FourChanDataProvider: DataProvider {
                                 name: thread.author,
                                 tripCode: thread.trip,
                                 isSecure: thread.trip?.starts(with: "!!") ?? false,
-                                tag: thread.capCode?.toTag()),
+                                tag: thread.capCode?.toTag(),
+                                country: country),
                             date: Date(timeIntervalSince1970: TimeInterval(thread.time)),
                             subject: thread.subject,
                             content: thread.content,
@@ -141,6 +149,13 @@ struct FourChanDataProvider: DataProvider {
                         archivedDate = Date(timeIntervalSince1970: TimeInterval(archiveTime))
                     }
                     
+                    var country: User.Country?
+                    if let code = post.countryCode,
+                       let name = post.countryName {
+                        // XX indicates an unknown country code
+                        country = code == "XX" ? .unknown : .code(code: code, name: name)
+                    }
+                    
                     return Post(
                         id: post.id,
                         boardId: thread.boardId,
@@ -150,7 +165,8 @@ struct FourChanDataProvider: DataProvider {
                             name: post.author,
                             tripCode: post.trip,
                             isSecure: post.trip?.starts(with: "!!") ?? false,
-                            tag: post.capCode?.toTag()),
+                            tag: post.capCode?.toTag(),
+                            country: country),
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
                         subject: post.subject,
                         content: post.content,
@@ -316,6 +332,8 @@ fileprivate struct ThreadModel: Codable {
     let subject: String?
     let author: String?
     let capCode: CapCode?
+    let countryCode: String?
+    let countryName: String?
     let trip: String?
     let content: String?
     let sticky: Int?
@@ -339,6 +357,8 @@ fileprivate struct ThreadModel: Codable {
         case subject = "sub"
         case author = "name"
         case capCode = "capcode"
+        case countryCode = "country"
+        case countryName = "country_name"
         case trip
         case content = "com"
         case sticky
@@ -369,6 +389,8 @@ fileprivate struct PostModel: Codable {
     let subject: String?
     let author: String?
     let capCode: CapCode?
+    let countryCode: String?
+    let countryName: String?
     let trip: String?
     let content: String?
     let sticky: Int?
@@ -395,6 +417,8 @@ fileprivate struct PostModel: Codable {
         case subject = "sub"
         case author = "name"
         case capCode = "capcode"
+        case countryCode = "country"
+        case countryName = "country_name"
         case trip
         case content = "com"
         case sticky

@@ -23,6 +23,7 @@
 		27B5E76C261FC24200178F1B /* ThreadListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B5E76B261FC24200178F1B /* ThreadListItemView.swift */; };
 		27B5E76F2621311000178F1B /* Persistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B5E76E2621311000178F1B /* Persistance.swift */; };
 		27B5E7722622511A00178F1B /* TextDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B5E7712622511A00178F1B /* TextDivider.swift */; };
+		27B5E77726228A7100178F1B /* FlagKit in Frameworks */ = {isa = PBXBuildFile; productRef = 27B5E77626228A7100178F1B /* FlagKit */; };
 		27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BBC9C026057E09005D8183 /* SearchBarView.swift */; };
 		27BBC9C626058595005D8183 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C526058595005D8183 /* Introspect */; };
 		27BBC9CA26067D14005D8183 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 27BBC9C926067D14005D8183 /* SwiftSoup */; };
@@ -108,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27B5E77726228A7100178F1B /* FlagKit in Frameworks */,
 				27BBC9C626058595005D8183 /* Introspect in Frameworks */,
 				27BBC9CA26067D14005D8183 /* SwiftSoup in Frameworks */,
 			);
@@ -259,6 +261,7 @@
 			packageProductDependencies = (
 				27BBC9C526058595005D8183 /* Introspect */,
 				27BBC9C926067D14005D8183 /* SwiftSoup */,
+				27B5E77626228A7100178F1B /* FlagKit */,
 			);
 			productName = Debiru;
 			productReference = 2799460625FD9E5A001DCCE3 /* Debiru.app */;
@@ -290,6 +293,7 @@
 			packageReferences = (
 				27BBC9C426058595005D8183 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				27BBC9C826067D14005D8183 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				27B5E77526228A7100178F1B /* XCRemoteSwiftPackageReference "FlagKit" */,
 			);
 			productRefGroup = 2799460725FD9E5A001DCCE3 /* Products */;
 			projectDirPath = "";
@@ -547,6 +551,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		27B5E77526228A7100178F1B /* XCRemoteSwiftPackageReference "FlagKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/madebybowtie/FlagKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
 		27BBC9C426058595005D8183 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
@@ -566,6 +578,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		27B5E77626228A7100178F1B /* FlagKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 27B5E77526228A7100178F1B /* XCRemoteSwiftPackageReference "FlagKit" */;
+			productName = FlagKit;
+		};
 		27BBC9C526058595005D8183 /* Introspect */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 27BBC9C426058595005D8183 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
