@@ -45,6 +45,11 @@ struct WatchedThreadsView: View {
                     .onTapGesture {
                         handleShowThread(watchedThread)
                     }
+                    .contextMenu {
+                        Button("Remove") {
+                            handleRemoveWatchedThread(watchedThread)
+                        }
+                    }
                 }
             }
         }
@@ -56,11 +61,20 @@ struct WatchedThreadsView: View {
     }
     
     private var watchedThreads: [WatchedThread] {
+        var threads: [WatchedThread] = appState.watchedThreads
         if !viewModel.selectedBoard.isEmpty {
-            return appState.watchedThreads.filter { $0.thread.boardId == viewModel.selectedBoard }
+            threads = appState.watchedThreads.filter { $0.thread.boardId == viewModel.selectedBoard }
         }
         
-        return appState.watchedThreads
+        // ensure a consistent ordering: first by total new posts then by thread id in case
+        // of ties
+        return threads.sorted(by: {
+            if $0.totalNewPosts == $1.totalNewPosts {
+                return $0.thread.id < $1.thread.id
+            }
+            
+            return $0.totalNewPosts > $1.totalNewPosts
+        })
     }
     
     private func makeBadge(_ watchedThread: WatchedThread) -> AnyView? {
@@ -93,6 +107,12 @@ struct WatchedThreadsView: View {
     
     private func handleShowThread(_ watchedThread: WatchedThread) {
         NotificationCenter.default.post(name: .showThread, object: watchedThread)
+    }
+    
+    private func handleRemoveWatchedThread(_ watchedThread: WatchedThread) {
+        guard let index = appState.watchedThreads.firstIndex(of: watchedThread) else { return }
+        
+        appState.watchedThreads.remove(at: index)
     }
 }
 
