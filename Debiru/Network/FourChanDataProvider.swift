@@ -63,7 +63,8 @@ struct FourChanDataProvider: DataProvider {
                             author: User(
                                 name: thread.author,
                                 tripCode: thread.trip,
-                                isSecure: thread.trip?.starts(with: "!!") ?? false),
+                                isSecure: thread.trip?.starts(with: "!!") ?? false,
+                                tag: thread.capCode?.toTag()),
                             date: Date(timeIntervalSince1970: TimeInterval(thread.time)),
                             subject: thread.subject,
                             content: thread.content,
@@ -148,7 +149,8 @@ struct FourChanDataProvider: DataProvider {
                         author: User(
                             name: post.author,
                             tripCode: post.trip,
-                            isSecure: post.trip?.starts(with: "!!") ?? false),
+                            isSecure: post.trip?.starts(with: "!!") ?? false,
+                            tag: post.capCode?.toTag()),
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
                         subject: post.subject,
                         content: post.content,
@@ -263,6 +265,30 @@ struct FourChanDataProvider: DataProvider {
 
 // MARK: - API models
 
+fileprivate enum CapCode: String, Codable {
+    case administrator = "admin"
+    case administratorHighlight = "admin_highlight"
+    case moderator = "mod"
+    case manager
+    case developer
+    case verified
+    
+    func toTag() -> User.Tag {
+        switch self {
+        case .administrator, .administratorHighlight:
+            return .administrator
+        case .moderator:
+            return .moderator
+        case .manager:
+            return .manager
+        case .developer:
+            return .developer
+        case .verified:
+            return .verified
+        }
+    }
+}
+
 fileprivate struct BoardsResponse: Codable {
     let boards: [BoardModel]
 }
@@ -289,6 +315,7 @@ fileprivate struct ThreadModel: Codable {
     let time: Int
     let subject: String?
     let author: String?
+    let capCode: CapCode?
     let trip: String?
     let content: String?
     let sticky: Int?
@@ -311,6 +338,7 @@ fileprivate struct ThreadModel: Codable {
         case time
         case subject = "sub"
         case author = "name"
+        case capCode = "capcode"
         case trip
         case content = "com"
         case sticky
@@ -340,6 +368,7 @@ fileprivate struct PostModel: Codable {
     let time: Int
     let subject: String?
     let author: String?
+    let capCode: CapCode?
     let trip: String?
     let content: String?
     let sticky: Int?
@@ -365,6 +394,7 @@ fileprivate struct PostModel: Codable {
         case time
         case subject = "sub"
         case author = "name"
+        case capCode = "capcode"
         case trip
         case content = "com"
         case sticky

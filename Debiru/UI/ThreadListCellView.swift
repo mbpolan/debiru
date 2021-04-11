@@ -37,7 +37,8 @@ struct ThreadListCellView_Previews: PreviewProvider {
                             author: User(
                                 name: "Anonymous",
                                 tripCode: nil,
-                                isSecure: false),
+                                isSecure: false,
+                                tag: nil),
                             date: Date(),
                             subject: nil,
                             content: nil,

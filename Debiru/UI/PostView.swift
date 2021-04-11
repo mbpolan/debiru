@@ -57,9 +57,8 @@ struct PostView<T>: View where T: View {
                         .hoverEffect()
                         .onTapGesture(perform: onActivate)
                     
-                    Text("Posted by ") +
-                        makeAuthorText(content.author) +
-                        Text(" on \(DateFormatter.standard().string(from: content.date))")
+                    makeAuthorText(content.author)
+                    Text("\(DateFormatter.standard().string(from: content.date))")
                 }
                 
                 if let headerContent = self.headerContent {
@@ -101,14 +100,46 @@ struct PostView<T>: View where T: View {
         }
     }
     
-    private func makeAuthorText(_ user: User) -> Text {
+    private func makeAuthorText(_ user: User) -> some View {
+        // set the name based on the username or tripcode
+        var username: String = ""
         if let name = user.name {
-            return Text(name).bold()
+            username = name
         } else if let trip = user.tripCode {
-            return Text(trip).bold()
-        } else {
-            return Text("")
+            username = trip
         }
+        
+        // apply extra styling if the user has a particular tag
+        var color: Color?
+        var help: String?
+        
+        switch user.tag {
+        case .administrator:
+            color = Color(NSColor.systemRed)
+            help = "Administrator"
+        case .developer:
+            color = Color(NSColor.systemOrange)
+            help = "Developer"
+        case .founder:
+            color = Color(NSColor.systemPink)
+            help = "Founder"
+        case .manager:
+            color = Color(NSColor.systemBlue)
+            help = "Manager"
+        case .moderator:
+            color = Color(NSColor.systemPurple)
+            help = "Moderator"
+        case .verified:
+            color = Color(NSColor.systemTeal)
+            help = "Verified user"
+        default:
+            break
+        }
+        
+        return Text(username)
+            .bold()
+            .foregroundColor(color ?? Color(NSColor.textColor))
+            .help(help ?? username)
     }
     
     private func handleLink(_ url: URL) -> Void {
@@ -248,7 +279,8 @@ struct PostView_Previews: PreviewProvider {
                     author: User(
                         name: "Anonymous",
                         tripCode: nil,
-                        isSecure: false),
+                        isSecure: false,
+                        tag: nil),
                     date: Date(),
                     subject: "Something",
                     content: "Ain't this cool?",

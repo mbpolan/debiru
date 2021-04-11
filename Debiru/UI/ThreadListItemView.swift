@@ -36,7 +36,8 @@ struct ThreadListItemView_Previews: PreviewProvider {
                             author: User(
                                 name: nil,
                                 tripCode: nil,
-                                isSecure: false),
+                                isSecure: false,
+                                tag: nil),
                             date: Date(),
                             subject: nil,
                             content: nil,

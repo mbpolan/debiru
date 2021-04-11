@@ -414,7 +414,8 @@ struct ThreadView_Previews: PreviewProvider {
         author: User(
             name: "Anonymous",
             tripCode: nil,
-            isSecure: false),
+            isSecure: false,
+            tag: nil),
         date: Date(),
         subject: "foo",
         content: nil,

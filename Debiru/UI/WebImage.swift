@@ -177,3 +177,22 @@ class WebImageViewModel: ObservableObject {
         case done(NSImage)
     }
 }
+
+// MARK: - Previews
+
+struct WebImage_Previews: PreviewProvider {
+    static var previews: some View {
+        WebImage(Asset(
+                    id: 1594686780709,
+                    boardId: "g",
+                    width: 100,
+                    height: 50,
+                    thumbnailWidth: 100,
+                    thumbnailHeight: 50,
+                    filename: "lol",
+                    extension: ".jpg"),
+                 saveLocation: URL(fileURLWithPath: "/foo"),
+                 bounds: CGSize(width: 128.0, height: 128.0),
+                 onOpen: { _ in })
+    }
+}
