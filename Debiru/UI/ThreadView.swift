@@ -279,6 +279,8 @@ struct ThreadView: View {
             withAnimation {
                 scrollProxy.scrollTo(targetPost)
             }
+        } else if let webLink = link as? WebLink {
+            NSWorkspace.shared.open(webLink.url)
         }
     }
     

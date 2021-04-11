@@ -149,6 +149,9 @@ struct PostView<T>: View where T: View {
         // links to a board or post
         case "applewebdata":
             link = handleInternalLink(url)
+            // links to external websites
+        case "http", "https":
+            link = handleExternalLink(url)
             
         default:
             print("Unknown URL scheme: \(url.scheme ?? "nil")")
@@ -186,6 +189,10 @@ struct PostView<T>: View where T: View {
         
         print("Unknown link: \(url.path)")
         return nil
+    }
+    
+    private func handleExternalLink(_ url: URL) -> Link? {
+        return WebLink(url: url)
     }
 }
 

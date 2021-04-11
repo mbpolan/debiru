@@ -169,7 +169,9 @@ struct CatalogView: View {
     }
     
     private func handleLink(_ link: Link) {
-        // TODO
+        if let webLink = link as? WebLink {
+            NSWorkspace.shared.open(webLink.url)
+        }
     }
     
     private func startRefreshTimer() {

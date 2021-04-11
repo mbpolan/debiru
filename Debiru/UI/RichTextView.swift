@@ -122,6 +122,7 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         let view = NSTextView()
         view.drawsBackground = false
         view.isEditable = false
+        view.enabledTextCheckingTypes = NSTextCheckingResult.CheckingType.link.rawValue
         view.autoresizesSubviews = true
         view.autoresizingMask = .init([.width, .height])
         view.delegate = context.coordinator
@@ -131,6 +132,13 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
             case .success(let string):
                 context.coordinator.string = string
                 view.textStorage?.setAttributedString(string)
+                
+                // apply additional constructs to the text (links, etc.) at this point.
+                // we need to make the view editable *before* calling checkTextInDocument,
+                // otherwise it will have no effect.
+                view.isEditable = true
+                view.checkTextInDocument(nil)
+                view.isEditable = false
                 
                 recalculateHeight(string)
             case .failure(let error):
