@@ -38,15 +38,7 @@ struct WebImage: View {
                 makeImage(image)
                 
             case .error(let error):
-                VStack(alignment: .center) {
-                    Image(systemName: "exclamationmark.circle")
-                        .imageScale(.large)
-                    
-                    Text("\(asset.filename)\(asset.extension)")
-                        .font(.footnote)
-                }
-                .help(error)
-                .frame(width: frame.width, height: frame.height)
+                makeErrorView(error, frame: frame)
                 
             default:
                 ProgressView()
@@ -77,6 +69,47 @@ struct WebImage: View {
             }
         }
         .onAppear(perform: self.load)
+    }
+    
+    private func makeImage(_ data: Data) -> some View {
+        let bounds = self.bounds ??
+            CGSize(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
+        
+        // depending on the type of image this is, we need to either create a static
+        // image view or an animated one instead. the set up is similar, but the underlying
+        // views are radically different.
+        let view: AnyView
+        if asset.extension.caseInsensitiveCompare(".gif") == .orderedSame {
+            view = AnimatedImageView(data: data,
+                                     frame: NSSize(width: bounds.width, height: bounds.height))
+                .aspectRatio(contentMode: .fit)
+                .frame(width: bounds.width, height: bounds.height)
+                .toErasedView()
+        } else if let nsImage = NSImage(data: data) {
+            view = Image(nsImage: nsImage)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: bounds.width, height: bounds.height)
+                .toErasedView()
+        } else {
+            view = makeErrorView("This image is not valid", frame: bounds)
+                .toErasedView()
+        }
+        
+        return view
+            .clipShape(RoundedRectangle(cornerRadius: 5.0))
+    }
+    
+    private func makeErrorView(_ error: String, frame: CGSize) -> some View {
+        VStack(alignment: .center) {
+            Image(systemName: "exclamationmark.circle")
+                .imageScale(.large)
+            
+            Text("\(asset.filename)\(asset.extension)")
+                .font(.footnote)
+        }
+        .help(error)
+        .frame(width: frame.width, height: frame.height)
     }
     
     func load() {
@@ -115,37 +148,12 @@ struct WebImage: View {
         return CGSize(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
     }
     
-    private func makeImage(_ nsImage: NSImage) -> some View {
-        let image = Image(nsImage: nsImage)
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-        
-        let result: AnyView
-        if let bounds = self.bounds {
-            result = AnyView(
-                image
-                    .clipShape(RoundedRectangle(cornerRadius: 5.0))
-                    .frame(width: bounds.width, height: bounds.height))
-        } else {
-            result = AnyView(
-                image
-                    .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight)))
-        }
-        
-        return result
-    }
-    
     private func handleCompletion(_ result: Result<Data, Error>) {
         switch result {
         case .success(let data):
             // save the data regardless if it is something we can render
             viewModel.imageData = data
-            
-            if let image = NSImage(data: data) {
-                self.viewModel.state = .done(image)
-            } else {
-                self.viewModel.state = .error("This image is not valid")
-            }
+            self.viewModel.state = .done(data)
             
         case .failure(let error):
             print(error)
@@ -174,7 +182,7 @@ class WebImageViewModel: ObservableObject {
         case empty
         case loading
         case error(String)
-        case done(NSImage)
+        case done(Data)
     }
 }
 
