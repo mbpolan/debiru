@@ -50,15 +50,26 @@ struct CatalogView: View {
                             onActivate: { handleShowThread(thread) },
                             onLink: handleLink) {
                             
-                            ThreadMetricsView(
-                                replies: thread.statistics.replies,
-                                images: thread.statistics.images,
-                                uniquePosters: thread.statistics.uniquePosters,
-                                bumpLimit: thread.statistics.bumpLimit,
-                                imageLimit: thread.statistics.imageLimit,
-                                page: thread.statistics.page,
-                                metrics: [.replies, .images, .page])
-                                .padding(.leading, 5)
+                            HStack(alignment: .firstTextBaseline) {
+                                ThreadMetricsView(
+                                    replies: thread.statistics.replies,
+                                    images: thread.statistics.images,
+                                    uniquePosters: thread.statistics.uniquePosters,
+                                    bumpLimit: thread.statistics.bumpLimit,
+                                    imageLimit: thread.statistics.imageLimit,
+                                    page: thread.statistics.page,
+                                    metrics: [.replies, .images, .page])
+                                
+                                Button(action: {
+                                    handleToggleWatchedThread(thread)
+                                }, label: {
+                                    Image(systemName: isThreadWatched(thread)
+                                        ? "star.fill"
+                                        : "star")
+                                })
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                            .padding(.leading, 5)
                         }
                         .padding(.leading, 10)
                         
@@ -178,6 +189,25 @@ struct CatalogView: View {
         viewModel.refreshTimer = Timer.scheduledTimer(
             withTimeInterval: TimeInterval(refreshTimeout),
             repeats: true) { _ in reloadFromState() }
+    }
+    
+    private func isThreadWatched(_ thread: Thread) -> Bool {
+        return appState.watchedThreads.contains(where: {
+            return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
+        })
+    }
+    
+    private func handleToggleWatchedThread(_ thread: Thread) {
+        if let index = appState.watchedThreads.firstIndex(where: {
+            return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
+           }) {
+            
+            appState.watchedThreads.remove(at: index)
+        } else {
+            appState.watchedThreads.append(.initial(thread))
+        }
+        
+        NotificationCenter.default.post(name: .saveAppState, object: nil)
     }
     
     private func getBoard(_ item: ViewableItem?) -> Board? {

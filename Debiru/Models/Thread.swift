@@ -52,6 +52,15 @@ struct WatchedThread: Identifiable, Hashable, Codable {
 }
 
 extension WatchedThread {
+    static func initial(_ thread: Thread) -> WatchedThread {
+        return WatchedThread(
+            thread: thread,
+            lastPostId: 0,
+            totalNewPosts: 0,
+            nowArchived: false,
+            nowDeleted: false)
+    }
+    
     static func initial(_ thread: Thread, posts: [Post]) -> WatchedThread {
         return WatchedThread(
             thread: thread,
