@@ -29,4 +29,11 @@ extension UserDefaults {
     func maxQuickSearchResults() -> Int {
         return 5
     }
+    
+    /// Returns whether images should be saved in directories corresponding to ther boards.
+    ///
+    /// - Returns: true if enabled, false if not.
+    func groupImagesByBoard() -> Bool {
+        return false
+    }
 }

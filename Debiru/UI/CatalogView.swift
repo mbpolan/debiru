@@ -14,6 +14,7 @@ import SwiftUI
 struct CatalogView: View {
     @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout = UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
+    @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard = UserDefaults.standard.groupImagesByBoard()
     
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
@@ -35,7 +36,7 @@ struct CatalogView: View {
                         if let asset = thread.attachment {
                             VStack(alignment: .leading) {
                                 WebImage(asset,
-                                         saveLocation: defaultImageLocation,
+                                         saveLocation: imageSaveLocation,
                                          bounds: CGSize(width: 128.0, height: 128.0),
                                          onOpen: handleOpenImage)
                                 
@@ -139,6 +140,15 @@ struct CatalogView: View {
                 startRefreshTimer()
             }
         }
+    }
+    
+    private var imageSaveLocation: URL {
+        if groupImagesByBoard,
+           let board = getBoard(appState.currentItem) {
+            return defaultImageLocation.appendingPathComponent("\(board.id)/")
+        }
+        
+        return defaultImageLocation
     }
     
     private var threads: [Thread] {

@@ -16,6 +16,8 @@ struct GeneralSettingsView: View {
         FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
     @AppStorage(StorageKeys.maxQuickSearchResults) private var maxQuickSearchResults: Int =
         UserDefaults.standard.maxQuickSearchResults()
+    @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard: Bool =
+        UserDefaults.standard.groupImagesByBoard()
     
     var body: some View {
         let maxQuickSearchResultsBinding = Binding<String>(
@@ -34,7 +36,7 @@ struct GeneralSettingsView: View {
         
         Form {
             LazyVGrid(columns: [
-                GridItem(.fixed(200)),
+                GridItem(.fixed(300)),
                 GridItem(.fixed(100), spacing: 0.0, alignment: .trailing),
             ], alignment: .leading) {
                 Text("Seconds to wait between automatic refreshes")
@@ -54,8 +56,13 @@ struct GeneralSettingsView: View {
                         .absoluteString
                         .replacingOccurrences(of: "file://", with: ""))
             }
+            
+            VStack {
+                Toggle("Save images in directories specific to their boards",
+                       isOn: $groupImagesByBoard)
+            }
         }
-        .frame(width: 400, height: 50)
+        .frame(width: 400, height: 150)
     }
     
     private func handleChooseSaveLocation() {

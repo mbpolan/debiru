@@ -122,7 +122,16 @@ struct WebImage: View {
     private func handleSaveImage() {
         if let data = viewModel.imageData {
             do {
-                // default to the user's pictures directory
+                // create the directory path if it doesn't already exist
+                var isDirectory: ObjCBool = true
+                if !FileManager.default.fileExists(atPath: saveLocation.path, isDirectory: &isDirectory) {
+                    try FileManager.default.createDirectory(
+                        at: saveLocation,
+                        withIntermediateDirectories: false,
+                        attributes: nil)
+                }
+                
+                // write the image with its filename preserved
                 try data.write(to: saveLocation.appendingPathComponent(asset.fullName))
                 
                 viewModel.popoverMessage = "Saved \(asset.fullName) to \(saveLocation.path)"

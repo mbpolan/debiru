@@ -13,6 +13,7 @@ import SwiftUI
 struct ThreadView: View {
     @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout = UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
+    @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard = UserDefaults.standard.groupImagesByBoard()
     
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
@@ -39,7 +40,7 @@ struct ThreadView: View {
                             if let asset = post.attachment {
                                 VStack(alignment: .leading) {
                                     WebImage(asset,
-                                             saveLocation: defaultImageLocation,
+                                             saveLocation: imageSaveLocation,
                                              bounds: CGSize(width: 128.0, height: 128.0),
                                              onOpen: handleOpenImage)
                                     
@@ -156,6 +157,15 @@ struct ThreadView: View {
     
     private var isWatched: Bool {
         return getWatchedThread() != nil
+    }
+    
+    private var imageSaveLocation: URL {
+        if groupImagesByBoard,
+           let thread = getThread(appState.currentItem) {
+            return defaultImageLocation.appendingPathComponent("\(thread.boardId)/")
+        }
+        
+        return defaultImageLocation
     }
     
     private var statistics: ThreadViewModel.Statistics {

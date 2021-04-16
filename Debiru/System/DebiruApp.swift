@@ -72,4 +72,5 @@ struct StorageKeys {
     static let refreshTimeout = "refreshTimeout"
     static let defaultImageLocation = "defaultImageLocation"
     static let maxQuickSearchResults = "maxQuickSearchResults"
+    static let groupImagesByBoard = "groupImagesByBoard"
 }
