@@ -53,10 +53,15 @@ struct RichTextView: View {
 // MARK: - Styles
 
 fileprivate struct TextStyles {
-    private static let baseStyles = """
+    private static let baseStyles = { () -> String in
+        let font = NSFont.preferredFont(forTextStyle: .body)
+        
+        return """
         <style>
         * {
           color: white;
+          font-family: -apple-system;
+          font-size: \(font.pointSize)px;
         }
         .quote {
           color: green;
@@ -66,8 +71,12 @@ fileprivate struct TextStyles {
           background-color: black;
           text-decoration: none;
         }
+        code {
+          font-family: monospace;
+        }
         </style>
     """
+    }()
     
     private let styles: String
     
@@ -177,8 +186,8 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
                 return
             }
             
-            let range = NSMakeRange(0, string.length)
-            string.addAttribute(.font, value: NSFont.preferredFont(forTextStyle: .body, options: [:]), range: range)
+//            let range = NSMakeRange(0, string.length)
+//            string.addAttribute(.font, value: NSFont.preferredFont(forTextStyle: .body, options: [:]), range: range)
             
             handler(.success(string))
         }
@@ -232,17 +241,21 @@ This is not a spoiler. <s>But this is</s>. And not this.
 """
     
     private static let quotes = "<span class=\"quote\">&gt;218664916</span><br>That looks cool."
+    private static let code = "Leading text<br><code class=\"prettyprint\">def myfunc() {}</code>"
     private static let empty = ""
-    private static let html = quotes
+    private static let html = code
     
     static var previews: some View {
-        HStack(alignment: .firstTextBaseline) {
+        VStack(alignment: .leading){
+            Text("Reference text")
+                .foregroundColor(.white)
+            
             RichTextView(
                 html,
                 boardId: "f",
                 threadId: 123,
                 onLink: { _ in })
         }
-        .frame(width: 300)
+        .frame(width: 300, height: 100)
     }
 }
