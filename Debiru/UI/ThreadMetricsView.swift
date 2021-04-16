@@ -59,6 +59,7 @@ struct ThreadMetricsView: View {
             return Group {
                 Image(systemName: icon)
                 makeNumberText(value)
+                    .lineLimit(1)
             }
             .toErasedView()
         } else {
