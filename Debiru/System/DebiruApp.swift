@@ -12,6 +12,7 @@ import SwiftUI
 struct DebiruApp: App {
     private var appState: AppState
     private let saveAppStatePublisher = NotificationCenter.default.publisher(for: .saveAppState)
+    private let threadWatcher: ThreadWatcher
     private var cancellables: Set<AnyCancellable> = Set()
     
     init() {
@@ -27,6 +28,10 @@ struct DebiruApp: App {
             print("Failed to load state: \(error.localizedDescription)")
             self.appState = AppState()
         }
+        
+        // start watching threads for updates
+        self.threadWatcher = ThreadWatcher(appState: appState)
+        self.threadWatcher.start()
         
         cancellables.insert(saveAppStatePublisher
                                 .receive(on: DispatchQueue.global(qos: .background))
