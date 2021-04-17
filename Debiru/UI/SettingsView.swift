@@ -17,12 +17,19 @@ struct SettingsView: View {
                     Label("General", systemImage: "gear")
                 }
                 .tag(Tabs.general)
+            
+                NotificationSettingsView()
+                    .tabItem {
+                        Label("Notifications", systemImage: "exclamationmark.bubble")
+                    }
+                    .tag(Tabs.notifications)
         }
         .padding(20)
     }
     
     private enum Tabs {
         case general
+        case notifications
     }
 }
 

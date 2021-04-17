@@ -36,4 +36,11 @@ extension UserDefaults {
     func groupImagesByBoard() -> Bool {
         return false
     }
+    
+    /// Returns whether local notifications are enabled.
+    ///
+    /// - Returns: true if enabled, false if not.
+    func notificationsEnabled() -> Bool {
+        return false
+    }
 }

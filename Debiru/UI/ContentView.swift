@@ -201,6 +201,28 @@ struct ContentView: View {
         group.notify(queue: .main) { [tasks] in
             print("**** Update sweep finished for \(tasks.count) threads")
             
+            // determine if a watched thread has new posts since the last time we checked
+            let hasNewPosts = appState.watchedThreads.contains { watchedThread in
+                let updated = updatedWatchedThreads.first {
+                    return $0.id == watchedThread.id &&
+                        $0.thread.boardId == watchedThread.thread.boardId
+                }
+                
+                // if this thread previously had no new posts, flag it as updated
+                if let updated = updated,
+                   watchedThread.totalNewPosts == 0,
+                   updated.totalNewPosts != watchedThread.totalNewPosts {
+                   return true
+                }
+                
+                return false
+            }
+            
+            // if at least one thread has a new post, push a notification
+            if hasNewPosts {
+                NotificationManager.shared.pushNewPostNotification()
+            }
+            
             // update the app state with our newly gathered thread statistics, and schedule
             // the next iteration
             appState.watchedThreads = updatedWatchedThreads

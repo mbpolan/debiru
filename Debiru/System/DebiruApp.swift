@@ -15,6 +15,9 @@ struct DebiruApp: App {
     private var cancellables: Set<AnyCancellable> = Set()
     
     init() {
+        // prepare for notifications
+        NotificationManager.shared.prepare()
+        
         // load saved app state if it exists, or default to our initial state otherwise
         let state = StateLoader.shared.load()
         switch state {
@@ -73,4 +76,5 @@ struct StorageKeys {
     static let defaultImageLocation = "defaultImageLocation"
     static let maxQuickSearchResults = "maxQuickSearchResults"
     static let groupImagesByBoard = "groupImagesByBoard"
+    static let notificationsEnabled = "notificationsEnabled"
 }
