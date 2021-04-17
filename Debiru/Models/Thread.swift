@@ -55,7 +55,7 @@ extension WatchedThread {
     static func initial(_ thread: Thread) -> WatchedThread {
         return WatchedThread(
             thread: thread,
-            lastPostId: 0,
+            lastPostId: thread.id, // corresponds to the first post
             totalNewPosts: 0,
             nowArchived: false,
             nowDeleted: false)

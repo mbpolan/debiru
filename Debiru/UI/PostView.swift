@@ -35,7 +35,7 @@ struct PostView<T>: View where T: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(content.getSubject() ?? "")
+            Text(content.subject?.unescapeHTML() ?? "")
                 .font(.title)
                 .onTapGesture(perform: onActivate)
             
@@ -237,14 +237,6 @@ struct PostContent {
     let archived: Bool
     let archivedDate: Date?
     let replies: [Int]
-    
-    func getSubject() -> String? {
-        if let subject = self.subject {
-            return CFXMLCreateStringByUnescapingEntities(nil, subject as CFString, nil) as String
-        }
-        
-        return nil
-    }
 }
 
 // MARK: - Extensions

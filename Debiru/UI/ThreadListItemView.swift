@@ -17,11 +17,13 @@ struct ThreadListItemView: View {
     }
     
     var body: some View {
+        let content = thread.subject ?? thread.content
+        
         HStack(alignment: .center) {
             Text("/\(thread.boardId)/")
                 .font(.title)
             
-            Text(thread.subject ?? thread.content ?? "")
+            Text(content?.removeHTML().unescapeHTML() ?? "")
         }
     }
 }
@@ -40,7 +42,7 @@ struct ThreadListItemView_Previews: PreviewProvider {
                                 tag: nil,
                                 country: nil),
                             date: Date(),
-                            subject: nil,
+                            subject: "<span class=\"quote\">&gt;what?</span>",
                             content: nil,
                             sticky: true,
                             closed: false,
