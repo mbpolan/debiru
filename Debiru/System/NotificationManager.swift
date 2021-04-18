@@ -9,24 +9,41 @@ import SwiftUI
 import UserNotifications
 
 class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
-    static let shared = NotificationManager()
+    static private(set) var shared: NotificationManager?
     
     @AppStorage(StorageKeys.notificationsEnabled) private var notificationsEnabled =
         UserDefaults.standard.notificationsEnabled()
+    @AppStorage(StorageKeys.soundNotificationEnabled) private var soundNotificationEnabled =
+        UserDefaults.standard.soundNotificationEnabled()
     
-    func prepare() {
+    private var appState: AppState
+    
+    init(appState: AppState) {
+        self.appState = appState
+        super.init()
+        
         UNUserNotificationCenter.current().delegate = self
+        NotificationManager.shared = self
     }
     
     func requestPermission(completion: @escaping(Result<Bool, Error>) -> Void) {
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .badge, .provisional]) { ok, error in
+        center.requestAuthorization(options: [.alert, .badge, .provisional, .sound]) { ok, error in
             if let error = error {
                 completion(.failure(error))
             } else {
                 completion(.success(ok))
             }
         }
+    }
+    
+    func updateApplicationBadge(withPostCount count: Int? = nil) {
+        // use the provided count, or compute the total number of new posts if not
+        let countNewPosts = count ?? appState.watchedThreads.reduce(0) { memo, watchedThread in
+            return memo + watchedThread.totalNewPosts
+        }
+        
+        NSApplication.shared.dockTile.badgeLabel = countNewPosts > 0 ? "\(countNewPosts)" : nil
     }
     
     func pushNewPostNotification() {
@@ -38,6 +55,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             let content = UNMutableNotificationContent()
             content.title = "New posts"
             content.body = "One or more of your watched threads have new replies."
+            content.sound = (self?.soundNotificationEnabled ?? false) ? .default : nil
             
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
             

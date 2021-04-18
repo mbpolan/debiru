@@ -54,6 +54,11 @@ struct ContentView: View {
         .onChange(of: appState.quickSearchOpen) { open in
             viewModel.openSheet = open ? .quickSearch : nil
         }
+        .onChange(of: appState.watchedThreads) { watchedThreads in
+            // update the application badge icon whenever a change is done on the
+            // list of watched threads
+            NotificationManager.shared?.updateApplicationBadge()
+        }
         .onReceive(showBoardPublisher) { event in
             if let board = event.object as? Board {
                 handleShowBoard(board)

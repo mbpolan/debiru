@@ -43,4 +43,11 @@ extension UserDefaults {
     func notificationsEnabled() -> Bool {
         return false
     }
+    
+    /// Returns whether to play a sound with notifications.
+    ///
+    /// - Returns: true to play a sound, false to not do so.
+    func soundNotificationEnabled() -> Bool {
+        return false
+    }
 }

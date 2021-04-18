@@ -5,6 +5,7 @@
 //  Created by Mike Polan on 4/17/21.
 //
 
+import AppKit
 import Combine
 import Foundation
 
@@ -77,6 +78,7 @@ class ThreadWatcher {
             var deleted = false
             var newPosts = false
             var archived = false
+            var countNewPosts = 0
             
             // track threads that previously had no new replies, but now do
             var activeThreads: [WatchedThread] = []
@@ -93,6 +95,7 @@ class ThreadWatcher {
                     deleted = previousThread.nowDeleted != updatedThread.nowDeleted || deleted
                     newPosts = previousThread.totalNewPosts != updatedThread.totalNewPosts || newPosts
                     archived = previousThread.nowArchived != updatedThread.nowArchived || archived
+                    countNewPosts += updatedThread.totalNewPosts
                     
                     // has a thread received its first new reply?
                     if previousThread.totalNewPosts == 0 && updatedThread.totalNewPosts > 0 {
@@ -106,8 +109,11 @@ class ThreadWatcher {
             
             // if at least one thread has new post activity, push a notification
             if !activeThreads.isEmpty {
-                NotificationManager.shared.pushNewPostNotification()
+                NotificationManager.shared?.pushNewPostNotification()
             }
+            
+            // update the dock tile badge to reflect the total count of new posts
+            NotificationManager.shared?.updateApplicationBadge(withPostCount: countNewPosts)
             
             // update the app state with our newly gathered thread statistics, and schedule
             // the next iteration. however, only update the state if at least some kind of

@@ -11,14 +11,12 @@ import SwiftUI
 @main
 struct DebiruApp: App {
     private var appState: AppState
+    private let notificationManager: NotificationManager
     private let saveAppStatePublisher = NotificationCenter.default.publisher(for: .saveAppState)
     private let threadWatcher: ThreadWatcher
     private var cancellables: Set<AnyCancellable> = Set()
     
     init() {
-        // prepare for notifications
-        NotificationManager.shared.prepare()
-        
         // load saved app state if it exists, or default to our initial state otherwise
         let state = StateLoader.shared.load()
         switch state {
@@ -28,6 +26,9 @@ struct DebiruApp: App {
             print("Failed to load state: \(error.localizedDescription)")
             self.appState = AppState()
         }
+        
+        // prepare for notifications
+        self.notificationManager = NotificationManager(appState: appState)
         
         // start watching threads for updates
         self.threadWatcher = ThreadWatcher(appState: appState)
@@ -82,4 +83,5 @@ struct StorageKeys {
     static let maxQuickSearchResults = "maxQuickSearchResults"
     static let groupImagesByBoard = "groupImagesByBoard"
     static let notificationsEnabled = "notificationsEnabled"
+    static let soundNotificationEnabled = "soundNotificationEnabled"
 }
