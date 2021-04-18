@@ -5,6 +5,7 @@
 //  Created by Mike Polan on 3/15/21.
 //
 
+import Combine
 import SwiftUI
 
 // MARK: - View
@@ -12,6 +13,11 @@ import SwiftUI
 struct WatchedThreadsView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject private var viewModel = WatchedThreadsViewModel()
+    private let dataProvider: DataProvider
+    
+    init(dataProvider: DataProvider = FourChanDataProvider()) {
+        self.dataProvider = dataProvider
+    }
     
     var body: some View {
         VStack {
@@ -46,6 +52,10 @@ struct WatchedThreadsView: View {
                         handleShowThread(watchedThread)
                     }
                     .contextMenu {
+                        Button("Mark as Read") {
+                            handleClearUnread(watchedThread)
+                        }
+                        
                         Button("Remove") {
                             handleRemoveWatchedThread(watchedThread)
                         }
@@ -109,6 +119,28 @@ struct WatchedThreadsView: View {
         NotificationCenter.default.post(name: .showThread, object: watchedThread)
     }
     
+    private func handleClearUnread(_ watchedThread: WatchedThread) {
+        guard let index = appState.watchedThreads.firstIndex(of: watchedThread) else { return }
+        
+        dataProvider.getPosts(for: watchedThread.thread) { result in
+            switch result {
+            case .success(let posts):
+                // update the last known post id and clear the number of unread posts
+                appState.watchedThreads[index] = WatchedThread(
+                    thread: watchedThread.thread,
+                    lastPostId: posts.last?.id ?? watchedThread.lastPostId,
+                    totalNewPosts: 0,
+                    nowArchived: watchedThread.nowArchived,
+                    nowDeleted: watchedThread.nowDeleted)
+                
+                NotificationCenter.default.post(name: .saveAppState, object: nil)
+                
+            case .failure(let error):
+                print("Failed to get posts for thread: \(error.localizedDescription)")
+            }
+        }?.store(in: &viewModel.cancellables)
+    }
+    
     private func handleRemoveWatchedThread(_ watchedThread: WatchedThread) {
         guard let index = appState.watchedThreads.firstIndex(of: watchedThread) else { return }
         
@@ -122,6 +154,7 @@ struct WatchedThreadsView: View {
 
 class WatchedThreadsViewModel: ObservableObject {
     @Published var selectedBoard: String = ""
+    @Published var cancellables: Set<AnyCancellable> = Set()
 }
 
 // MARK: - Preview
