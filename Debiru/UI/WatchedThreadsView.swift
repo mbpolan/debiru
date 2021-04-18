@@ -112,7 +112,9 @@ struct WatchedThreadsView: View {
     private func handleRemoveWatchedThread(_ watchedThread: WatchedThread) {
         guard let index = appState.watchedThreads.firstIndex(of: watchedThread) else { return }
         
+        // remove the thread and post a request to save app state
         appState.watchedThreads.remove(at: index)
+        NotificationCenter.default.post(name: .saveAppState, object: nil)
     }
 }
 

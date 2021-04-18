@@ -156,6 +156,7 @@ struct PostView<T>: View where T: View {
             if let image = Flag(countryCode: code)?.originalImage {
                 return Image(nsImage: image)
                     .help(name)
+                    .clipShape(Circle())
                     .toErasedView()
             } else {
                 return Image(systemName: "flag")
