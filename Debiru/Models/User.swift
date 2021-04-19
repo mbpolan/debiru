@@ -25,6 +25,7 @@ extension User {
     
     enum Country: Equatable, Hashable, Codable {
         case code(code: String, name: String)
+        case fake(code: String, name: String)
         case unknown
     }
 }
@@ -32,6 +33,7 @@ extension User {
 extension User.Country {
     private enum CodingKeys: CodingKey {
         case code
+        case fake
         case unknown
     }
     
@@ -40,11 +42,18 @@ extension User.Country {
         let name: String
     }
     
+    private struct FakeCountryData: Codable {
+        let fakeCode: String
+        let fakeName: String
+    }
+    
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
         if let data = try? values.decode(CountryData.self, forKey: .code) {
             self = .code(code: data.code, name: data.name)
+        } else if let data = try? values.decode(FakeCountryData.self, forKey: .code) {
+            self = .fake(code: data.fakeCode, name: data.fakeName)
         } else {
             self = .unknown
         }
@@ -55,6 +64,8 @@ extension User.Country {
         switch self {
         case .code(let code, let name):
             try container.encode(CountryData(code: code, name: name), forKey: .code)
+        case .fake(let code, let name):
+            try container.encode(FakeCountryData(fakeCode: code, fakeName: name), forKey: .code)
         case .unknown:
             try container.encodeNil(forKey: .unknown)
         }

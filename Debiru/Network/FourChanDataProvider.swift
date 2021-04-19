@@ -14,7 +14,8 @@ struct FourChanDataProvider: DataProvider {
     private let webBaseUrl = "https://4chan.org"
     private let webBoardsBaseUrl = "https://boards.4chan.org"
     private let apiBaseUrl = "https://a.4cdn.org"
-    private let assetBaseUrl = "https://i.4cdn.org"
+    private let imageBaseUrl = "https://i.4cdn.org"
+    private let staticBaseUrl = "https://s.4cdn.org"
     
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable? {
         return getData(
@@ -62,6 +63,10 @@ struct FourChanDataProvider: DataProvider {
                            let name = thread.countryName {
                             // XX indicates an unknown country code
                             country = code == "XX" ? .unknown : .code(code: code, name: name)
+                            
+                        } else if let code = thread.trollCountryCode,
+                                  let name = thread.countryName {
+                            country = .fake(code: code, name: name)
                         }
                         
                         return Thread(
@@ -154,6 +159,10 @@ struct FourChanDataProvider: DataProvider {
                        let name = post.countryName {
                         // XX indicates an unknown country code
                         country = code == "XX" ? .unknown : .code(code: code, name: name)
+                        
+                    } else if let code = post.trollCountryCode,
+                              let name = post.countryName {
+                        country = .fake(code: code, name: name)
                     }
                     
                     return Post(
@@ -184,40 +193,14 @@ struct FourChanDataProvider: DataProvider {
     
     func getImage(for asset: Asset, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
         
-        let key = "\(assetBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)"
-        if let url = URL(string: key) {
-            if let cachedImage = FourChanDataProvider.imageCache.get(forKey: key) {
-                completion(.success(cachedImage))
-                return nil
-            }
-            
-            return URLSession.shared.dataTaskPublisher(for: url)
-                .tryMap { output in
-                    guard let response = output.response as? HTTPURLResponse else {
-                        throw NetworkError.invalidResponse("Unreadable image response")
-                    }
-                    if response.statusCode != 200 {
-                        throw NetworkError.invalidResponse("Failed to fetch image: \(key): \(response.statusCode)")
-                    }
-                    
-                    return output.data
-                }
-                .eraseToAnyPublisher()
-                .receive(on: DispatchQueue.main)
-                .sink(receiveCompletion: { result in
-                    switch result {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }, receiveValue: { (value: Data) in
-                    FourChanDataProvider.imageCache.set(key, value: value)
-                    completion(.success(value))
-                })
-        }
+        let key = "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)"
+        return getImageData(key, completion: completion)
+    }
+    
+    func getCountryFlagImage(for countryCode: String, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
         
-        return nil
+        let key = "\(staticBaseUrl)/image/country/troll/\(countryCode.lowercased()).gif"
+        return getImageData(key, completion: completion)
     }
     
     func getURL(for board: Board) -> URL? {
@@ -258,6 +241,45 @@ struct FourChanDataProvider: DataProvider {
                     }
                 }, receiveValue: { value in
                     completion(.success(mapper(value)))
+                })
+        }
+        
+        return nil
+    }
+    
+    private func getImageData(
+        _ urlString: String,
+        completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?  {
+        
+        if let url = URL(string: urlString) {
+            if let cachedImage = FourChanDataProvider.imageCache.get(forKey: urlString) {
+                completion(.success(cachedImage))
+                return nil
+            }
+            
+            return URLSession.shared.dataTaskPublisher(for: url)
+                .tryMap { output in
+                    guard let response = output.response as? HTTPURLResponse else {
+                        throw NetworkError.invalidResponse("Unreadable image response")
+                    }
+                    if response.statusCode != 200 {
+                        throw NetworkError.invalidResponse("Failed to fetch image: \(urlString): \(response.statusCode)")
+                    }
+                    
+                    return output.data
+                }
+                .eraseToAnyPublisher()
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { result in
+                    switch result {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                }, receiveValue: { (value: Data) in
+                    FourChanDataProvider.imageCache.set(urlString, value: value)
+                    completion(.success(value))
                 })
         }
         
@@ -333,6 +355,7 @@ fileprivate struct ThreadModel: Codable {
     let author: String?
     let capCode: CapCode?
     let countryCode: String?
+    let trollCountryCode: String?
     let countryName: String?
     let trip: String?
     let content: String?
@@ -358,6 +381,7 @@ fileprivate struct ThreadModel: Codable {
         case author = "name"
         case capCode = "capcode"
         case countryCode = "country"
+        case trollCountryCode = "troll_country"
         case countryName = "country_name"
         case trip
         case content = "com"
@@ -390,6 +414,7 @@ fileprivate struct PostModel: Codable {
     let author: String?
     let capCode: CapCode?
     let countryCode: String?
+    let trollCountryCode: String?
     let countryName: String?
     let trip: String?
     let content: String?
@@ -418,6 +443,7 @@ fileprivate struct PostModel: Codable {
         case author = "name"
         case capCode = "capcode"
         case countryCode = "country"
+        case trollCountryCode = "troll_country"
         case countryName = "country_name"
         case trip
         case content = "com"

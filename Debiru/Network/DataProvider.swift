@@ -18,6 +18,8 @@ protocol DataProvider {
     
     func getImage(for asset: Asset, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?
     
+    func getCountryFlagImage(for countryCode: String, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?
+    
     func getURL(for board: Board) -> URL?
     
     func getURL(for thread: Thread) -> URL?

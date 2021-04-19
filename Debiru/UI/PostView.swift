@@ -163,6 +163,12 @@ struct PostView<T>: View where T: View {
                     .help(name)
                     .toErasedView()
             }
+            
+        case .fake(let code, let name):
+            return CountryFlagImage(code: code, name: name)
+                .clipShape(Circle())
+                .toErasedView()
+            
         default:
             return Image(systemName: "flag")
                 .help("Unknown country")
@@ -177,7 +183,7 @@ struct PostView<T>: View where T: View {
         // links to a board or post
         case "applewebdata":
             link = handleInternalLink(url)
-            // links to external websites
+        // links to external websites
         case "http", "https":
             link = handleExternalLink(url)
             
