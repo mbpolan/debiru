@@ -55,7 +55,7 @@
 		27C056152612998D0037A91B /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056142612998D0037A91B /* Link.swift */; };
 		27C056192612C1900037A91B /* HoverTextViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056182612C1900037A91B /* HoverTextViewModifier.swift */; };
 		27C05624261694130037A91B /* QuickSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C05623261694130037A91B /* QuickSearchView.swift */; };
-		27C0562D2618D49B0037A91B /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0562C2618D49B0037A91B /* AppCommands.swift */; };
+		27C0562D2618D49B0037A91B /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0562C2618D49B0037A91B /* Commands.swift */; };
 		27C056302618D4FC0037A91B /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C0562F2618D4FC0037A91B /* UserDefaults.swift */; };
 		27C056332618D5170037A91B /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C056322618D5170037A91B /* Notification.swift */; };
 		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
@@ -111,7 +111,7 @@
 		27C056142612998D0037A91B /* Link.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
 		27C056182612C1900037A91B /* HoverTextViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverTextViewModifier.swift; sourceTree = "<group>"; };
 		27C05623261694130037A91B /* QuickSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSearchView.swift; sourceTree = "<group>"; };
-		27C0562C2618D49B0037A91B /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
+		27C0562C2618D49B0037A91B /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		27C0562F2618D4FC0037A91B /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		27C056322618D5170037A91B /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
@@ -210,7 +210,7 @@
 		2799462125FDA1EF001DCCE3 /* System */ = {
 			isa = PBXGroup;
 			children = (
-				27C0562C2618D49B0037A91B /* AppCommands.swift */,
+				27C0562C2618D49B0037A91B /* Commands.swift */,
 				2799460925FD9E5A001DCCE3 /* DebiruApp.swift */,
 				27B5E788262A5BCC00178F1B /* NotificationManager.swift */,
 				27B5E76E2621311000178F1B /* Persistance.swift */,
@@ -364,7 +364,7 @@
 				27C0560F2611535F0037A91B /* ThreadMetricsView.swift in Sources */,
 				27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */,
 				27BBC9CE2606C6BD005D8183 /* View.swift in Sources */,
-				27C0562D2618D49B0037A91B /* AppCommands.swift in Sources */,
+				27C0562D2618D49B0037A91B /* Commands.swift in Sources */,
 				27C05624261694130037A91B /* QuickSearchView.swift in Sources */,
 				27C056152612998D0037A91B /* Link.swift in Sources */,
 				27BA39BD26347F4F00C9C519 /* CenteredViewModifier.swift in Sources */,

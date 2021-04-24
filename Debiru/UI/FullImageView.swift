@@ -9,22 +9,33 @@ import SwiftUI
 
 // MARK: - View
 
+enum ImageScaleMode {
+    case original
+    case stretch
+    case aspectRatio
+}
+
 struct FullImageView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: FullImageViewModel = FullImageViewModel()
+    private let changeImageModePublisher = NotificationCenter.default.publisher(for: .changeImageMode)
+    private let resetZoomPublisher = NotificationCenter.default.publisher(for: .resetZoom)
+    private let zoomInPublisher = NotificationCenter.default.publisher(for: .zoomIn)
+    private let zoomOutPublisher = NotificationCenter.default.publisher(for: .zoomOut)
     
     var body: some View {
         let image = self.image
         
         VStack {
             if viewModel.scaleMode == .stretch {
-                StretchedImageView(image: image)
+                StretchedImageView(image: image, scale: viewModel.scale)
             } else if viewModel.scaleMode == .aspectRatio {
-                AspectRatioImageView(image: image)
+                AspectRatioImageView(image: image, scale: viewModel.scale)
             } else {
-                OriginalImageView(image: image)
+                OriginalImageView(image: image, scale: viewModel.scale)
             }
         }
+        .edgesIgnoringSafeArea(.top)
         .toolbar {
             Button(action: handleOriginalMode) {
                 Image(systemName: viewModel.scaleMode == .original
@@ -47,7 +58,20 @@ struct FullImageView: View {
             }
             .help("Show image stretched to fit the window")
         }
-        .edgesIgnoringSafeArea(.top)
+        .onReceive(changeImageModePublisher) { event in
+            if let mode = event.object as? ImageScaleMode {
+                viewModel.scaleMode = mode
+            }
+        }
+        .onReceive(resetZoomPublisher) { _ in
+            viewModel.scale = 1.0
+        }
+        .onReceive(zoomInPublisher) { _ in
+            viewModel.scale *= 1.25
+        }
+        .onReceive(zoomOutPublisher) { _ in
+            viewModel.scale /= 1.25
+        }
     }
     
     private var image: NSImage {
@@ -78,10 +102,12 @@ struct FullImageView: View {
 
 fileprivate struct OriginalImageView: View {
     let image: NSImage
+    let scale: CGFloat
     
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
             Image(nsImage: image)
+                .scaleEffect(scale)
                 .centered(.both)
         }
     }
@@ -91,11 +117,13 @@ fileprivate struct OriginalImageView: View {
 
 fileprivate struct StretchedImageView: View {
     let image: NSImage
+    let scale: CGFloat
     
     var body: some View {
         GeometryReader { geo in
             Image(nsImage: image)
                 .resizable()
+                .scaleEffect(scale)
                 .frame(
                     width: geo.size.width,
                     height: geo.size.height)
@@ -108,12 +136,14 @@ fileprivate struct StretchedImageView: View {
 
 fileprivate struct AspectRatioImageView: View {
     let image: NSImage
+    let scale: CGFloat
     
     var body: some View {
         GeometryReader { geo in
             Image(nsImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
+                .scaleEffect(scale)
                 .frame(
                     width: geo.size.width,
                     height: geo.size.height)
@@ -125,13 +155,8 @@ fileprivate struct AspectRatioImageView: View {
 // MARK: - View Model
 
 class FullImageViewModel: ObservableObject {
-    @Published var scaleMode: ScaleMode = .aspectRatio
-    
-    enum ScaleMode {
-        case original
-        case stretch
-        case aspectRatio
-    }
+    @Published var scaleMode: ImageScaleMode = .aspectRatio
+    @Published var scale: CGFloat = 1.0
 }
 
 // MARK: - Preview

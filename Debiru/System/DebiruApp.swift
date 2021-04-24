@@ -54,6 +54,9 @@ struct DebiruApp: App {
                 .environmentObject(appState)
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "*"))
         }
+        .commands {
+            FullImageViewCommands()
+        }
         .windowStyle(HiddenTitleBarWindowStyle())
         .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
         

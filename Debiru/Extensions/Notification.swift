@@ -16,4 +16,9 @@ extension Notification.Name {
     static let goToTop = Notification.Name("goToTop")
     static let goToBottom = Notification.Name("goToBottom")
     static let saveAppState = Notification.Name("saveAppState")
+    
+    static let resetZoom = Notification.Name("resetZoom")
+    static let zoomIn = Notification.Name("zoomIn")
+    static let zoomOut = Notification.Name("zoomOut")
+    static let changeImageMode = Notification.Name("changeImageMode")
 }
