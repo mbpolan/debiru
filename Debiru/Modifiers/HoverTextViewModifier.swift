@@ -1,5 +1,5 @@
 //
-//  HoverText.swift
+//  HoverTextViewModifier.swift
 //  Debiru
 //
 //  Created by Mike Polan on 3/29/21.
@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - View Modifier
 
-struct HoverText: ViewModifier {
+struct HoverTextViewModifier: ViewModifier {
     @State private var hovered: Bool = false
     
     let backgroundColor: Color
@@ -32,7 +32,7 @@ extension View {
     func hoverEffect(backgroundColor: Color = Color(.systemBlue),
                      foregroundColor: Color = Color(.textColor)) -> some View {
         
-        self.modifier(HoverText(
+        self.modifier(HoverTextViewModifier(
                         backgroundColor: backgroundColor,
                         foregroundColor: foregroundColor))
     }
