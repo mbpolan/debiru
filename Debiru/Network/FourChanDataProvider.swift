@@ -107,11 +107,7 @@ struct FourChanDataProvider: DataProvider {
                 // find all posts that this post references in its thread
                 value.posts.forEach { post in
                     parseRepliesTo(post.content ?? "").forEach { reply in
-                        if var existing = postsToReplies[reply] {
-                            existing.append(post.id)
-                        } else {
-                            postsToReplies[reply] = [post.id]
-                        }
+                        postsToReplies[reply, default: [Int]()].append(post.id)
                     }
                 }
                 
