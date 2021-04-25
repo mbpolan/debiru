@@ -12,7 +12,7 @@ As an aside, this is also an experiement to see how much SwiftUI has progressed 
 
 ## Developing
 
-You'll need macOS 11.x and Xcode 12.5. Simpy open the Xcode project, and build and run the app. At this time, all dependencies are configured using Swift Package Manager, so you should not need any external tools.
+You'll need macOS 11.x and Xcode 12.4. Simpy open the Xcode project, and build and run the app. At this time, all dependencies are configured using Swift Package Manager, so you should not need any external tools.
 
 ## Contributing
 
