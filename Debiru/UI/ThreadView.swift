@@ -73,7 +73,6 @@ struct ThreadView: View {
                         }
                     }
                     .id(post)
-                    
                 }
                 
                 Divider()
@@ -257,7 +256,8 @@ struct ThreadView: View {
     }
     
     private func handleBackToCatalog() {
-        if let board = getParentBoard(appState.currentItem) {
+        if let thread = getThread(appState.currentItem),
+           let board = appState.boards.first(where: { $0.id == thread.boardId }) {
             NotificationCenter.default.post(name: .showBoard, object: board)
         }
     }
