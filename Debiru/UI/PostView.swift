@@ -68,28 +68,14 @@ struct PostView<T>: View where T: View {
                 }
             }
             
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
-                ForEach(content.replies, id: \.self) { replyId in
-                    Text(">>\(String(replyId))")
-                        .foregroundColor(Color(NSColor.linkColor))
-                        .underline()
-                        .onTapGesture {
-                            guard let url = PostLink.makeURL(
-                                    boardId: boardId,
-                                    threadId: threadId,
-                                    postId: content.id) else { return }
-                            
-                            guard let link = handleInternalLink(url) else { return }
-                            onLink(link)
-                        }
-                        .onHover { hover in
-                            if hover {
-                                NSCursor.pointingHand.push()
-                            } else {
-                                NSCursor.pop()
-                            }
-                        }
-                }
+            ReplyHStack(postIds: content.replies) { postId in
+                guard let url = PostLink.makeURL(
+                        boardId: boardId,
+                        threadId: threadId,
+                        postId: postId) else { return }
+                
+                guard let link = handleInternalLink(url) else { return }
+                onLink(link)
             }
             
             RichTextView(
