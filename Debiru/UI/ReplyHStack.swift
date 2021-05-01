@@ -70,10 +70,13 @@ struct ReplyHStack: View {
     }
     
     private func background(_ height: Binding<CGFloat>) -> some View {
-        GeometryReader { geo -> Color in
+        return GeometryReader { geo -> Color in
             let rect = geo.frame(in: .local)
-            DispatchQueue.main.async {
-                height.wrappedValue = rect.size.height
+            
+            if rect.size.height != height.wrappedValue {
+                DispatchQueue.main.async {
+                    height.wrappedValue = rect.size.height
+                }
             }
             
             return .clear
