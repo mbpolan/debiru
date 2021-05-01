@@ -38,7 +38,9 @@ struct CatalogView: View {
                                 WebImage(asset,
                                          saveLocation: imageSaveLocation,
                                          bounds: CGSize(width: 128.0, height: 128.0),
-                                         onOpen: handleOpenImage)
+                                         onOpen: { data in
+                                            handleOpenImage(data, asset: asset)
+                                         })
                                 
                                 Spacer()
                             }
@@ -181,8 +183,12 @@ struct CatalogView: View {
         return ""
     }
     
-    private func handleOpenImage(_ data: Data) {
-        NotificationCenter.default.post(name: .showImage, object: data)
+    private func handleOpenImage(_ data: Data, asset: Asset) {
+        NotificationCenter.default.post(
+            name: .showImage,
+            object: DownloadedAsset(
+                data: data,
+                asset: asset))
     }
     
     private func handleShowThread(_ thread: Thread) {

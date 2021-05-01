@@ -24,15 +24,25 @@ struct FullImageView: View {
     private let zoomOutPublisher = NotificationCenter.default.publisher(for: .zoomOut)
     
     var body: some View {
-        let image = self.image
-        
         VStack {
-            if viewModel.scaleMode == .stretch {
-                StretchedImageView(image: image, scale: viewModel.scale)
-            } else if viewModel.scaleMode == .aspectRatio {
-                AspectRatioImageView(image: image, scale: viewModel.scale)
+            if let image = appState.openImageData {
+                if viewModel.scaleMode == .stretch {
+                    StretchedImageView(
+                        image: image,
+                        scale: viewModel.scale)
+                } else if viewModel.scaleMode == .aspectRatio {
+                    AspectRatioImageView(
+                        image: image,
+                        scale: viewModel.scale)
+                } else {
+                    OriginalImageView(
+                        image: image,
+                        scale: viewModel.scale)
+                }
             } else {
-                OriginalImageView(image: image, scale: viewModel.scale)
+                Image(nsImage: NSImage(
+                        systemSymbolName: "exclamationmark.circle",
+                        accessibilityDescription: nil) ?? NSImage())
             }
         }
         .edgesIgnoringSafeArea(.top)
@@ -74,17 +84,6 @@ struct FullImageView: View {
         }
     }
     
-    private var image: NSImage {
-        if let data = appState.openImageData,
-           let image = NSImage(data: data){
-            return image
-        }
-        
-        return NSImage(
-            systemSymbolName: "exclamationmark.circle",
-            accessibilityDescription: nil) ?? NSImage()
-    }
-    
     private func handleOriginalMode() {
         viewModel.scaleMode = .original
     }
@@ -101,12 +100,13 @@ struct FullImageView: View {
 // MARK: - Original Image View
 
 fileprivate struct OriginalImageView: View {
-    let image: NSImage
+    let image: DownloadedAsset
     let scale: CGFloat
     
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
-            Image(nsImage: image)
+            ImageContainerView(image: image, resizable: false)
+                .frame(width: CGFloat(image.asset.width), height: CGFloat(image.asset.height))
                 .scaleEffect(scale)
                 .centered(.both)
         }
@@ -116,13 +116,12 @@ fileprivate struct OriginalImageView: View {
 // MARK: - Stretched Image View
 
 fileprivate struct StretchedImageView: View {
-    let image: NSImage
+    let image: DownloadedAsset
     let scale: CGFloat
     
     var body: some View {
         GeometryReader { geo in
-            Image(nsImage: image)
-                .resizable()
+            ImageContainerView(image: image, resizable: true)
                 .scaleEffect(scale)
                 .frame(
                     width: geo.size.width,
@@ -135,13 +134,12 @@ fileprivate struct StretchedImageView: View {
 // MARK: - Aspect Ratio Image View
 
 fileprivate struct AspectRatioImageView: View {
-    let image: NSImage
+    let image: DownloadedAsset
     let scale: CGFloat
     
     var body: some View {
         GeometryReader { geo in
-            Image(nsImage: image)
-                .resizable()
+            ImageContainerView(image: image, resizable: true)
                 .aspectRatio(contentMode: .fit)
                 .scaleEffect(scale)
                 .frame(
@@ -149,6 +147,39 @@ fileprivate struct AspectRatioImageView: View {
                     height: geo.size.height)
                 .centered(.both)
         }
+    }
+}
+
+fileprivate struct ImageContainerView: View {
+    let image: DownloadedAsset
+    let resizable: Bool
+    
+    var body: some View {
+        if image.asset.extension.hasSuffix(".gif") {
+            AnimatedImageView(
+                data: image.data,
+                frame: NSSize(width: image.asset.width, height: image.asset.height))
+        } else {
+            makeStaticImage()
+        }
+    }
+    
+    private func makeStaticImage() -> Image {
+        var nsImage: NSImage
+        if let img = NSImage(data: image.data) {
+            nsImage = img
+        } else {
+            nsImage = NSImage(
+                systemSymbolName: "exclamationmark.circle",
+                accessibilityDescription: nil) ?? NSImage()
+        }
+        
+        var image = Image(nsImage: nsImage)
+        if resizable {
+            image = image.resizable()
+        }
+        
+        return image
     }
 }
 

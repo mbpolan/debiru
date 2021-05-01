@@ -72,7 +72,7 @@ struct ContentView: View {
             }
         }
         .onReceive(showImagePublisher) { event in
-            if let data = event.object as? Data {
+            if let data = event.object as? DownloadedAsset {
                 handleShowImage(data)
             }
         }
@@ -140,7 +140,7 @@ struct ContentView: View {
         appState.targettedPostId = watchedThread.lastPostId
     }
     
-    private func handleShowImage(_ data: Data) {
+    private func handleShowImage(_ data: DownloadedAsset) {
         if let url = URL(string: "debiru://image") {
             appState.openImageData = data
             openURL(url)

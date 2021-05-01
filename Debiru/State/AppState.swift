@@ -12,7 +12,7 @@ class AppState: ObservableObject, Codable {
     @Published var currentItem: ViewableItem?
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
-    @Published var openImageData: Data?
+    @Published var openImageData: DownloadedAsset?
     @Published var autoRefresh: Bool = false
     @Published var targettedPostId: Int?
     @Published var watchedThreads: [WatchedThread] = []
@@ -35,7 +35,7 @@ class AppState: ObservableObject, Codable {
         currentItem = try values.decode(ViewableItem.self, forKey: .currentItem)
         boards = try values.decode([Board].self, forKey: .boards)
         openItems = try values.decode([ViewableItem].self, forKey: .openItems)
-        openImageData = try values.decode(Data.self, forKey: .openImageData)
+        openImageData = try values.decode(DownloadedAsset.self, forKey: .openImageData)
         autoRefresh = try values.decode(Bool.self, forKey: .autoRefresh)
         watchedThreads = try values.decode([WatchedThread].self, forKey: .watchedThreads)
     }
