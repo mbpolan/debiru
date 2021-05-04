@@ -14,6 +14,11 @@ struct AppCommands: Commands {
     
     var body: some Commands {
         CommandGroup(before: .sidebar) {
+            Button("Go Back") {
+                NotificationCenter.default.post(name: .goBack, object: nil)
+            }
+            .keyboardShortcut(.leftArrow, modifiers: .command)
+            
             Button("Go to Top") {
                 NotificationCenter.default.post(name: .goToTop, object: nil)
             }

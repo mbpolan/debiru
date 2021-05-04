@@ -39,7 +39,7 @@ struct ContentView: View {
                 if viewModel.pendingBoards != nil {
                     ProgressView("Loading")
                 } else {
-                    EmptyView()
+                    PlaceholderView()
                 }
             }
         }

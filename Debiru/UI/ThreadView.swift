@@ -20,6 +20,7 @@ struct ThreadView: View {
     private let dataProvider: DataProvider
     private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
     private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
+    private let goBackPublisher = NotificationCenter.default.publisher(for: .goBack)
     private let goToTopPublisher = NotificationCenter.default.publisher(for: .goToTop)
     private let goToBottomPublisher = NotificationCenter.default.publisher(for: .goToBottom)
     
@@ -80,6 +81,9 @@ struct ThreadView: View {
                 Divider()
                 
                 makeFooter(statistics)
+            }
+            .onReceive(goBackPublisher) { _ in
+                handleBackToCatalog()
             }
             .onReceive(goToTopPublisher) { _ in
                 if let first = posts.first {

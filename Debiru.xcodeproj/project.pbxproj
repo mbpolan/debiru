@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275F8F102641FC7300CB2D7B /* PlaceholderView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460B25FD9E5A001DCCE3 /* ContentView.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
@@ -65,6 +66,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		275F8F102641FC7300CB2D7B /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460B25FD9E5A001DCCE3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 				27BBC9D7260AC67B005D8183 /* ThreadView.swift */,
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
+				275F8F102641FC7300CB2D7B /* PlaceholderView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -373,6 +376,7 @@
 				27BBC9CE2606C6BD005D8183 /* View.swift in Sources */,
 				27C0562D2618D49B0037A91B /* Commands.swift in Sources */,
 				27C05624261694130037A91B /* QuickSearchView.swift in Sources */,
+				275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */,
 				27C056152612998D0037A91B /* Link.swift in Sources */,
 				27BFE1D8263B82DA004E7E2F /* ReplyHStack.swift in Sources */,
 				27BA39BD26347F4F00C9C519 /* CenteredViewModifier.swift in Sources */,
