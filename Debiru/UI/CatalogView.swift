@@ -109,6 +109,12 @@ struct CatalogView: View {
         }
         .navigationTitle(getNavigationTitle())
         .toolbar {
+            ToolbarItemGroup(placement: .navigation) {
+                Button(action: handleCloseCatalog) {
+                    Image(systemName: "xmark")
+                }
+            }
+            
             ToolbarItemGroup {
                 Toggle("Auto-Refresh", isOn: $appState.autoRefresh)
                 
@@ -181,6 +187,10 @@ struct CatalogView: View {
         }
         
         return ""
+    }
+    
+    private func handleCloseCatalog() {
+        appState.currentItem = nil
     }
     
     private func handleOpenImage(_ data: Data, asset: Asset) {
