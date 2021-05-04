@@ -18,11 +18,6 @@ struct SidebarView: View {
             
             HStack {
                 SubviewImageButton(
-                    subview: .openItems,
-                    toggled: viewModel.subview == .openItems,
-                    action: handleShowOpenItems)
-
-                SubviewImageButton(
                     subview: .allBoards,
                     toggled: viewModel.subview == .allBoards,
                     action: handleShowAllBoards)
@@ -37,8 +32,6 @@ struct SidebarView: View {
             Divider()
             
             switch viewModel.subview {
-            case .openItems:
-                OpenItemsView()
             case .allBoards:
                 BoardListView()
             case .watchedThreads:
@@ -58,10 +51,6 @@ struct SidebarView: View {
         NSApp.keyWindow?.firstResponder?.tryToPerform(
             #selector(NSSplitViewController.toggleSidebar(_:)),
             with: nil)
-    }
-    
-    private func handleShowOpenItems() {
-        viewModel.subview = .openItems
     }
     
     private func handleShowAllBoards() {
@@ -94,8 +83,6 @@ struct SubviewImageButton: View {
         switch subview {
         case .allBoards:
             return "rectangle.3.offgrid.bubble.left"
-        case .openItems:
-            return "folder"
         case .watchedThreads:
             return "star"
         }
@@ -109,7 +96,6 @@ class SidebarViewModel: ObservableObject {
     
     enum Subview {
         case allBoards
-        case openItems
         case watchedThreads
     }
 }
