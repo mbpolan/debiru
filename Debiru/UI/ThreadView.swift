@@ -39,16 +39,10 @@ struct ThreadView: View {
                     VStack {
                         HStack {
                             if let asset = post.attachment {
-                                VStack(alignment: .leading) {
-                                    WebImage(asset,
-                                             saveLocation: imageSaveLocation,
-                                             bounds: CGSize(width: 128.0, height: 128.0),
-                                             onOpen: { data in
-                                                handleOpenImage(data, asset: asset)
-                                             })
-                                    
-                                    Spacer()
-                                }
+                                AssetView(asset: asset,
+                                          saveLocation: imageSaveLocation,
+                                          bounds: CGSize(width: 128.0, height: 128.0),
+                                          onOpen: { handleOpenImage($0, asset: $1) })
                             }
                             
                             PostView(

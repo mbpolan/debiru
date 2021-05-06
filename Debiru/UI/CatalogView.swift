@@ -34,16 +34,10 @@ struct CatalogView: View {
                 List(threads, id: \.self) { thread in
                     HStack {
                         if let asset = thread.attachment {
-                            VStack(alignment: .leading) {
-                                WebImage(asset,
-                                         saveLocation: imageSaveLocation,
-                                         bounds: CGSize(width: 128.0, height: 128.0),
-                                         onOpen: { data in
-                                            handleOpenImage(data, asset: asset)
-                                         })
-                                
-                                Spacer()
-                            }
+                            AssetView(asset: asset,
+                                      saveLocation: imageSaveLocation,
+                                      bounds: CGSize(width: 128.0, height: 128.0),
+                                      onOpen: { handleOpenImage($0, asset: $1) })
                         }
                         
                         PostView(
@@ -67,8 +61,8 @@ struct CatalogView: View {
                                     handleToggleWatchedThread(thread)
                                 }, label: {
                                     Image(systemName: isThreadWatched(thread)
-                                        ? "star.fill"
-                                        : "star")
+                                            ? "star.fill"
+                                            : "star")
                                 })
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -226,7 +220,7 @@ struct CatalogView: View {
     private func handleToggleWatchedThread(_ thread: Thread) {
         if let index = appState.watchedThreads.firstIndex(where: {
             return $0.thread.boardId == thread.boardId && $0.thread.id == thread.id
-           }) {
+        }) {
             
             appState.watchedThreads.remove(at: index)
         } else {

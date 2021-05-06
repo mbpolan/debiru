@@ -14,8 +14,17 @@ struct Asset: Identifiable, Hashable, Equatable, Codable {
     let thumbnailHeight: Int
     let filename: String
     let `extension`: String
+    let fileType: FileType
     
     var fullName: String {
         return "\(filename)\(`extension`)"
+    }
+}
+
+extension Asset {
+    enum FileType: String, Codable {
+        case image
+        case animatedImage
+        case webm
     }
 }

@@ -55,7 +55,8 @@ struct FourChanDataProvider: DataProvider {
                                 thumbnailWidth: thumbWidth,
                                 thumbnailHeight: thumbHeight,
                                 filename: filename,
-                                extension: ext)
+                                extension: ext,
+                                fileType: determineFileType(ext))
                         }
                         
                         var country: User.Country?
@@ -129,7 +130,8 @@ struct FourChanDataProvider: DataProvider {
                             thumbnailWidth: thumbWidth,
                             thumbnailHeight: thumbHeight,
                             filename: filename,
-                            extension: ext)
+                            extension: ext,
+                            fileType: determineFileType(ext))
                     }
                     
                     var threadStatistics: ThreadStatistics?
@@ -205,6 +207,17 @@ struct FourChanDataProvider: DataProvider {
     
     func getURL(for thread: Thread) -> URL? {
         return URL(string: "\(webBoardsBaseUrl)/\(thread.boardId)/thread/\(thread.id)")
+    }
+    
+    private func determineFileType(_ fileExtension: String) -> Asset.FileType {
+        switch fileExtension.lowercased() {
+        case ".gif":
+            return .animatedImage
+        case ".webm":
+            return .webm
+        default:
+            return .image
+        }
     }
     
     private func getData<S: Decodable, T>(
