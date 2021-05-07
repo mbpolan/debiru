@@ -23,6 +23,8 @@ protocol DataProvider {
     func getURL(for board: Board) -> URL?
     
     func getURL(for thread: Thread) -> URL?
+    
+    func getURL(for asset: Asset) -> URL?
 }
 
 enum NetworkError: Error {

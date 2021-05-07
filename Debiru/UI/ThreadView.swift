@@ -251,12 +251,18 @@ struct ThreadView: View {
         .padding([.bottom, .leading, .trailing], 5)
     }
     
-    private func handleOpenImage(_ data: Data, asset: Asset) {
-        NotificationCenter.default.post(
-            name: .showImage,
-            object: DownloadedAsset(
-                data: data,
-                asset: asset))
+    private func handleOpenImage(_ data: Data?, asset: Asset) {
+        if asset.fileType == .webm {
+            NotificationCenter.default.post(
+                name: .showWebVideo,
+                object: asset)
+        } else if let data = data {
+            NotificationCenter.default.post(
+                name: .showImage,
+                object: DownloadedAsset(
+                    data: data,
+                    asset: asset))
+        }
     }
     
     private func handleBackToCatalog() {

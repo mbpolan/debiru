@@ -13,7 +13,7 @@ struct AssetView: View {
     let asset: Asset
     let saveLocation: URL
     let bounds: CGSize?
-    let onOpen: (_: Data, _: Asset) -> Void
+    let onOpen: (_: Data?, _: Asset) -> Void
     
     var body: some View {
         VStack(alignment: .leading) {

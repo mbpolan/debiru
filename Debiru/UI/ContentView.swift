@@ -19,6 +19,7 @@ struct ContentView: View {
     private let showBoardPublisher = NotificationCenter.default.publisher(for: .showBoard)
     private let showThreadPublisher = NotificationCenter.default.publisher(for: .showThread)
     private let showImagePublisher = NotificationCenter.default.publisher(for: .showImage)
+    private let showWebVideoPublisher = NotificationCenter.default.publisher(for: .showWebVideo)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -74,6 +75,11 @@ struct ContentView: View {
         .onReceive(showImagePublisher) { event in
             if let data = event.object as? DownloadedAsset {
                 handleShowImage(data)
+            }
+        }
+        .onReceive(showWebVideoPublisher) { event in
+            if let asset = event.object as? Asset {
+                handleShowWebVideo(asset)
             }
         }
         .sheet(item: $viewModel.openSheet, onDismiss: handleSheetDismiss) { sheet in
@@ -143,6 +149,13 @@ struct ContentView: View {
     private func handleShowImage(_ data: DownloadedAsset) {
         if let url = URL(string: "debiru://image") {
             appState.openImageData = data
+            openURL(url)
+        }
+    }
+    
+    private func handleShowWebVideo(_ asset: Asset) {
+        if let url = URL(string: "debiru://webVideo") {
+            appState.openWebVideo = asset
             openURL(url)
         }
     }

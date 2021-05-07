@@ -16,12 +16,12 @@ struct WebImage: View {
     private let dataProvider: DataProvider = FourChanDataProvider()
     private let saveLocation: URL
     private let bounds: CGSize?
-    private let onOpen: (_: Data) -> Void
+    private let onOpen: (_: Data?) -> Void
     
     init(_ asset: Asset,
          saveLocation: URL,
          bounds: CGSize? = nil,
-         onOpen: @escaping(_: Data) -> Void) {
+         onOpen: @escaping(_: Data?) -> Void) {
         
         self.asset = asset
         self.saveLocation = saveLocation
@@ -64,9 +64,7 @@ struct WebImage: View {
             handleSaveImage()
         }
         .onTapGesture(count: 1) {
-            if let data = viewModel.imageData {
-                onOpen(data)
-            }
+            onOpen(viewModel.imageData)
         }
         .onAppear(perform: self.load)
     }

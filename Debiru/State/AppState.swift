@@ -13,6 +13,7 @@ class AppState: ObservableObject, Codable {
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
     @Published var openImageData: DownloadedAsset?
+    @Published var openWebVideo: Asset?
     @Published var autoRefresh: Bool = false
     @Published var targettedPostId: Int?
     @Published var watchedThreads: [WatchedThread] = []
@@ -36,6 +37,7 @@ class AppState: ObservableObject, Codable {
         boards = try values.decode([Board].self, forKey: .boards)
         openItems = try values.decode([ViewableItem].self, forKey: .openItems)
         openImageData = try values.decode(DownloadedAsset.self, forKey: .openImageData)
+        openWebVideo = try values.decode(Asset.self, forKey: .openWebVideo)
         autoRefresh = try values.decode(Bool.self, forKey: .autoRefresh)
         watchedThreads = try values.decode([WatchedThread].self, forKey: .watchedThreads)
     }
@@ -48,6 +50,7 @@ extension AppState {
         case boards
         case openItems
         case openImageData
+        case openWebVideo
         case autoRefresh
         case watchedThreads
     }

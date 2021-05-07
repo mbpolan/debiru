@@ -209,6 +209,10 @@ struct FourChanDataProvider: DataProvider {
         return URL(string: "\(webBoardsBaseUrl)/\(thread.boardId)/thread/\(thread.id)")
     }
     
+    func getURL(for asset: Asset) -> URL? {
+        return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)")
+    }
+    
     private func determineFileType(_ fileExtension: String) -> Asset.FileType {
         switch fileExtension.lowercased() {
         case ".gif":

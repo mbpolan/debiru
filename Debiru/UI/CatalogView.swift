@@ -187,12 +187,18 @@ struct CatalogView: View {
         appState.currentItem = nil
     }
     
-    private func handleOpenImage(_ data: Data, asset: Asset) {
-        NotificationCenter.default.post(
-            name: .showImage,
-            object: DownloadedAsset(
-                data: data,
-                asset: asset))
+    private func handleOpenImage(_ data: Data?, asset: Asset) {
+        if asset.fileType == .webm {
+            NotificationCenter.default.post(
+                name: .showWebVideo,
+                object: asset)
+        } else if let data = data {
+            NotificationCenter.default.post(
+                name: .showImage,
+                object: DownloadedAsset(
+                    data: data,
+                    asset: asset))
+        }
     }
     
     private func handleShowThread(_ thread: Thread) {

@@ -40,6 +40,8 @@ struct DebiruApp: App {
     }
     
     var body: some Scene {
+        // main content window
+        
         WindowGroup {
             ContentView()
                 .environmentObject(appState)
@@ -49,16 +51,28 @@ struct DebiruApp: App {
         }
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
         
+        // image viewer window
+
         WindowGroup {
             FullImageView()
                 .environmentObject(appState)
-                .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "*"))
+                .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "image"))
         }
         .commands {
             FullImageViewCommands()
         }
         .windowStyle(HiddenTitleBarWindowStyle())
-        .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
+        .handlesExternalEvents(matching: Set(arrayLiteral: "image"))
+        
+        // web video window
+
+        WindowGroup {
+            WebVideoView()
+                .environmentObject(appState)
+                .handlesExternalEvents(preferring: Set(arrayLiteral: "webVideo"), allowing: Set(arrayLiteral: "webVideo"))
+        }
+        .windowStyle(HiddenTitleBarWindowStyle())
+        .handlesExternalEvents(matching: Set(arrayLiteral: "webVideo"))
         
         Settings {
             SettingsView()
