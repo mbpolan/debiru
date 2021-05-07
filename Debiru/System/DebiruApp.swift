@@ -101,4 +101,5 @@ struct StorageKeys {
     static let groupImagesByBoard = "groupImagesByBoard"
     static let notificationsEnabled = "notificationsEnabled"
     static let soundNotificationEnabled = "soundNotificationEnabled"
+    static let maximumCacheSize = "maximumCacheSize"
 }

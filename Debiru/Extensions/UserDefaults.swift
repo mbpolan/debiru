@@ -50,4 +50,11 @@ extension UserDefaults {
     func soundNotificationEnabled() -> Bool {
         return false
     }
+    
+    /// Returns the maximum amount of data to store in cache.
+    ///
+    /// - Returns: number of megabytes to cache at most (or zero for no limit).
+    func maximumCacheSize() -> Int {
+        return 5
+    }
 }

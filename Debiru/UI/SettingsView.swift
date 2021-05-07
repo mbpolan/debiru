@@ -18,11 +18,17 @@ struct SettingsView: View {
                 }
                 .tag(Tabs.general)
             
-                NotificationSettingsView()
-                    .tabItem {
-                        Label("Notifications", systemImage: "exclamationmark.bubble")
-                    }
-                    .tag(Tabs.notifications)
+            NotificationSettingsView()
+                .tabItem {
+                    Label("Notifications", systemImage: "exclamationmark.bubble")
+                }
+                .tag(Tabs.notifications)
+            
+            CacheSettingsView()
+                .tabItem {
+                    Label("Cache", systemImage: "internaldrive")
+                }
+                .tag(Tabs.cache)
         }
         .padding(20)
     }
@@ -30,6 +36,7 @@ struct SettingsView: View {
     private enum Tabs {
         case general
         case notifications
+        case cache
     }
 }
 
