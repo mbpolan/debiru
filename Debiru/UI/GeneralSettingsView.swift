@@ -62,7 +62,7 @@ struct GeneralSettingsView: View {
                        isOn: $groupImagesByBoard)
             }
         }
-        .frame(width: 400, height: 150)
+        .frame(width: 400, height: 120)
     }
     
     private func handleChooseSaveLocation() {

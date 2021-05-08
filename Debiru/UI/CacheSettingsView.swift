@@ -15,6 +15,11 @@ struct CacheSettingsView: View {
     
     @AppStorage(StorageKeys.maximumCacheSize) private var maximumCacheSize: Int =
         UserDefaults.standard.maximumCacheSize()
+    @AppStorage(StorageKeys.cacheEnabled) private var cacheEnabled: Bool =
+        UserDefaults.standard.cacheEnabled()
+    @AppStorage(StorageKeys.limitCacheEnabled) private var limitCacheEnabled: Bool =
+        UserDefaults.standard.limitCacheEnabled()
+    
     @ObservedObject private var viewModel: CacheSettingsViewModel = CacheSettingsViewModel()
     
     private let byteFormatter = { () -> ByteCountFormatter in
@@ -33,6 +38,9 @@ struct CacheSettingsView: View {
         
         Form {
             VStack(alignment: .leading) {
+                Toggle("Enable caching", isOn: $cacheEnabled)
+                Toggle("Limit amount of data to be cached", isOn: $limitCacheEnabled)
+                    .disabled(!cacheEnabled)
                 
                 LazyVGrid(columns: [
                     GridItem(.fixed(300)),
@@ -46,8 +54,10 @@ struct CacheSettingsView: View {
                         TextField("", text: maximumCacheSizeBinding)
                     }
                 }
+                .disabled(!cacheEnabled || !limitCacheEnabled)
                 
                 makeCacheStatisticsText()
+                    .disabled(!cacheEnabled)
                 
                 HStack {
                     Text("Purge all cached data")
@@ -58,10 +68,21 @@ struct CacheSettingsView: View {
                         handleClearCache()
                     }
                 }
+                .disabled(!cacheEnabled)
             }
             
         }
-        .frame(width: 400, height: 100)
+        .frame(width: 400, height: 120)
+        .onChange(of: cacheEnabled) { value in
+            DataCache.shared.setEnabled(value)
+        }
+        .onChange(of: limitCacheEnabled) { value in
+            if !value {
+                DataCache.shared.updateMaximumCost(0)
+            } else {
+                DataCache.shared.updateMaximumCost(maximumCacheSize)
+            }
+        }
         .onChange(of: maximumCacheSize) { value in
             // convert megabytes into bytes
             DataCache.shared.updateMaximumCost(value * 1024 * 1024)

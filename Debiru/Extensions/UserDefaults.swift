@@ -8,6 +8,18 @@
 import Foundation
 
 extension UserDefaults {
+    func bool(forKey key: String, defaultValue: Bool) -> Bool {
+        return contains(key: key) ? bool(forKey: key) : defaultValue
+    }
+    
+    func integer(forKey key: String, defaultValue: Int) -> Int {
+        return contains(key: key) ? integer(forKey: key) : defaultValue
+    }
+    
+    func contains(key: String) -> Bool {
+        return object(forKey: key) != nil
+    }
+    
     /// Returns the default auto-refresh timeout.
     ///
     /// - Returns: The timeout, in seconds.
@@ -56,5 +68,19 @@ extension UserDefaults {
     /// - Returns: number of megabytes to cache at most (or zero for no limit).
     func maximumCacheSize() -> Int {
         return 5
+    }
+    
+    /// Returns whether data caching is enabled or not.
+    ///
+    /// - Returns: true if enabled, false if not.
+    func cacheEnabled() -> Bool {
+        return true
+    }
+    
+    /// Returns if data caching is restricted to a specific size.
+    ///
+    /// - Returns: true if enabled, false if not.
+    func limitCacheEnabled() -> Bool {
+        return true
     }
 }

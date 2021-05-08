@@ -14,6 +14,7 @@ class DataCache: NSObject, NSCacheDelegate {
     static let shared = DataCache()
     
     private let cache: NSCache<CacheKey, CacheData> = NSCache()
+    private var enabled: Bool = true
     private var count: Int = 0
     private var cost: Int = 0
     
@@ -22,13 +23,20 @@ class DataCache: NSObject, NSCacheDelegate {
     override init() {
         super.init()
         
-        // convert user defaults into bytes
-        cache.totalCostLimit = UserDefaults.standard.maximumCacheSize() * 1024 * 1024
         cache.delegate = self
+        self.configureFromUserDefaults()
     }
     
     var statistics: Statistics {
         return Statistics(count: count, cost: cost)
+    }
+    
+    func setEnabled(_ enabled: Bool) {
+        if !enabled {
+            clear()
+        }
+        
+        self.enabled = enabled
     }
     
     func updateMaximumCost(_ cost: Int) {
@@ -36,6 +44,8 @@ class DataCache: NSObject, NSCacheDelegate {
     }
     
     func set(_ key: String, value: Data) {
+        guard enabled else { return }
+        
         cache.setObject(
             CacheData(value),
             forKey: CacheKey(key),
@@ -69,6 +79,25 @@ class DataCache: NSObject, NSCacheDelegate {
     
     private func publishUpdate() {
         statisticsSubject.send(self.statistics)
+    }
+    
+    private func configureFromUserDefaults() {
+        let defaults = UserDefaults.standard
+        
+        enabled = defaults.bool(forKey: StorageKeys.cacheEnabled, defaultValue: defaults.cacheEnabled())
+        
+        // apply cache cost limits if enabled
+        if enabled {
+            if defaults.bool(forKey: StorageKeys.limitCacheEnabled, defaultValue: defaults.limitCacheEnabled()) {
+                // convert user defaults into bytes
+                cache.totalCostLimit = (defaults.integer(
+                                            forKey: StorageKeys.maximumCacheSize,
+                                            defaultValue: defaults.maximumCacheSize())) * 1024 * 1024
+            } else {
+                // no limit specified
+                cache.totalCostLimit = 0
+            }
+        }
     }
 }
 

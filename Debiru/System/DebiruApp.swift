@@ -102,4 +102,6 @@ struct StorageKeys {
     static let notificationsEnabled = "notificationsEnabled"
     static let soundNotificationEnabled = "soundNotificationEnabled"
     static let maximumCacheSize = "maximumCacheSize"
+    static let cacheEnabled = "cacheEnabled"
+    static let limitCacheEnabled = "limitCacheEnabled"
 }
