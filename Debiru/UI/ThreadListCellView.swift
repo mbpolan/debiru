@@ -45,6 +45,7 @@ struct ThreadListCellView_Previews: PreviewProvider {
                             content: nil,
                             sticky: false,
                             closed: false,
+                            spoileredImage: false,
                             attachment: nil,
                             statistics: ThreadStatistics(
                                 replies: 1,

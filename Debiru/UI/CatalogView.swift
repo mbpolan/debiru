@@ -36,6 +36,7 @@ struct CatalogView: View {
                         if let asset = thread.attachment {
                             AssetView(asset: asset,
                                       saveLocation: imageSaveLocation,
+                                      spoilered: thread.spoileredImage,
                                       bounds: CGSize(width: 128.0, height: 128.0),
                                       onOpen: { handleOpenImage($0, asset: $1) })
                         }

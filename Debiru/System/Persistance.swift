@@ -116,6 +116,7 @@ struct StateLoader {
                     content: watchedThread.thread.content,
                     sticky: false,
                     closed: false,
+                    spoileredImage: false,
                     attachment: nil,
                     statistics: .unknown),
                 lastPostId: watchedThread.lastPostId,

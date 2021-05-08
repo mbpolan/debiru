@@ -41,6 +41,7 @@ struct ThreadView: View {
                             if let asset = post.attachment {
                                 AssetView(asset: asset,
                                           saveLocation: imageSaveLocation,
+                                          spoilered: post.spoileredImage,
                                           bounds: CGSize(width: 128.0, height: 128.0),
                                           onOpen: { handleOpenImage($0, asset: $1) })
                             }
@@ -444,6 +445,7 @@ struct ThreadView_Previews: PreviewProvider {
         content: nil,
         sticky: false,
         closed: false,
+        spoileredImage: false,
         attachment: nil,
         statistics: ThreadStatistics(
             replies: 1,

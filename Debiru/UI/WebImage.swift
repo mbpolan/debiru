@@ -95,7 +95,7 @@ struct WebImage: View {
         }
         
         return view
-            .clipShape(RoundedRectangle(cornerRadius: 5.0))
+            .clipShape(RoundedRectangle(cornerRadius: 8.0))
     }
     
     private func makeErrorView(_ error: String, frame: CGSize) -> some View {

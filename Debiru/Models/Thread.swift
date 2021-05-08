@@ -16,6 +16,7 @@ struct Thread: Identifiable, Hashable, Codable {
     let content: String?
     let sticky: Bool
     let closed: Bool
+    let spoileredImage: Bool
     let attachment: Asset?
     let statistics: ThreadStatistics
 }

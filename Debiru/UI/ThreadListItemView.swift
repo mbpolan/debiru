@@ -46,6 +46,7 @@ struct ThreadListItemView_Previews: PreviewProvider {
                             content: nil,
                             sticky: true,
                             closed: false,
+                            spoileredImage: false,
                             attachment: nil,
                             statistics: ThreadStatistics(
                                 replies: 0,

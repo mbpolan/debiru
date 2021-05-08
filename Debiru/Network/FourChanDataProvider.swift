@@ -83,6 +83,7 @@ struct FourChanDataProvider: DataProvider {
                             content: thread.content,
                             sticky: thread.sticky == 1,
                             closed: thread.closed == 1,
+                            spoileredImage: thread.spoiler == 1,
                             attachment: asset,
                             statistics: ThreadStatistics(
                                 replies: thread.replies,
@@ -178,6 +179,7 @@ struct FourChanDataProvider: DataProvider {
                         content: post.content,
                         sticky: post.sticky == 1,
                         closed: post.closed == 1,
+                        spoileredImage: post.spoiler == 1,
                         attachment: asset,
                         threadStatistics: threadStatistics,
                         archived: post.archived == 1,
@@ -373,6 +375,7 @@ fileprivate struct ThreadModel: Codable {
     let content: String?
     let sticky: Int?
     let closed: Int?
+    let spoiler: Int?
     let assetId: Int?
     let imageWidth: Int?
     let imageHeight: Int?
@@ -399,6 +402,7 @@ fileprivate struct ThreadModel: Codable {
         case content = "com"
         case sticky
         case closed
+        case spoiler
         case assetId = "tim"
         case imageWidth = "w"
         case imageHeight = "h"
@@ -432,6 +436,7 @@ fileprivate struct PostModel: Codable {
     let content: String?
     let sticky: Int?
     let closed: Int?
+    let spoiler: Int?
     let assetId: Int?
     let imageWidth: Int?
     let imageHeight: Int?
@@ -461,6 +466,7 @@ fileprivate struct PostModel: Codable {
         case content = "com"
         case sticky
         case closed
+        case spoiler
         case assetId = "tim"
         case imageWidth = "w"
         case imageHeight = "h"

@@ -18,6 +18,7 @@ struct Post: Identifiable, Hashable {
     let content: String?
     let sticky: Bool
     let closed: Bool
+    let spoileredImage: Bool
     let attachment: Asset?
     let threadStatistics: ThreadStatistics?
     let archived: Bool
