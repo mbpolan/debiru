@@ -73,7 +73,12 @@ struct GeneralSettingsView: View {
         
         if panel.runModal() == .OK,
            let url = panel.url {
-            defaultImageLocation = url
+            switch DataManager.shared.bookmarkSaveDirectory(url) {
+            case .success(_):
+                defaultImageLocation = url
+            case .failure(let error):
+                print("Could not store save directory: \(error.localizedDescription)")
+            }
         }
     }
 }

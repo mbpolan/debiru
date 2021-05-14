@@ -118,32 +118,27 @@ struct WebImage: View {
     }
     
     private func handleSaveImage() {
-        if let data = viewModel.imageData {
-            do {
-                // create the directory path if it doesn't already exist
-                var isDirectory: ObjCBool = true
-                if !FileManager.default.fileExists(atPath: saveLocation.path, isDirectory: &isDirectory) {
-                    try FileManager.default.createDirectory(
-                        at: saveLocation,
-                        withIntermediateDirectories: false,
-                        attributes: nil)
-                }
-                
-                // write the image with its filename preserved
-                try data.write(to: saveLocation.appendingPathComponent(asset.fullName))
-                
-                viewModel.popoverMessage = "Saved \(asset.fullName) to \(saveLocation.path)"
-                viewModel.popoverType = .success
-                
-                // dismiss the popover after a few seconds
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    viewModel.popoverMessage = nil
-                    viewModel.popoverType = nil
-                }
-            } catch (let error) {
-                viewModel.popoverMessage = error.localizedDescription
-                viewModel.popoverType = .error
+        guard let data = viewModel.imageData else { return }
+        
+        let result = DataManager.shared.saveImageData(
+            fileName: asset.fullName,
+            data: data,
+            to: saveLocation)
+        
+        switch result {
+        case .success:
+            viewModel.popoverMessage = "Saved \(asset.fullName) to \(saveLocation.path)"
+            viewModel.popoverType = .success
+            
+            // dismiss the popover after a few seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                viewModel.popoverMessage = nil
+                viewModel.popoverType = nil
             }
+            
+        case .failure(let error):
+            viewModel.popoverMessage = error.localizedDescription
+            viewModel.popoverType = .error
         }
     }
     

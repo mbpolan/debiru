@@ -17,6 +17,14 @@ struct DebiruApp: App {
     private var cancellables: Set<AnyCancellable> = Set()
     
     init() {
+        // check and request permissions for data
+        switch DataManager.shared.checkSaveDirectory() {
+        case .failure(let error):
+            print(error.localizedDescription)
+        default:
+            break
+        }
+        
         // load saved app state if it exists, or default to our initial state otherwise
         let state = StateLoader.shared.load()
         switch state {
@@ -106,4 +114,6 @@ struct StorageKeys {
     static let cacheEnabled = "cacheEnabled"
     static let limitCacheEnabled = "limitCacheEnabled"
     static let boardWordFilters = "boardWordFilters"
+    
+    static let bookmarkSaveDirectory = "bookmarkSaveDirectory"
 }
