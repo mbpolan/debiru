@@ -76,6 +76,7 @@ struct DebiruApp: App {
         
         Settings {
             SettingsView()
+                .environmentObject(appState)
         }
     }
     
@@ -104,4 +105,5 @@ struct StorageKeys {
     static let maximumCacheSize = "maximumCacheSize"
     static let cacheEnabled = "cacheEnabled"
     static let limitCacheEnabled = "limitCacheEnabled"
+    static let boardWordFilters = "boardWordFilters"
 }

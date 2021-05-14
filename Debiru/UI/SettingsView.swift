@@ -29,6 +29,12 @@ struct SettingsView: View {
                     Label("Cache", systemImage: "internaldrive")
                 }
                 .tag(Tabs.cache)
+            
+//            FilterSettingsView()
+//                .tabItem {
+//                    Label("Filters", systemImage: "doc.plaintext")
+//                }
+//                .tag(Tabs.filters)
         }
         .padding(20)
     }
@@ -37,6 +43,7 @@ struct SettingsView: View {
         case general
         case notifications
         case cache
+        case filters
     }
 }
 
