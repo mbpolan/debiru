@@ -116,7 +116,9 @@ struct WatchedThreadsView: View {
     }
     
     private func handleShowThread(_ watchedThread: WatchedThread) {
-        NotificationCenter.default.post(name: .showThread, object: watchedThread)
+        ThreadDestination
+            .watchedThread(watchedThread)
+            .notify()
     }
     
     private func handleClearUnread(_ watchedThread: WatchedThread) {

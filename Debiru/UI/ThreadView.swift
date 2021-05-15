@@ -269,7 +269,9 @@ struct ThreadView: View {
     private func handleBackToCatalog() {
         if let thread = getThread(appState.currentItem),
            let board = appState.boards.first(where: { $0.id == thread.boardId }) {
-            NotificationCenter.default.post(name: .showBoard, object: board)
+            
+            BoardDestination(board: board, filter: nil)
+                .notify()
         }
     }
     
@@ -300,10 +302,13 @@ struct ThreadView: View {
             withAnimation {
                 scrollProxy.scrollTo(targetPost)
             }
-        } else if let boardLink = link as? BoardLink {
-            NotificationCenter.default.post(name: .showBoard, object: BoardDestination(
-                                                boardId: boardLink.boardId,
-                                                filter: boardLink.filter))
+        } else if let boardLink = link as? BoardLink,
+                  let board = appState.boards.first(where: { $0.id == boardLink.boardId }) {
+            
+            BoardDestination(
+                board: board,
+                filter: boardLink.filter)
+                .notify()
         } else if let webLink = link as? WebLink {
             NSWorkspace.shared.open(webLink.url)
         }

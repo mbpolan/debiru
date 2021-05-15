@@ -16,8 +16,6 @@ struct ContentView: View {
     @StateObject private var viewModel: ContentViewModel = ContentViewModel()
     
     private let dataProvider: DataProvider
-    private let showBoardPublisher = NotificationCenter.default.publisher(for: .showBoard)
-    private let showThreadPublisher = NotificationCenter.default.publisher(for: .showThread)
     private let showImagePublisher = NotificationCenter.default.publisher(for: .showImage)
     private let showWebVideoPublisher = NotificationCenter.default.publisher(for: .showWebVideo)
     
@@ -60,20 +58,11 @@ struct ContentView: View {
             // list of watched threads
             NotificationManager.shared?.updateApplicationBadge()
         }
-        .onReceive(showBoardPublisher) { event in
-            if let board = event.object as? Board {
-                handleShowBoard(board)
-            } else if let destination = event.object as? BoardDestination,
-                      let board = appState.boards.first(where: { $0.id == destination.boardId }) {
-                handleShowBoard(board)
-            }
+        .onReceiveShowBoard { board in
+            handleShowBoard(board)
         }
-        .onReceive(showThreadPublisher) { event in
-            if let thread = event.object as? Thread {
-                handleShowThread(thread)
-            } else if let watchedThread = event.object as? WatchedThread {
-                handleShowWatchedThread(watchedThread)
-            }
+        .onReceiveShowThread { thread in
+            handleShowThread(thread)
         }
         .onReceive(showImagePublisher) { event in
             if let data = event.object as? DownloadedAsset {
@@ -126,22 +115,24 @@ struct ContentView: View {
         viewModel.openSheet = nil
     }
     
-    private func handleShowBoard(_ board: Board) {
-        appState.currentItem = .board(board)
+    private func handleShowBoard(_ destination: BoardDestination) {
+        appState.currentItem = .board(destination.board)
     }
     
-    private func handleShowThread(_ thread: Thread) {
-        switch appState.currentItem {
-        case .board(let board):
-            appState.currentItem = .thread(board, thread)
-        default:
-            break
+    private func handleShowThread(_ destination: ThreadDestination) {
+        switch destination {
+        case .thread(let thread):
+            switch appState.currentItem {
+            case .board(let board):
+                appState.currentItem = .thread(board, thread)
+            default:
+                break
+            }
+            
+        case .watchedThread(let watchedThread):
+            appState.currentItem = .thread(nil, watchedThread.thread)
+            appState.targettedPostId = watchedThread.lastPostId
         }
-    }
-    
-    private func handleShowWatchedThread(_ watchedThread: WatchedThread) {
-        appState.currentItem = .thread(nil, watchedThread.thread)
-        appState.targettedPostId = watchedThread.lastPostId
     }
     
     private func handleShowImage(_ data: DownloadedAsset) {

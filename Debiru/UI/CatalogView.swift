@@ -203,7 +203,9 @@ struct CatalogView: View {
     }
     
     private func handleShowThread(_ thread: Thread) {
-        NotificationCenter.default.post(name: .showThread, object: thread)
+        ThreadDestination
+            .thread(thread)
+            .notify()
     }
     
     private func handleLink(_ link: Link) {

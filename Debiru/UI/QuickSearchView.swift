@@ -93,7 +93,8 @@ struct QuickSearchView: View {
         switch viewModel.matches[viewModel.selected] {
         case .board(let board):
             self.shown = false
-            NotificationCenter.default.post(name: .showBoard, object: board)
+            BoardDestination(board: board, filter: nil)
+                .notify()
             
         case .thread(_, _):
             break
