@@ -19,10 +19,6 @@ struct CatalogView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
     private let dataProvider: DataProvider
-    private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
-    private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
-    private let goToTopPublisher = NotificationCenter.default.publisher(for: .goToTop)
-    private let goToBottomPublisher = NotificationCenter.default.publisher(for: .goToBottom)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -83,16 +79,7 @@ struct CatalogView: View {
                 }
                 .padding([.bottom, .leading, .trailing], 5)
             }
-            .onReceive(goToTopPublisher) { _ in
-                if let first = threads.first {
-                    scroll.scrollTo(first)
-                }
-            }
-            .onReceive(goToBottomPublisher) { _ in
-                if let last = threads.last {
-                    scroll.scrollTo(last)
-                }
-            }
+            .onNavigate { handleNavigation($0, proxy: scroll) }
             .onChange(of: appState.autoRefresh) { refresh in
                 if refresh {
                     startRefreshTimer()
@@ -124,10 +111,10 @@ struct CatalogView: View {
                     search: $viewModel.search)
             }
         }
-        .onReceive(refreshViewPublisher) { _ in
+        .onRefreshView {
             reloadFromState()
         }
-        .onReceive(openInBrowserPublisher) { _ in
+        .onOpenInBrowser {
             guard let board = getBoard(appState.currentItem),
                   let url = dataProvider.getURL(for: board) else { return }
             
@@ -188,6 +175,19 @@ struct CatalogView: View {
         appState.currentItem = nil
     }
     
+    private func handleNavigation(_ destination: NavigateNotification, proxy: ScrollViewProxy) {
+        switch destination {
+        case .top:
+            guard let first = threads.first else { return }
+            proxy.scrollTo(first)
+        case .down:
+            guard let last = threads.last else { return }
+            proxy.scrollTo(last)
+        default:
+            break
+        }
+    }
+    
     private func handleOpenImage(_ data: Data?, asset: Asset) {
         if asset.fileType == .webm {
             ShowVideoNotification(asset: asset)
@@ -235,7 +235,7 @@ struct CatalogView: View {
             appState.watchedThreads.append(.initial(thread))
         }
         
-        NotificationCenter.default.post(name: .saveAppState, object: nil)
+        PersistAppStateNotification().notify()
     }
     
     private func getBoard(_ item: ViewableItem?) -> Board? {

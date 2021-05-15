@@ -18,11 +18,6 @@ struct ThreadView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
-    private let refreshViewPublisher = NotificationCenter.default.publisher(for: .refreshView)
-    private let openInBrowserPublisher = NotificationCenter.default.publisher(for: .openInBrowser)
-    private let goBackPublisher = NotificationCenter.default.publisher(for: .goBack)
-    private let goToTopPublisher = NotificationCenter.default.publisher(for: .goToTop)
-    private let goToBottomPublisher = NotificationCenter.default.publisher(for: .goToBottom)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -77,19 +72,7 @@ struct ThreadView: View {
                 
                 makeFooter(statistics)
             }
-            .onReceive(goBackPublisher) { _ in
-                handleBackToCatalog()
-            }
-            .onReceive(goToTopPublisher) { _ in
-                if let first = posts.first {
-                    scroll.scrollTo(first)
-                }
-            }
-            .onReceive(goToBottomPublisher) { _ in
-                if let last = posts.last {
-                    scroll.scrollTo(last)
-                }
-            }
+            .onNavigate { handleNavigation($0, proxy: scroll) }
             .onChange(of: viewModel.targettedPostId) { targettedPostId in
                 if let targettedPostId = targettedPostId,
                    let post = viewModel.posts.first(where: { $0.id == targettedPostId }) {
@@ -126,10 +109,10 @@ struct ThreadView: View {
                     search: $viewModel.search)
             }
         }
-        .onReceive(refreshViewPublisher) { _ in
+        .onRefreshView {
             reloadFromState()
         }
-        .onReceive(openInBrowserPublisher) { _ in
+        .onOpenInBrowser {
             guard let thread = getThread(appState.currentItem),
                   let url = dataProvider.getURL(for: thread) else { return }
             
@@ -265,6 +248,19 @@ struct ThreadView: View {
         }
     }
     
+    private func handleNavigation(_ destination: NavigateNotification, proxy: ScrollViewProxy) {
+        switch destination {
+        case .back:
+            handleBackToCatalog()
+        case .top:
+            guard let first = posts.first else { return }
+            proxy.scrollTo(first)
+        case .down:
+            guard let last = posts.last else { return }
+            proxy.scrollTo(last)
+        }
+    }
+    
     private func handleBackToCatalog() {
         if let thread = getThread(appState.currentItem),
            let board = appState.boards.first(where: { $0.id == thread.boardId }) {
@@ -287,7 +283,7 @@ struct ThreadView: View {
             appState.watchedThreads.append(.initial(thread, posts: posts))
         }
         
-        NotificationCenter.default.post(name: .saveAppState, object: nil)
+        PersistAppStateNotification().notify()
     }
     
     private func handleLink(_ link: Link, scrollProxy: ScrollViewProxy) {

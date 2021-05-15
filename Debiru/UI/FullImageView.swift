@@ -18,10 +18,6 @@ enum ImageScaleMode {
 struct FullImageView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: FullImageViewModel = FullImageViewModel()
-    private let changeImageModePublisher = NotificationCenter.default.publisher(for: .changeImageMode)
-    private let resetZoomPublisher = NotificationCenter.default.publisher(for: .resetZoom)
-    private let zoomInPublisher = NotificationCenter.default.publisher(for: .zoomIn)
-    private let zoomOutPublisher = NotificationCenter.default.publisher(for: .zoomOut)
     
     var body: some View {
         VStack {
@@ -68,19 +64,18 @@ struct FullImageView: View {
             }
             .help("Show image stretched to fit the window")
         }
-        .onReceive(changeImageModePublisher) { event in
-            if let mode = event.object as? ImageScaleMode {
-                viewModel.scaleMode = mode
-            }
-        }
-        .onReceive(resetZoomPublisher) { _ in
-            viewModel.scale = 1.0
-        }
-        .onReceive(zoomInPublisher) { _ in
+        .onImageMode { viewModel.scaleMode = $0 }
+        .onImageZoom { handleImageZoom($0) }
+    }
+    
+    private func handleImageZoom(_ zoom: ImageZoomNotification) {
+        switch zoom {
+        case .zoomIn:
             viewModel.scale *= 1.25
-        }
-        .onReceive(zoomOutPublisher) { _ in
+        case .zoomOut:
             viewModel.scale /= 1.25
+        case .zoomNormal:
+            viewModel.scale = 1.0
         }
     }
     

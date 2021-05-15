@@ -135,7 +135,7 @@ struct WatchedThreadsView: View {
                     nowArchived: watchedThread.nowArchived,
                     nowDeleted: watchedThread.nowDeleted)
                 
-                NotificationCenter.default.post(name: .saveAppState, object: nil)
+                PersistAppStateNotification().notify()
                 
             case .failure(let error):
                 print("Failed to get posts for thread: \(error.localizedDescription)")
@@ -148,7 +148,7 @@ struct WatchedThreadsView: View {
         
         // remove the thread and post a request to save app state
         appState.watchedThreads.remove(at: index)
-        NotificationCenter.default.post(name: .saveAppState, object: nil)
+        PersistAppStateNotification().notify()
     }
 }
 

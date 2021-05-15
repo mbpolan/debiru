@@ -12,7 +12,6 @@ import SwiftUI
 struct DebiruApp: App {
     private var appState: AppState
     private let notificationManager: NotificationManager
-    private let saveAppStatePublisher = NotificationCenter.default.publisher(for: .saveAppState)
     private let threadWatcher: ThreadWatcher
     private var cancellables: Set<AnyCancellable> = Set()
     
@@ -42,9 +41,10 @@ struct DebiruApp: App {
         self.threadWatcher = ThreadWatcher(appState: appState)
         self.threadWatcher.start()
         
-        cancellables.insert(saveAppStatePublisher
-                                .receive(on: DispatchQueue.global(qos: .background))
-                                .sink(receiveValue: handleSaveAppState))
+        PersistAppStateNotification.publisher
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: handleSaveAppState)
+            .store(in: &cancellables)
     }
     
     var body: some Scene {

@@ -5,11 +5,27 @@
 //  Created by Mike Polan on 5/14/21.
 //
 
+import Combine
 import SwiftUI
 
 protocol Notifiable {
     static var name: Notification.Name { get }
     func notify()
+}
+
+struct PersistAppStateNotification: Notifiable {
+    static var name = Notification.Name("saveAppState")
+    
+    static var publisher: AnyPublisher<Notification, Never> {
+        NotificationCenter
+            .default
+            .publisher(for: PersistAppStateNotification.name, object: nil)
+            .eraseToAnyPublisher()
+    }
+    
+    func notify() {
+        NotificationCenter.default.post(name: PersistAppStateNotification.name, object: nil)
+    }
 }
 
 struct ShowImageNotification: Notifiable {
@@ -27,6 +43,22 @@ struct ShowVideoNotification: Notifiable {
     
     func notify() {
         NotificationCenter.default.post(name: ShowVideoNotification.name, object: asset)
+    }
+}
+
+struct OpenInBrowserNotification: Notifiable {
+    static var name = Notification.Name("openInBrowser")
+    
+    func notify() {
+        NotificationCenter.default.post(name: OpenInBrowserNotification.name, object: nil)
+    }
+}
+
+struct RefreshNotification: Notifiable {
+    static var name = Notification.Name("refreshView")
+    
+    func notify() {
+        NotificationCenter.default.post(name: RefreshNotification.name, object: nil)
     }
 }
 
@@ -53,6 +85,43 @@ enum ThreadDestination: Notifiable {
     }
 }
 
+enum ImageZoomNotification: Notifiable {
+    case zoomIn
+    case zoomOut
+    case zoomNormal
+    
+    static var name: Notification.Name {
+        return Notification.Name("changeZoom")
+    }
+    
+    func notify() {
+        NotificationCenter.default.post(name: ImageZoomNotification.name, object: self)
+    }
+}
+
+struct ImageModeNotification: Notifiable {
+    static var name = Notification.Name("changeImageMode")
+    let mode: ImageScaleMode
+    
+    func notify() {
+        NotificationCenter.default.post(name: ImageModeNotification.name, object: mode)
+    }
+}
+
+enum NavigateNotification: Notifiable {
+    case top
+    case down
+    case back
+    
+    static var name: Notification.Name {
+        return Notification.Name("navigate")
+    }
+    
+    func notify() {
+        NotificationCenter.default.post(name: NavigateNotification.name, object: self)
+    }
+}
+
 extension View {
     func onNotification<T>(_ name: Notification.Name, perform: @escaping(_: T) -> Void) -> some View {
         return onReceive(NotificationCenter.default.publisher(for: name)) { event in
@@ -64,12 +133,10 @@ extension View {
         }
     }
     
-    func onShowBoard(perform: @escaping(_: BoardDestination) -> Void) -> some View {
-        return onNotification(BoardDestination.name, perform: perform)
-    }
-    
-    func onShowThread(perform: @escaping(_: ThreadDestination) -> Void) -> some View {
-        return onNotification(ThreadDestination.name, perform: perform)
+    func onNotification(_ name: Notification.Name, perform: @escaping() -> Void) -> some View {
+        return onReceive(NotificationCenter.default.publisher(for: name)) { event in
+            perform()
+        }
     }
     
     func onShowImage(perform: @escaping(_: DownloadedAsset) -> Void) -> some View {
@@ -78,5 +145,33 @@ extension View {
     
     func onShowVideo(perform: @escaping(_: Asset) -> Void) -> some View {
         return onNotification(ShowVideoNotification.name, perform: perform)
+    }
+    
+    func onOpenInBrowser(perform: @escaping() -> Void) -> some View {
+        return onNotification(OpenInBrowserNotification.name, perform: perform)
+    }
+    
+    func onRefreshView(perform: @escaping() -> Void) -> some View {
+        return onNotification(RefreshNotification.name, perform: perform)
+    }
+    
+    func onShowBoard(perform: @escaping(_: BoardDestination) -> Void) -> some View {
+        return onNotification(BoardDestination.name, perform: perform)
+    }
+    
+    func onShowThread(perform: @escaping(_: ThreadDestination) -> Void) -> some View {
+        return onNotification(ThreadDestination.name, perform: perform)
+    }
+    
+    func onImageZoom(perform: @escaping(_: ImageZoomNotification) -> Void) -> some View {
+        return onNotification(ImageZoomNotification.name, perform: perform)
+    }
+    
+    func onImageMode(perform: @escaping(_: ImageScaleMode) -> Void) -> some View {
+        return onNotification(ImageModeNotification.name, perform: perform)
+    }
+    
+    func onNavigate(perform: @escaping(_: NavigateNotification) -> Void) -> some View {
+        return onNotification(NavigateNotification.name, perform: perform)
     }
 }
