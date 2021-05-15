@@ -254,15 +254,14 @@ struct ThreadView: View {
     
     private func handleOpenImage(_ data: Data?, asset: Asset) {
         if asset.fileType == .webm {
-            NotificationCenter.default.post(
-                name: .showWebVideo,
-                object: asset)
+            ShowVideoNotification(asset: asset)
+                .notify()
         } else if let data = data {
-            NotificationCenter.default.post(
-                name: .showImage,
-                object: DownloadedAsset(
+            ShowImageNotification(
+                asset: DownloadedAsset(
                     data: data,
                     asset: asset))
+                .notify()
         }
     }
     

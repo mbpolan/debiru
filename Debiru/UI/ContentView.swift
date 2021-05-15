@@ -16,8 +16,6 @@ struct ContentView: View {
     @StateObject private var viewModel: ContentViewModel = ContentViewModel()
     
     private let dataProvider: DataProvider
-    private let showImagePublisher = NotificationCenter.default.publisher(for: .showImage)
-    private let showWebVideoPublisher = NotificationCenter.default.publisher(for: .showWebVideo)
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -58,22 +56,10 @@ struct ContentView: View {
             // list of watched threads
             NotificationManager.shared?.updateApplicationBadge()
         }
-        .onReceiveShowBoard { board in
-            handleShowBoard(board)
-        }
-        .onReceiveShowThread { thread in
-            handleShowThread(thread)
-        }
-        .onReceive(showImagePublisher) { event in
-            if let data = event.object as? DownloadedAsset {
-                handleShowImage(data)
-            }
-        }
-        .onReceive(showWebVideoPublisher) { event in
-            if let asset = event.object as? Asset {
-                handleShowWebVideo(asset)
-            }
-        }
+        .onShowBoard { handleShowBoard($0) }
+        .onShowThread { handleShowThread($0) }
+        .onShowImage { handleShowImage($0) }
+        .onShowVideo { handleShowWebVideo($0) }
         .sheet(item: $viewModel.openSheet, onDismiss: handleSheetDismiss) { sheet in
             makeSheet(sheet)
         }
