@@ -291,8 +291,8 @@ struct ThreadView: View {
     
     private func handleLink(_ link: Link, scrollProxy: ScrollViewProxy) {
         // if this link refers to a post in this thread, we can scroll to it right away
-        if let thread = getThread(appState.currentItem),
-           let postLink = link as? PostLink,
+        if let postLink = link as? PostLink,
+           let thread = getThread(appState.currentItem),
            postLink.threadId == thread.id,
            let targetPost = posts.first(where: { $0.id == postLink.postId }) {
             
@@ -300,6 +300,10 @@ struct ThreadView: View {
             withAnimation {
                 scrollProxy.scrollTo(targetPost)
             }
+        } else if let boardLink = link as? BoardLink {
+            NotificationCenter.default.post(name: .showBoard, object: BoardDestination(
+                                                boardId: boardLink.boardId,
+                                                filter: boardLink.filter))
         } else if let webLink = link as? WebLink {
             NSWorkspace.shared.open(webLink.url)
         }

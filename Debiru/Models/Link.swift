@@ -18,6 +18,7 @@ struct WebLink: Link {
 struct BoardLink: Link {
     let url: URL
     let boardId: String
+    let filter: String?
 }
 
 struct PostLink: Link {

@@ -63,6 +63,9 @@ struct ContentView: View {
         .onReceive(showBoardPublisher) { event in
             if let board = event.object as? Board {
                 handleShowBoard(board)
+            } else if let destination = event.object as? BoardDestination,
+                      let board = appState.boards.first(where: { $0.id == destination.boardId }) {
+                handleShowBoard(board)
             }
         }
         .onReceive(showThreadPublisher) { event in
@@ -125,11 +128,6 @@ struct ContentView: View {
     
     private func handleShowBoard(_ board: Board) {
         appState.currentItem = .board(board)
-        
-        // add this board to our open items view, if it's not there already
-        if !appState.openItems.contains(where: { $0 == .board(board) }) {
-            appState.openItems.append(.board(board))
-        }
     }
     
     private func handleShowThread(_ thread: Thread) {

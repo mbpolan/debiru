@@ -187,8 +187,11 @@ struct PostView<T>: View where T: View {
             .components(separatedBy: "/")
             .filter { !$0.isEmpty }
         
-        // if there are four segments, this indicates a link to post
-        // otherwise, a single segment is a link to a board
+        // determine what kind of link this is based on how many segments
+        // are present in the path:
+        // a. four segments: this indicates a link to post
+        // b. two segments: a board followed by a destination
+        // b. a single segment: a link to a board
         if parts.count == 4,
            let boardId = parts.first,
            let threadId = Int(parts[2]),
@@ -199,12 +202,22 @@ struct PostView<T>: View where T: View {
                 boardId: boardId,
                 threadId: threadId,
                 postId: postId)
+        } else if parts.count == 2,
+                  let boardId = parts.first,
+                  let filter = parts.last {
+            
+            // the filter is applied on the target board
+            return BoardLink(
+                url: url,
+                boardId: boardId,
+                filter: filter)
         } else if parts.count == 1,
                   let boardId = parts.first {
             
             return BoardLink(
                 url: url,
-                boardId: boardId)
+                boardId: boardId,
+                filter: nil)
         }
         
         print("Unknown link: \(url.path)")
