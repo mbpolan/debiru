@@ -41,6 +41,7 @@ struct FullImageView: View {
                         accessibilityDescription: nil) ?? NSImage())
             }
         }
+        .frame(minWidth: 100, minHeight: 100)
         .edgesIgnoringSafeArea(.top)
         .toolbar {
             Button(action: handleOriginalMode) {
