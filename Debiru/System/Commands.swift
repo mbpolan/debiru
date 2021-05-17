@@ -31,6 +31,11 @@ struct AppCommands: Commands {
             
             Divider()
             
+            Button("Toggle Sidebar") {
+                ToggleSidebarNotification().notify()
+            }
+            .keyboardShortcut(KeyEquivalent("0"), modifiers: .command)
+            
             Button("Toggle Quick Search") {
                 onShowQuickSearch()
             }
@@ -81,7 +86,7 @@ struct FullImageViewCommands: Commands {
                     .zoomNormal
                     .notify()
             }
-            .keyboardShortcut("0", modifiers: .command)
+            .keyboardShortcut("0", modifiers: [.command, .shift])
             
             Button("Zoom In") {
                 ImageZoomNotification

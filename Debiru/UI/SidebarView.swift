@@ -45,6 +45,7 @@ struct SidebarView: View {
                 }
             }
         }
+        .onToggleSidebar(perform: handleToggleSidebar)
     }
     
     private func handleToggleSidebar() {

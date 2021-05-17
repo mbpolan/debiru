@@ -13,6 +13,14 @@ protocol Notifiable {
     func notify()
 }
 
+struct ToggleSidebarNotification: Notifiable {
+    static var name = Notification.Name("toggleSidebar")
+    
+    func notify() {
+        NotificationCenter.default.post(name: ToggleSidebarNotification.name, object: nil)
+    }
+}
+
 struct PersistAppStateNotification: Notifiable {
     static var name = Notification.Name("saveAppState")
     
@@ -137,6 +145,10 @@ extension View {
         return onReceive(NotificationCenter.default.publisher(for: name)) { event in
             perform()
         }
+    }
+    
+    func onToggleSidebar(perform: @escaping() -> Void) -> some View {
+        return onNotification(ToggleSidebarNotification.name, perform: perform)
     }
     
     func onShowImage(perform: @escaping(_: DownloadedAsset) -> Void) -> some View {
