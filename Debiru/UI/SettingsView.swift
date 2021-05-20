@@ -30,11 +30,11 @@ struct SettingsView: View {
                 }
                 .tag(Tabs.cache)
             
-//            FilterSettingsView()
-//                .tabItem {
-//                    Label("Filters", systemImage: "doc.plaintext")
-//                }
-//                .tag(Tabs.filters)
+            FilterSettingsView()
+                .tabItem {
+                    Label("Filters", systemImage: "doc.plaintext")
+                }
+                .tag(Tabs.filters)
         }
         .padding(20)
     }
