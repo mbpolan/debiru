@@ -17,6 +17,7 @@ class AppState: ObservableObject, Codable {
     @Published var autoRefresh: Bool = false
     @Published var targettedPostId: Int?
     @Published var watchedThreads: [WatchedThread] = []
+    @Published var boardFilters: [String: [OrderedFilter]] = [:]
     
     init() {
         self.boards = []
@@ -120,5 +121,14 @@ extension ViewableItem {
                                     thread: thread), forKey: .thread)
         }
         
+    }
+}
+
+struct OrderedFilter: Identifiable, Hashable, Equatable {
+    let index: Int
+    let filter: String
+    
+    var id: String {
+        return "\(index)\(filter)"
     }
 }

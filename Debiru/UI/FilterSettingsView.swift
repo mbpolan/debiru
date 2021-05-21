@@ -19,7 +19,7 @@ struct FilterSettingsView: View {
             VStack {
                 EditableList(
                     selection: $viewModel.selectedBoardId,
-                    items: viewModel.configuredBoardIds,
+                    items: [String] (appState.boardFilters.keys),
                     onAdd: handleAddBoard,
                     onRemove: { handleRemoveBoard($0) }) { item in
                     Text("/\(item)/")
@@ -32,13 +32,13 @@ struct FilterSettingsView: View {
                 .frame(width: 5)
             
             VStack {
-                if let selectedBoardFilters = viewModel.selectedBoardFilters {
+                if let selectedBoardId = viewModel.selectedBoardId {
                     Text("Hide posts and threads that contain any of the below terms.")
                         .padding()
                     
                     EditableList(
                         selection: $viewModel.selectedBoardFilter,
-                        items: selectedBoardFilters,
+                        items: appState.boardFilters[selectedBoardId] ?? [],
                         onAdd: handleAddBoardFilter,
                         onRemove: { handleRemoveBoardFilter($0) }) { item in
                         
@@ -67,13 +67,6 @@ struct FilterSettingsView: View {
             .border(Color(NSColor.darkGray), width: 1)
             .layoutPriority(3)
         }
-        .onChange(of: viewModel.selectedBoardId) { boardId in
-            if let boardId = boardId {
-                viewModel.selectedBoardFilters = []
-            } else {
-                viewModel.selectedBoardFilters = nil
-            }
-        }
         .sheet(isPresented: $viewModel.addBoardSheetOpen) {
             VStack {
                 Picker("Select a board", selection: $viewModel.addBoardSelected) {
@@ -96,7 +89,7 @@ struct FilterSettingsView: View {
                         viewModel.addBoardSheetOpen = false
                         
                         if let addedBoard = viewModel.addBoardSelected {
-                            viewModel.configuredBoardIds.append(addedBoard.id)
+                            appState.boardFilters[addedBoard.id] = []
                             viewModel.addBoardSelected = nil
                         }
                     }
@@ -111,7 +104,8 @@ struct FilterSettingsView: View {
     }
     
     private var selectableBoards: [Board] {
-        return appState.boards.filter { !viewModel.configuredBoardIds.contains($0.id) }
+        // allow selecting boards that aren't already in our filter list
+        return appState.boards.filter { appState.boardFilters[$0.id] == nil }
     }
     
     private func handleAddBoard() {
@@ -119,33 +113,39 @@ struct FilterSettingsView: View {
     }
     
     private func handleRemoveBoard(_ boardId: String) {
-        if let index = viewModel.configuredBoardIds.firstIndex(of: boardId) {
-            viewModel.selectedBoardId = nil
-            viewModel.configuredBoardIds.remove(at: index)
-        }
+        viewModel.selectedBoardId = nil
+        appState.boardFilters.removeValue(forKey: boardId)
     }
     
     private func handleAddBoardFilter() {
-        viewModel.selectedBoardFilters?.append(
+        guard let selectedBoardId = viewModel.selectedBoardId else { return }
+        
+        let existingFilters = appState.boardFilters[selectedBoardId] ?? []
+        
+        appState.boardFilters[selectedBoardId] = existingFilters + [
             OrderedFilter(
-                index: viewModel.selectedBoardFilters?.count ?? 0,
-                filter: "..."))
+                index: existingFilters.count,
+                filter: "...")
+        ]
     }
     
     private func handleRemoveBoardFilter(_ filter: OrderedFilter) {
-        if let index = viewModel.selectedBoardFilters?.firstIndex(of: filter) {
-            viewModel.selectedBoardFilters?.remove(at: index)
+        guard let selectedBoardId = viewModel.selectedBoardId,
+              let existingFilters = appState.boardFilters[selectedBoardId] else { return }
+        
+        appState.boardFilters[selectedBoardId] = existingFilters.filter {
+            return $0 != filter
         }
     }
     
     private func handleApplyEditToFilter(at index: Int) {
-        // find the targeted item
-        if let filters = viewModel.selectedBoardFilters {
-            viewModel.selectedBoardFilters = filters.enumerated().map { filter in
-                return filter.offset == index
-                    ? OrderedFilter(index: index, filter: viewModel.editedFilter)
-                    : filter.element
-            }
+        guard let selectedBoardId = viewModel.selectedBoardId,
+              let existingFilters = appState.boardFilters[selectedBoardId] else { return }
+        
+        appState.boardFilters[selectedBoardId] = existingFilters.map {
+            return $0.index == index
+                ? OrderedFilter(index: index, filter: viewModel.editedFilter)
+                : $0
         }
         
         viewModel.editedFilter = ""
@@ -157,22 +157,11 @@ struct FilterSettingsView: View {
 }
 
 class FilterSettingsViewModel: ObservableObject {
-    @Published var configuredBoardIds: [String] = []
     @Published var selectedBoardId: String?
-    @Published var selectedBoardFilters: [OrderedFilter]?
     @Published var selectedBoardFilter: OrderedFilter?
     @Published var addBoardSheetOpen: Bool = false
     @Published var addBoardSelected: Board?
     @Published var editedFilter: String = ""
-}
-
-struct OrderedFilter: Identifiable, Hashable, Equatable {
-    let index: Int
-    let filter: String
-    
-    var id: String {
-        return "\(index)\(filter)"
-    }
 }
 
 fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: View {
