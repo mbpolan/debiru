@@ -21,7 +21,7 @@ struct FilterSettingsView: View {
                     selection: $viewModel.selectedBoardId,
                     items: viewModel.configuredBoardIds,
                     onAdd: handleAddBoard,
-                    onRemove: { handleRemoveBoard($0) }) { _, item in
+                    onRemove: { handleRemoveBoard($0) }) { item in
                     Text("/\(item)/")
                 }
             }
@@ -40,7 +40,7 @@ struct FilterSettingsView: View {
                         selection: $viewModel.selectedBoardFilter,
                         items: selectedBoardFilters,
                         onAdd: handleAddBoardFilter,
-                        onRemove: { handleRemoveBoardFilter($0) }) { index, item in
+                        onRemove: { handleRemoveBoardFilter($0) }) { item in
                         
                         Group {
                             if viewModel.selectedBoardFilter == item {
@@ -49,15 +49,15 @@ struct FilterSettingsView: View {
                                     text: $viewModel.editedFilter,
                                     onEditingChanged: { _ in },
                                     onCommit: {
-                                        handleApplyEditToFilter(at: index)
+                                        handleApplyEditToFilter(at: item.index)
                                     })
                             } else {
-                                Text(item)
+                                Text(item.filter)
                             }
                         }
                     }
                     .onChange(of: viewModel.selectedBoardFilter) { value in
-                        viewModel.editedFilter = value ?? "..."
+                        viewModel.editedFilter = value?.filter ?? "..."
                     }
                 } else {
                     Text("Select or add a board from the left")
@@ -126,10 +126,13 @@ struct FilterSettingsView: View {
     }
     
     private func handleAddBoardFilter() {
-        viewModel.selectedBoardFilters?.append("...")
+        viewModel.selectedBoardFilters?.append(
+            OrderedFilter(
+                index: viewModel.selectedBoardFilters?.count ?? 0,
+                filter: "..."))
     }
     
-    private func handleRemoveBoardFilter(_ filter: String) {
+    private func handleRemoveBoardFilter(_ filter: OrderedFilter) {
         if let index = viewModel.selectedBoardFilters?.firstIndex(of: filter) {
             viewModel.selectedBoardFilters?.remove(at: index)
         }
@@ -139,7 +142,9 @@ struct FilterSettingsView: View {
         // find the targeted item
         if let filters = viewModel.selectedBoardFilters {
             viewModel.selectedBoardFilters = filters.enumerated().map { filter in
-                return filter.offset == index ? viewModel.editedFilter : filter.element
+                return filter.offset == index
+                    ? OrderedFilter(index: index, filter: viewModel.editedFilter)
+                    : filter.element
             }
         }
         
@@ -154,11 +159,20 @@ struct FilterSettingsView: View {
 class FilterSettingsViewModel: ObservableObject {
     @Published var configuredBoardIds: [String] = []
     @Published var selectedBoardId: String?
-    @Published var selectedBoardFilters: [String]?
-    @Published var selectedBoardFilter: String?
+    @Published var selectedBoardFilters: [OrderedFilter]?
+    @Published var selectedBoardFilter: OrderedFilter?
     @Published var addBoardSheetOpen: Bool = false
     @Published var addBoardSelected: Board?
     @Published var editedFilter: String = ""
+}
+
+struct OrderedFilter: Identifiable, Hashable, Equatable {
+    let index: Int
+    let filter: String
+    
+    var id: String {
+        return "\(index)\(filter)"
+    }
 }
 
 fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: View {
@@ -166,12 +180,12 @@ fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: Vi
     let items: [T]
     let onAdd: () -> Void
     let onRemove: (_: T) -> Void
-    let content: (_: Int, _: T) -> Content
+    let content: (_: T) -> Content
     
     var body: some View {
         VStack {
-            List(listItems, id: \.datum, selection: $selection) { index, item in
-                content(index, item)
+            List(items, id: \.self, selection: $selection) { item in
+                content(item)
             }
             
             Spacer()
@@ -200,10 +214,6 @@ fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: Vi
             }
             .padding([.leading, .bottom], 5)
         }
-    }
-    
-    var listItems: [(index: Int, datum: T)] {
-        return items.enumerated().map { $0 }
     }
 }
 
