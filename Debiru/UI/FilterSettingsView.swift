@@ -67,6 +67,9 @@ struct FilterSettingsView: View {
             .border(Color(NSColor.darkGray), width: 1)
             .layoutPriority(3)
         }
+        .onChange(of: appState.boardFilters) { _ in
+            serializeToData()
+        }
         .sheet(isPresented: $viewModel.addBoardSheetOpen) {
             VStack {
                 Picker("Select a board", selection: $viewModel.addBoardSelected) {
@@ -152,7 +155,11 @@ struct FilterSettingsView: View {
     }
     
     private func serializeToData() {
-        
+        do {
+            boardWordFilters = try JSONEncoder().encode(appState.boardFilters)
+        } catch (let error) {
+            print(error.localizedDescription)
+        }
     }
 }
 
@@ -187,6 +194,7 @@ fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: Vi
                         .foregroundColor(Color(NSColor.systemGray))
                 })
                 .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
                 
                 Button(action: {
                     if let selection = selection {
@@ -197,6 +205,7 @@ fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: Vi
                         .foregroundColor(Color(NSColor.systemGray))
                 })
                 .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
                 .disabled(selection == nil)
                 
                 Spacer()

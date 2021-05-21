@@ -39,9 +39,17 @@ struct StateLoader {
             let url = try getURL(create: false)
             let data = try Data(contentsOf: url)
             
-            return .success(
-                convertFromSnapshot(
-                    try JSONDecoder().decode(Snapshot.self, from: data)))
+            let state = convertFromSnapshot(
+                try JSONDecoder().decode(Snapshot.self, from: data))
+            
+            // load board filters from user defaults
+            if let boardFiltersData = UserDefaults.standard.data(forKey: StorageKeys.boardWordFilters) {
+                state.boardFilters = try JSONDecoder().decode(
+                    [String: [OrderedFilter]].self,
+                    from: boardFiltersData)
+            }
+            
+            return .success(state)
         } catch (let error) {
             return .failure(error)
         }

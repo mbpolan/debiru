@@ -124,7 +124,7 @@ extension ViewableItem {
     }
 }
 
-struct OrderedFilter: Identifiable, Hashable, Equatable {
+struct OrderedFilter: Identifiable, Hashable, Equatable, Codable {
     let index: Int
     let filter: String
     
