@@ -21,6 +21,22 @@ struct Thread: Identifiable, Hashable, Codable {
     let statistics: ThreadStatistics
 }
 
+extension Thread {
+    func matchesFilter(_ filter: String) -> Bool {
+        if let subject = subject,
+           subject.localizedCaseInsensitiveContains(filter) {
+            return true
+        }
+        
+        if let content = content,
+           content.localizedCaseInsensitiveContains(filter) {
+            return true
+        }
+        
+        return false
+    }
+}
+
 struct ThreadStatistics: Equatable, Hashable, Codable {
     let replies: Int
     let images: Int

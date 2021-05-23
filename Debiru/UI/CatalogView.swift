@@ -100,6 +100,10 @@ struct CatalogView: View {
             ToolbarItemGroup {
                 Toggle("Auto-Refresh", isOn: $appState.autoRefresh)
                 
+                Toggle(isOn: $viewModel.filtersEnabled) {
+                    Image(systemName: "text.badge.xmark")
+                }
+                
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -123,8 +127,13 @@ struct CatalogView: View {
         .onChange(of: appState.currentItem) { item in
             reload(from: item)
         }
+        .onChange(of: viewModel.filtersEnabled) { enabled in
+            guard let board = getBoard(appState.currentItem) else { return }
+            appState.boardFilterEnablement[board.id] = enabled
+        }
         .onAppear {
             reloadFromState()
+            updateFilterToggle()
             
             if appState.autoRefresh {
                 startRefreshTimer()
@@ -142,25 +151,38 @@ struct CatalogView: View {
     }
     
     private var threads: [Thread] {
+        var data = viewModel.threads
+        
+        // apply filtering from the search bar
         if viewModel.searchExpanded && !viewModel.search.isEmpty {
             let query = viewModel.search.trimmingCharacters(in: .whitespaces)
             
-            return viewModel.threads.filter { thread in
-                if let subject = thread.subject,
-                   subject.localizedCaseInsensitiveContains(query) {
-                    return true
-                }
-                
-                if let content = thread.content,
-                   content.localizedCaseInsensitiveContains(query) {
-                    return true
-                }
-                
-                return false
+            // take only threads that match the search query
+            data = data.filter { $0.matchesFilter(query) }
+        }
+        
+        // apply filtering for user provided word filters, if enabled
+        if viewModel.filtersEnabled,
+           let board = getBoard(appState.currentItem),
+           let filters = appState.boardFilters[board.id] {
+            
+            // take only threads that do not match any of the individual filters
+            data = data.filter { thread in
+                return !filters.contains { thread.matchesFilter($0.filter) }
             }
         }
         
-        return viewModel.threads
+        return data
+    }
+    
+    private func updateFilterToggle() {
+        guard let board = getBoard(appState.currentItem) else { return }
+        
+        // are there filters on this board?
+        viewModel.hasFilters = !(appState.boardFilters[board.id] ?? []).isEmpty
+        
+        // are filters manually disabled?
+        viewModel.filtersEnabled = appState.boardFilterEnablement[board.id] ?? true
     }
     
     private func getNavigationTitle() -> String {
@@ -281,6 +303,8 @@ class CatalogViewModel: ObservableObject {
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
     @Published var refreshTimer: Timer?
+    @Published var hasFilters: Bool = false
+    @Published var filtersEnabled: Bool = false
 }
 
 // MARK: - Preview

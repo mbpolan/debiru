@@ -18,6 +18,7 @@ class AppState: ObservableObject, Codable {
     @Published var targettedPostId: Int?
     @Published var watchedThreads: [WatchedThread] = []
     @Published var boardFilters: [String: [OrderedFilter]] = [:]
+    @Published var boardFilterEnablement: [String: Bool] = [:]
     
     init() {
         self.boards = []
