@@ -12,7 +12,13 @@ As an aside, this is also an experiement to see how much SwiftUI has progressed 
 
 ## Developing
 
-You'll need macOS 11.x and Xcode 12.4. Simpy open the Xcode project, and build and run the app. At this time, all dependencies are configured using Swift Package Manager, so you should not need any external tools.
+You'll need macOS 11.x and Xcode 12.4. 
+
+Additionally, you'll need a recent version of [Sourcery](https://github.com/krzysztofzablocki/Sourcery), and
+it must be on your path.
+
+Afterwards, once you have all of the necessary tools, open the Xcode project, and build and run the app. 
+Most dependencies are configured using Swift Package Manager, which Xcode should handle for you automatically.
 
 ## Contributing
 

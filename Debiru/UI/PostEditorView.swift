@@ -71,16 +71,16 @@ struct PostEditorView: View {
                                         captchaToken: captchaToken),
                                     to: board) { result in
             
-            viewModel.postButtonEnabled = true
-            
-            switch result {
-            case .success():
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                viewModel.postButtonEnabled = true
+                
+                switch result {
+                case .success():
                     onComplete()
+                case .failure(let error):
+                    viewModel.error = "Failed to submit post: \(error.localizedDescription)"
+                    break
                 }
-            case .failure(let error):
-                viewModel.error = "Failed to submit post: \(error.localizedDescription)"
-                break
             }
         }
     }
