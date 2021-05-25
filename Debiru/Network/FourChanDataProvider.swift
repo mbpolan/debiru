@@ -10,11 +10,55 @@ import Foundation
 import SwiftSoup
 
 struct FourChanDataProvider: DataProvider {
+    private let sysBaseUrl = "https://sys.4chan.org"
     private let webBaseUrl = "https://4chan.org"
     private let webBoardsBaseUrl = "https://boards.4chan.org"
     private let apiBaseUrl = "https://a.4cdn.org"
     private let imageBaseUrl = "https://i.4cdn.org"
     private let staticBaseUrl = "https://s.4cdn.org"
+    
+    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Bool, Error>) -> Void) {
+        
+        let body = MutableFormData()
+        body.addField("resto", value: String(submission.replyTo ?? 0))
+        body.addField("com", value: String(submission.content))
+        body.addField("mode", value: "regist")
+        body.addField("g-recaptcha-response", value: submission.captchaToken)
+        
+        guard let data = body.data else { return }
+        
+        var request = URLRequest(url: URL(string: "\(sysBaseUrl)/\(board.id)/post")!)
+        request.httpMethod = "POST"
+        request.setValue(body.contentType, forHTTPHeaderField: "Content-Type")
+        request.httpBody = data
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let response = response as? HTTPURLResponse else {
+                completion(.failure(NetworkError.invalidResponse("Unreadable response")))
+                return
+            }
+            
+            guard let data = data,
+                  let responseData = String(data: data, encoding: .utf8) else {
+                completion(.failure(NetworkError.invalidResponse("Unreadable body")))
+                return
+            }
+            
+            if response.statusCode != 200 {
+                completion(.failure(NetworkError.invalidResponse(
+                                        "Unexpected status code: \(response.statusCode)")))
+                return
+            }
+            
+            print(responseData)
+            completion(.success(true))
+        }.resume()
+    }
     
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable? {
         return getData(

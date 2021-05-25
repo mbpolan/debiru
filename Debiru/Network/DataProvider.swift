@@ -10,6 +10,8 @@ import Foundation
 
 protocol DataProvider {
     
+    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Bool, Error>) -> Void)
+    
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable?
     
     func getCatalog(for board: Board, completion: @escaping(_: Result<[Thread], Error>) -> Void) -> AnyCancellable?
