@@ -3,4 +3,5 @@ xcuserdata/
 Packages
 Package.resolved
 .swiftpm
-
+variables.env
+Debiru/Generated/

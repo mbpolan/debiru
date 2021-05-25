@@ -26,7 +26,7 @@ struct CaptchaView: NSViewRepresentable {
          data-theme="dark"
          data-size="normal"
          data-callback="onCaptchaResponse"
-         data-sitekey="KEY"></div>
+         data-sitekey=""></div>
     </form>
   </body>
 </html>

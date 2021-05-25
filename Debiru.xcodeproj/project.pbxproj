@@ -72,6 +72,7 @@
 		27E4B804265C778F00E183CB /* PostEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B803265C778F00E183CB /* PostEditorView.swift */; };
 		27E4B806265C7F8F00E183CB /* Submission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B805265C7F8F00E183CB /* Submission.swift */; };
 		27E4B808265C892400E183CB /* MutableFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B807265C892400E183CB /* MutableFormData.swift */; };
+		27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B80B265C9B1600E183CB /* Parameters.stencil */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -140,6 +141,7 @@
 		27E4B803265C778F00E183CB /* PostEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostEditorView.swift; sourceTree = "<group>"; };
 		27E4B805265C7F8F00E183CB /* Submission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Submission.swift; sourceTree = "<group>"; };
 		27E4B807265C892400E183CB /* MutableFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableFormData.swift; sourceTree = "<group>"; };
+		27E4B80B265C9B1600E183CB /* Parameters.stencil */ = {isa = PBXFileReference; lastKnownFileType = text; path = Parameters.stencil; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,10 +161,11 @@
 		279945FD25FD9E5A001DCCE3 = {
 			isa = PBXGroup;
 			children = (
-				27C055F4260EA00B0037A91B /* README.md */,
-				27C055F3260EA00B0037A91B /* screenshot.png */,
 				2799460825FD9E5A001DCCE3 /* Debiru */,
 				2799460725FD9E5A001DCCE3 /* Products */,
+				27C055F4260EA00B0037A91B /* README.md */,
+				27C055F3260EA00B0037A91B /* screenshot.png */,
+				27E4B80A265C9ADB00E183CB /* Templates */,
 			);
 			sourceTree = "<group>";
 		};
@@ -177,6 +180,7 @@
 		2799460825FD9E5A001DCCE3 /* Debiru */ = {
 			isa = PBXGroup;
 			children = (
+				27E4B80D265C9D0200E183CB /* Generated */,
 				2799460D25FD9E5B001DCCE3 /* Assets.xcassets */,
 				27BA39C52634E77300C9C519 /* Credits.html */,
 				2799461325FD9E5B001DCCE3 /* Debiru.entitlements */,
@@ -307,6 +311,21 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		27E4B80A265C9ADB00E183CB /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				27E4B80B265C9B1600E183CB /* Parameters.stencil */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		27E4B80D265C9D0200E183CB /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -314,6 +333,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2799461625FD9E5B001DCCE3 /* Build configuration list for PBXNativeTarget "Debiru" */;
 			buildPhases = (
+				27E4B809265C8D4000E183CB /* Generate Secrets */,
 				2799460225FD9E5A001DCCE3 /* Sources */,
 				2799460325FD9E5A001DCCE3 /* Frameworks */,
 				2799460425FD9E5A001DCCE3 /* Resources */,
@@ -343,6 +363,7 @@
 				TargetAttributes = {
 					2799460525FD9E5A001DCCE3 = {
 						CreatedOnToolsVersion = 12.4;
+						LastSwiftMigration = 1250;
 					};
 				};
 			};
@@ -384,6 +405,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		27E4B809265C8D4000E183CB /* Generate Secrets */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Secrets";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -f './variables.env' ]; then\n  . ./variables.env\nfi\n\necho $GRC_SITE_KEY\n\nsourcery \\\n  --templates ./Templates \\\n  --sources Debiru \\\n  --output Debiru/Generated \\\n  --args siteKey=$GRC_SITE_KEY\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2799460225FD9E5A001DCCE3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -410,6 +452,7 @@
 				27B06E20264F293E00FCBC0B /* DataManager.swift in Sources */,
 				27B06E1C2645DC1A00FCBC0B /* CacheSettingsView.swift in Sources */,
 				27BFE1D8263B82DA004E7E2F /* ReplyHStack.swift in Sources */,
+				27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */,
 				27BA39BD26347F4F00C9C519 /* CenteredViewModifier.swift in Sources */,
 				27BFE1DD263CAE83004E7E2F /* DownloadedAsset.swift in Sources */,
 				27B06E1E26475F2300FCBC0B /* FilterSettingsView.swift in Sources */,
@@ -574,6 +617,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Debiru/Debiru.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -588,6 +632,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mbpolan.Debiru;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -597,6 +642,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Debiru/Debiru.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
