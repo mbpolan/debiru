@@ -1,5 +1,5 @@
 struct Parameters {
     static let shared = Parameters()
     
-    let siteKey: String = "{{ argument.GRC_SITE_KEY }}"
+    let siteKey: String = "{{ argument.siteKey }}"
 }

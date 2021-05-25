@@ -13,6 +13,8 @@ struct PostEditorView: View {
     @StateObject private var viewModel: PostEditorViewModel = PostEditorViewModel()
     let board: Board
     let replyTo: Int?
+    let initialContent: String?
+    let onDismiss: () -> Void
     
     var body: some View {
         VStack {
@@ -30,11 +32,17 @@ struct PostEditorView: View {
             HStack {
                 Spacer()
                 
+                Button("Cancel", action: onDismiss)
+                
                 Button("Post", action: handlePost)
                     .disabled(!canPost)
             }
         }
         .padding()
+        .frame(minWidth: 450, minHeight: 500)
+        .onAppear {
+            viewModel.content = initialContent ?? ""
+        }
     }
     
     private var canPost: Bool {
@@ -80,7 +88,9 @@ struct PostEditorView_Preview: PreviewProvider {
                 id: "f",
                 title: "foo",
                 description: "Foo bar"),
-            replyTo: nil)
+            replyTo: nil,
+            initialContent: nil,
+            onDismiss: { })
             .frame(width: 400, height: 400)
     }
 }

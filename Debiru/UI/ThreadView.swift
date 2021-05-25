@@ -45,7 +45,7 @@ struct ThreadView: View {
                                 post.toPostContent(),
                                 boardId: post.boardId,
                                 threadId: post.threadId,
-                                onActivate: { },
+                                onActivate: { handleReplyTo(post)} ,
                                 onLink: { link in
                                     handleLink(link, scrollProxy: scroll)
                                 })
@@ -127,6 +127,15 @@ struct ThreadView: View {
             } else {
                 viewModel.refreshTimer?.invalidate()
                 viewModel.refreshTimer = nil
+            }
+        }
+        .sheet(item: $viewModel.replyToPost, onDismiss: handleHideReplySheet) { post in
+            if let board = getParentBoard(appState.currentItem) {
+                PostEditorView(
+                    board: board,
+                    replyTo: post.id,
+                    initialContent: viewModel.initialReplyToContent,
+                    onDismiss: handleHideReplySheet)
             }
         }
         .onAppear {
@@ -286,6 +295,18 @@ struct ThreadView: View {
         PersistAppStateNotification().notify()
     }
     
+    private func handleReplyTo(_ post: Post) {
+        viewModel.replyToPost = post
+        
+        // prepare a default post template as a response
+        viewModel.initialReplyToContent = ">>\(post.id)\n"
+    }
+    
+    private func handleHideReplySheet() {
+        viewModel.replyToPost = nil
+        viewModel.initialReplyToContent = nil
+    }
+    
     private func handleLink(_ link: Link, scrollProxy: ScrollViewProxy) {
         // if this link refers to a post in this thread, we can scroll to it right away
         if let postLink = link as? PostLink,
@@ -413,6 +434,8 @@ class ThreadViewModel: ObservableObject {
     @Published var lastUpdate: Date = Date()
     @Published var refreshTimer: Timer?
     @Published var targettedPostId: Int?
+    @Published var replyToPost: Post?
+    @Published var initialReplyToContent: String?
     
     struct Statistics {
         let replies: Int?

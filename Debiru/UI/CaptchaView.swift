@@ -26,7 +26,7 @@ struct CaptchaView: NSViewRepresentable {
          data-theme="dark"
          data-size="normal"
          data-callback="onCaptchaResponse"
-         data-sitekey=""></div>
+         data-sitekey="$SITE_KEY" />
     </form>
   </body>
 </html>
@@ -47,12 +47,16 @@ struct CaptchaView: NSViewRepresentable {
             frame: CGRect(x: 0, y: 0, width: 200, height: 75),
             configuration: config)
         view.setValue(false, forKey: "drawsBackground")
-        view.loadHTMLString(captchaHTML, baseURL: URL(string: "https://boards.4chan.org")!)
+        view.loadHTMLString(template, baseURL: URL(string: "https://boards.4chan.org")!)
         
         return view
     }
     
     func updateNSView(_ nsView: WKWebView, context: Context) {
+    }
+    
+    private var template: String {
+        return captchaHTML.replacingOccurrences(of: "$SITE_KEY", with: Parameters.shared.siteKey)
     }
 }
 

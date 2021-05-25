@@ -73,6 +73,7 @@
 		27E4B806265C7F8F00E183CB /* Submission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B805265C7F8F00E183CB /* Submission.swift */; };
 		27E4B808265C892400E183CB /* MutableFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B807265C892400E183CB /* MutableFormData.swift */; };
 		27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B80B265C9B1600E183CB /* Parameters.stencil */; };
+		27E4B80F265C9DA200E183CB /* Parameters.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B80E265C9DA200E183CB /* Parameters.generated.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -142,6 +143,7 @@
 		27E4B805265C7F8F00E183CB /* Submission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Submission.swift; sourceTree = "<group>"; };
 		27E4B807265C892400E183CB /* MutableFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableFormData.swift; sourceTree = "<group>"; };
 		27E4B80B265C9B1600E183CB /* Parameters.stencil */ = {isa = PBXFileReference; lastKnownFileType = text; path = Parameters.stencil; sourceTree = "<group>"; };
+		27E4B80E265C9DA200E183CB /* Parameters.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parameters.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,11 +182,11 @@
 		2799460825FD9E5A001DCCE3 /* Debiru */ = {
 			isa = PBXGroup;
 			children = (
-				27E4B80D265C9D0200E183CB /* Generated */,
 				2799460D25FD9E5B001DCCE3 /* Assets.xcassets */,
 				27BA39C52634E77300C9C519 /* Credits.html */,
 				2799461325FD9E5B001DCCE3 /* Debiru.entitlements */,
 				27BBC9CC2606C6AA005D8183 /* Extensions */,
+				27E4B80D265C9D0200E183CB /* Generated */,
 				2799461225FD9E5B001DCCE3 /* Info.plist */,
 				279CFF7325FEBCC900884724 /* Models */,
 				27BA39BF26347F7E00C9C519 /* Modifiers */,
@@ -322,6 +324,7 @@
 		27E4B80D265C9D0200E183CB /* Generated */ = {
 			isa = PBXGroup;
 			children = (
+				27E4B80E265C9DA200E183CB /* Parameters.generated.swift */,
 			);
 			path = Generated;
 			sourceTree = "<group>";
@@ -483,6 +486,7 @@
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,
 				27BBC9D8260AC67B005D8183 /* ThreadView.swift in Sources */,
 				27C0560C261123FD0037A91B /* DateFormatter.swift in Sources */,
+				27E4B80F265C9DA200E183CB /* Parameters.generated.swift in Sources */,
 				2799461B25FD9EE6001DCCE3 /* SidebarView.swift in Sources */,
 				27B5E76F2621311000178F1B /* Persistance.swift in Sources */,
 				27B06E22264F499500FCBC0B /* Events.swift in Sources */,
