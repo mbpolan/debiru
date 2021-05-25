@@ -10,7 +10,7 @@ import Foundation
 
 protocol DataProvider {
     
-    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Bool, Error>) -> Void)
+    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Void, Error>) -> Void)
     
     func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable?
     

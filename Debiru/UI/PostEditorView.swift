@@ -15,6 +15,7 @@ struct PostEditorView: View {
     let replyTo: Int?
     let initialContent: String?
     let onDismiss: () -> Void
+    let onComplete: () -> Void
     
     var body: some View {
         VStack {
@@ -27,7 +28,12 @@ struct PostEditorView: View {
             TextEditor(text: $viewModel.content)
             
             CaptchaView { viewModel.captchaToken = $0 }
-                .frame(height: 80)
+                .frame(height: 100)
+            
+            if let error = viewModel.error {
+                Text(error)
+                    .foregroundColor(Color(NSColor.systemRed))
+            }
             
             HStack {
                 Spacer()
@@ -46,12 +52,17 @@ struct PostEditorView: View {
     }
     
     private var canPost: Bool {
-        return viewModel.content.count > 0 && viewModel.captchaToken != nil
+        return viewModel.content.count > 0 &&
+            viewModel.captchaToken != nil &&
+            viewModel.postButtonEnabled
     }
     
     private func handlePost() {
         guard let captchaToken = viewModel.captchaToken,
               viewModel.content.count > 0 else { return }
+        
+        viewModel.error = nil
+        viewModel.postButtonEnabled = false
         
         FourChanDataProvider().post(Submission(
                                         replyTo: replyTo,
@@ -59,12 +70,16 @@ struct PostEditorView: View {
                                         content: viewModel.content,
                                         captchaToken: captchaToken),
                                     to: board) { result in
+            
+            viewModel.postButtonEnabled = true
+            
             switch result {
-            case .success(_):
-                print("OK!")
-                break
+            case .success():
+                DispatchQueue.main.async {
+                    onComplete()
+                }
             case .failure(let error):
-                print(error)
+                viewModel.error = "Failed to submit post: \(error.localizedDescription)"
                 break
             }
         }
@@ -77,6 +92,8 @@ class PostEditorViewModel: ObservableObject {
     @Published var name: String = ""
     @Published var content: String = ""
     @Published var captchaToken: String?
+    @Published var error: String?
+    @Published var postButtonEnabled: Bool = true
 }
 
 // MARK: - Preview
@@ -90,7 +107,9 @@ struct PostEditorView_Preview: PreviewProvider {
                 description: "Foo bar"),
             replyTo: nil,
             initialContent: nil,
-            onDismiss: { })
+            onDismiss: { },
+            onComplete: { })
             .frame(width: 400, height: 400)
     }
 }
+

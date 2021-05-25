@@ -135,7 +135,8 @@ struct ThreadView: View {
                     board: board,
                     replyTo: post.id,
                     initialContent: viewModel.initialReplyToContent,
-                    onDismiss: handleHideReplySheet)
+                    onDismiss: handleHideReplySheet,
+                    onComplete: handlePostComplete)
             }
         }
         .onAppear {
@@ -300,6 +301,11 @@ struct ThreadView: View {
         
         // prepare a default post template as a response
         viewModel.initialReplyToContent = ">>\(post.id)\n"
+    }
+    
+    private func handlePostComplete() {
+        reloadFromState()
+        handleHideReplySheet()
     }
     
     private func handleHideReplySheet() {

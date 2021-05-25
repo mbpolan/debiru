@@ -17,8 +17,7 @@ struct FourChanDataProvider: DataProvider {
     private let imageBaseUrl = "https://i.4cdn.org"
     private let staticBaseUrl = "https://s.4cdn.org"
     
-    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Bool, Error>) -> Void) {
-        
+    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Void, Error>) -> Void) {
         let body = MutableFormData()
         body.addField("resto", value: String(submission.replyTo ?? 0))
         body.addField("com", value: String(submission.content))
@@ -55,8 +54,9 @@ struct FourChanDataProvider: DataProvider {
                 return
             }
             
+            // TODO: check response to validate we got a "post successful" message
             print(responseData)
-            completion(.success(true))
+            completion(.success(()))
         }.resume()
     }
     
