@@ -19,6 +19,10 @@ struct CaptchaView: NSViewRepresentable {
       function onCaptchaResponse(response) {
         window.webkit.messageHandlers.captcha.postMessage(response);
       }
+
+      function onCaptchaExpired() {
+        window.webkit.messageHandlers.captchaExpired.postMessage('expired');
+      }
     </script>
   </head>
   <body>
@@ -26,6 +30,7 @@ struct CaptchaView: NSViewRepresentable {
          data-theme="dark"
          data-size="normal"
          data-callback="onCaptchaResponse"
+         data-expired-callback="onCaptchaExpired"
          data-sitekey="$SITE_KEY" />
     </form>
   </body>
@@ -34,7 +39,7 @@ struct CaptchaView: NSViewRepresentable {
     
     private let handler: CaptchaMessageHandler
     
-    init(onCaptchaResponse: @escaping(_: String) -> Void) {
+    init(onCaptchaResponse: @escaping(_: CaptchaEvent) -> Void) {
         self.handler = CaptchaMessageHandler(onCaptchaResponse: onCaptchaResponse)
     }
     
@@ -42,6 +47,7 @@ struct CaptchaView: NSViewRepresentable {
         let config = WKWebViewConfiguration()
         config.userContentController = WKUserContentController()
         config.userContentController.add(handler, name: "captcha")
+        config.userContentController.add(handler, name: "captchaExpired")
         
         let view = WKWebView(
             frame: CGRect(x: 0, y: 0, width: 200, height: 75),
@@ -60,19 +66,26 @@ struct CaptchaView: NSViewRepresentable {
     }
 }
 
+enum CaptchaEvent {
+    case success(token: String)
+    case expired
+}
+
 // MARK: - Message Handler
 
 class CaptchaMessageHandler: NSObject, WKScriptMessageHandler {
-    private let onCaptchaResponse: (_: String) -> Void
+    private let onCaptchaResponse: (_: CaptchaEvent) -> Void
     
-    init(onCaptchaResponse: @escaping(_: String) -> Void) {
+    init(onCaptchaResponse: @escaping(_: CaptchaEvent) -> Void) {
         self.onCaptchaResponse = onCaptchaResponse
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        // the message body contains the captcha response token
-        if let token = message.body as? String {
-            onCaptchaResponse(token)
+        // captcha success: the message body contains the captcha response token
+        if message.name == "captcha", let token = message.body as? String {
+            onCaptchaResponse(.success(token: token))
+        } else if message.name == "captchaExpired" {
+            onCaptchaResponse(.expired)
         }
     }
 }

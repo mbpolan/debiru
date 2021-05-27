@@ -27,7 +27,7 @@ struct PostEditorView: View {
             
             TextEditor(text: $viewModel.content)
             
-            CaptchaView { viewModel.captchaToken = $0 }
+            CaptchaView(onCaptchaResponse: handleCaptchaResponse)
                 .frame(height: 100)
             
             if let error = viewModel.error {
@@ -55,6 +55,15 @@ struct PostEditorView: View {
         return viewModel.content.count > 0 &&
             viewModel.captchaToken != nil &&
             viewModel.postButtonEnabled
+    }
+    
+    private func handleCaptchaResponse(_ event: CaptchaEvent) {
+        switch event {
+        case .success(let token):
+            viewModel.captchaToken = token
+        case .expired:
+            viewModel.captchaToken = nil
+        }
     }
     
     private func handlePost() {
