@@ -19,9 +19,30 @@ struct PostEditorView: View {
     
     var body: some View {
         VStack {
-            HStack {
+            LazyVGrid(columns: [
+                GridItem(.fixed(50)),
+                GridItem(.flexible()),
+            ]) {
                 Text("Name")
                 TextField("Anonymous", text: $viewModel.name)
+                
+                Text("Image")
+                HStack {
+                    if let imageURL = viewModel.imageURL {
+                        Text(imageURL.absoluteString)
+                    } else {
+                        Text(viewModel.imageURL?.absoluteString ?? "Choose an iamge")
+                            .foregroundColor(Color(NSColor.placeholderTextColor))
+                    }
+                    
+                    Spacer()
+                    Button("...", action: handleOpenImagePicker)
+                }
+            }
+            
+            HStack {
+                Toggle("Bump thread after posting", isOn: $viewModel.bump)
+                Spacer()
             }
             .padding(.bottom, 3)
             
@@ -57,6 +78,21 @@ struct PostEditorView: View {
             viewModel.postButtonEnabled
     }
     
+    private func handleOpenImagePicker() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.image]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        panel.prompt = "Select image"
+        
+        panel.begin { result in
+            if result == NSApplication.ModalResponse.OK {
+                viewModel.imageURL = panel.url
+            }
+        }
+    }
+    
     private func handleCaptchaResponse(_ event: CaptchaEvent) {
         switch event {
         case .success(let token):
@@ -73,9 +109,21 @@ struct PostEditorView: View {
         viewModel.error = nil
         viewModel.postButtonEnabled = false
         
+        let asset: AssetSubmission?
+        if let imageURL = viewModel.imageURL,
+           let imageData = try? Data(contentsOf: imageURL) {
+            asset = AssetSubmission(
+                data: imageData,
+                fileName: imageURL.lastPathComponent)
+        } else {
+            asset = nil
+        }
+        
         FourChanDataProvider().post(Submission(
                                         replyTo: replyTo,
                                         name: viewModel.name,
+                                        asset: asset,
+                                        bump: viewModel.bump,
                                         content: viewModel.content,
                                         captchaToken: captchaToken),
                                     to: board) { result in
@@ -99,6 +147,8 @@ struct PostEditorView: View {
 
 class PostEditorViewModel: ObservableObject {
     @Published var name: String = ""
+    @Published var imageURL: URL?
+    @Published var bump: Bool = true
     @Published var content: String = ""
     @Published var captchaToken: String?
     @Published var error: String?

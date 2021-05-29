@@ -10,6 +10,13 @@ import Foundation
 struct Submission {
     let replyTo: Int?
     let name: String?
+    let asset: AssetSubmission?
+    let bump: Bool
     let content: String
     let captchaToken: String
+}
+
+struct AssetSubmission {
+    let data: Data
+    let fileName: String
 }

@@ -24,7 +24,15 @@ struct FourChanDataProvider: DataProvider {
         body.addField("mode", value: "regist")
         body.addField("g-recaptcha-response", value: submission.captchaToken)
         
-        guard let data = body.data else { return }
+        if !submission.bump {
+            body.addField("email", value: "sage")
+        }
+        
+        if let asset = submission.asset {
+            body.addFile("upfile", fileName: asset.fileName, value: asset.data)
+        }
+        
+        let data = body.build()
         
         var request = URLRequest(url: URL(string: "\(sysBaseUrl)/\(board.id)/post")!)
         request.httpMethod = "POST"
