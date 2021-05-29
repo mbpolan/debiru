@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - View
 
@@ -29,15 +30,16 @@ struct PostEditorView: View {
                 Text("Image")
                 HStack {
                     if let imageURL = viewModel.imageURL {
-                        Text(imageURL.absoluteString)
+                        Text(imageURL.relativePath)
                     } else {
-                        Text(viewModel.imageURL?.absoluteString ?? "Choose an iamge")
+                        Text("Drag and drop or choose an image")
                             .foregroundColor(Color(NSColor.placeholderTextColor))
                     }
                     
                     Spacer()
                     Button("...", action: handleOpenImagePicker)
                 }
+                .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDropImage)
             }
             
             HStack {
@@ -91,6 +93,30 @@ struct PostEditorView: View {
                 viewModel.imageURL = panel.url
             }
         }
+    }
+    
+    private func handleDropImage(items: [NSItemProvider]) -> Bool {
+        if let item = items.first,
+           let identifier = item.registeredTypeIdentifiers.first,
+           identifier == UTType.fileURL.identifier {
+            
+            item.loadItem(forTypeIdentifier: identifier, options: nil) { (urlData, error) in
+                DispatchQueue.main.async {
+                    if let urlData = urlData as? Data {
+                        viewModel.imageURL = NSURL(
+                            absoluteURLWithDataRepresentation: urlData,
+                            relativeTo: nil) as URL
+                    } else if let error = error {
+                        print(error)
+                        viewModel.error = "Failed to load image"
+                    }
+                }
+            }
+            
+            return true
+        }
+        
+        return false
     }
     
     private func handleCaptchaResponse(_ event: CaptchaEvent) {
