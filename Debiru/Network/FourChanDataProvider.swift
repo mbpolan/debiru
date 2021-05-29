@@ -227,6 +227,7 @@ struct FourChanDataProvider: DataProvider {
                             tag: post.capCode?.toTag(),
                             country: country),
                         date: Date(timeIntervalSince1970: TimeInterval(post.time)),
+                        replyToId: post.replyTo == 0 ? nil : post.replyTo,
                         subject: post.subject,
                         content: post.content,
                         sticky: post.sticky == 1,

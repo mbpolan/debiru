@@ -130,10 +130,13 @@ struct ThreadView: View {
             }
         }
         .sheet(item: $viewModel.replyToPost, onDismiss: handleHideReplySheet) { post in
+            // replies are always against the original post
+            let replyTo = post.replyToId ?? post.id
+            
             if let board = getParentBoard(appState.currentItem) {
                 PostEditorView(
                     board: board,
-                    replyTo: post.id,
+                    replyTo: replyTo,
                     initialContent: viewModel.initialReplyToContent,
                     onDismiss: handleHideReplySheet,
                     onComplete: handlePostComplete)
