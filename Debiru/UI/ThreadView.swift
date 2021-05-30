@@ -53,6 +53,22 @@ struct ThreadView: View {
                             
                             Spacer()
                         }
+                        .popover(isPresented: makeReplyPopoverPresented(post), arrowEdge: .leading) {
+                            HStack {
+                                if viewModel.replyPopoverType == .success {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.green)
+                                    
+                                    Text("Post successful!")
+                                } else {
+                                    Image(systemName: "exclamationmark.circle")
+                                        .foregroundColor(.red)
+                                    
+                                    Text("Failed to submit post.")
+                                }
+                            }
+                            .padding()
+                        }
                         
                         if shouldShowNewPostDividerAfter(post) {
                             TextDivider("New Posts", color: .red)
@@ -152,7 +168,11 @@ struct ThreadView: View {
     }
     
     private var isWatched: Bool {
-        return getWatchedThread() != nil
+        getWatchedThread() != nil
+    }
+    
+    private var isArchived: Bool {
+        posts.first?.archived ?? false
     }
     
     private var imageSaveLocation: URL {
@@ -213,7 +233,7 @@ struct ThreadView: View {
     
     private func makeHeader() -> some View {
         VStack {
-            if let op = posts.first, op.archived {
+            if isArchived {
                 HStack(alignment: .firstTextBaseline) {
                     Spacer()
                     
@@ -246,6 +266,13 @@ struct ThreadView: View {
             RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
         }
         .padding([.bottom, .leading, .trailing], 5)
+    }
+    
+    private func makeReplyPopoverPresented(_ post: Post) -> Binding<Bool> {
+        return Binding<Bool>(
+            get: { viewModel.replyPopoverPostId == post.id },
+            set: { _ in }
+        )
     }
     
     private func handleOpenImage(_ data: Data?, asset: Asset) {
@@ -300,6 +327,10 @@ struct ThreadView: View {
     }
     
     private func handleReplyTo(_ post: Post) {
+        if isArchived {
+            return
+        }
+        
         viewModel.replyToPost = post
         
         // prepare a default post template as a response
@@ -307,8 +338,20 @@ struct ThreadView: View {
     }
     
     private func handlePostComplete() {
-        reloadFromState()
+        // show a popover to provide visual feedback
+        viewModel.replyPopoverType = .success
+        viewModel.replyPopoverPostId = viewModel.replyToPost?.id
+        
         handleHideReplySheet()
+        
+        // schedule the popover automatically hiding after a few seconds,
+        // and refresh the thread afterwards
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            viewModel.replyPopoverType = nil
+            viewModel.replyPopoverPostId = nil
+            
+            reloadFromState()
+        }
     }
     
     private func handleHideReplySheet() {
@@ -445,6 +488,15 @@ class ThreadViewModel: ObservableObject {
     @Published var targettedPostId: Int?
     @Published var replyToPost: Post?
     @Published var initialReplyToContent: String?
+    @Published var replyPopoverPostId: Int?
+    @Published var replyPopoverType: ReplyPopoverType?
+    
+    enum ReplyPopoverType: Identifiable {
+        var id: Int { hashValue }
+        
+        case success
+        case error
+    }
     
     struct Statistics {
         let replies: Int?
