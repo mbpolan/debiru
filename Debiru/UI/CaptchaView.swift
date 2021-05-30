@@ -16,13 +16,25 @@ struct CaptchaView: NSViewRepresentable {
   <head>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
-      function onCaptchaResponse(response) {
-        window.webkit.messageHandlers.captcha.postMessage(response);
-      }
+        window.onerror = function (message, url, line, column, error) {
+            var message = {
+                message: message,
+                url: url,
+                line: line,
+                column: column,
+                error: JSON.stringify(error)
+            }
 
-      function onCaptchaExpired() {
-        window.webkit.messageHandlers.captchaExpired.postMessage('expired');
-      }
+            window.webkit.messageHandlers.error.postMessage(message);
+        };
+      
+        function onCaptchaResponse(response) {
+            window.webkit.messageHandlers.captcha.postMessage(response);
+        }
+
+        function onCaptchaExpired() {
+            window.webkit.messageHandlers.captchaExpired.postMessage('expired');
+        }
     </script>
   </head>
   <body>
@@ -48,6 +60,7 @@ struct CaptchaView: NSViewRepresentable {
         config.userContentController = WKUserContentController()
         config.userContentController.add(handler, name: "captcha")
         config.userContentController.add(handler, name: "captchaExpired")
+        config.userContentController.add(handler, name: "error")
         
         let view = WKWebView(
             frame: CGRect(x: 0, y: 0, width: 200, height: 75),
@@ -71,6 +84,22 @@ enum CaptchaEvent {
     case expired
 }
 
+fileprivate struct WebKitError {
+    let message: String?
+    let url: String?
+    let line: Int?
+    let column: Int?
+    let error: String?
+    
+    init(from dictionary: [String: Any]) {
+        self.message = dictionary["message"] as? String
+        self.url = dictionary["url"] as? String
+        self.line = dictionary["line"] as? Int
+        self.column = dictionary["column"] as? Int
+        self.error = dictionary["error"] as? String
+    }
+}
+
 // MARK: - Message Handler
 
 class CaptchaMessageHandler: NSObject, WKScriptMessageHandler {
@@ -86,6 +115,35 @@ class CaptchaMessageHandler: NSObject, WKScriptMessageHandler {
             onCaptchaResponse(.success(token: token))
         } else if message.name == "captchaExpired" {
             onCaptchaResponse(.expired)
+        } else if message.name == "error" {
+            handleError(message)
+        } else {
+            print("Unknown message: \(message.name)")
+        }
+    }
+    
+    private func handleError(_ message: WKScriptMessage) {
+        if let body = message.body as? [String: Any] {
+            let error = WebKitError(from: body)
+            
+            var formatted = "WebKit JS Error: "
+            if let message = error.message {
+                formatted += message
+            }
+            
+            if let url = error.url {
+                formatted += "\nURL: \(url)"
+            }
+            
+            formatted += "\nLocation: \(error.line ?? 1),\(error.column ?? 1)"
+            
+            if let error = error.error {
+                formatted += "\nError: \(error)"
+            }
+            
+            print(formatted)
+        } else {
+            print("JS error: \(message.body)")
         }
     }
 }
