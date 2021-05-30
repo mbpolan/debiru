@@ -10,6 +10,8 @@ import SwiftUI
 
 @main
 struct DebiruApp: App {
+    @AppStorage(StorageKeys.colorScheme) private var colorScheme: UserColorScheme = UserDefaults.standard.colorScheme()
+    
     private var appState: AppState
     private let notificationManager: NotificationManager
     private let threadWatcher: ThreadWatcher
@@ -53,6 +55,7 @@ struct DebiruApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(appState)
+                .preferredColorScheme(colorScheme.identifier)
         }
         .commands {
             AppCommands(onShowQuickSearch: handleShowQuickSearch)
@@ -64,6 +67,7 @@ struct DebiruApp: App {
         WindowGroup {
             FullImageView()
                 .environmentObject(appState)
+                .preferredColorScheme(colorScheme.identifier)
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "image"), allowing: Set(arrayLiteral: "image"))
         }
         .commands {
@@ -77,6 +81,7 @@ struct DebiruApp: App {
         WindowGroup {
             WebVideoView()
                 .environmentObject(appState)
+                .preferredColorScheme(colorScheme.identifier)
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "webVideo"), allowing: Set(arrayLiteral: "webVideo"))
         }
         .windowStyle(HiddenTitleBarWindowStyle())
@@ -85,6 +90,7 @@ struct DebiruApp: App {
         Settings {
             SettingsView()
                 .environmentObject(appState)
+                .preferredColorScheme(colorScheme.identifier)
         }
     }
     
@@ -101,19 +107,4 @@ struct DebiruApp: App {
             break
         }
     }
-}
-
-struct StorageKeys {
-    static let refreshTimeout = "refreshTimeout"
-    static let defaultImageLocation = "defaultImageLocation"
-    static let maxQuickSearchResults = "maxQuickSearchResults"
-    static let groupImagesByBoard = "groupImagesByBoard"
-    static let notificationsEnabled = "notificationsEnabled"
-    static let soundNotificationEnabled = "soundNotificationEnabled"
-    static let maximumCacheSize = "maximumCacheSize"
-    static let cacheEnabled = "cacheEnabled"
-    static let limitCacheEnabled = "limitCacheEnabled"
-    static let boardWordFilters = "boardWordFilters"
-    
-    static let bookmarkSaveDirectory = "bookmarkSaveDirectory"
 }

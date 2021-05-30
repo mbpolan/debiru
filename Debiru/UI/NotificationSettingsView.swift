@@ -37,5 +37,6 @@ struct NotificationSettingsView: View {
             Toggle("Play a sound with each notification", isOn: $soundNotificationEnabled)
                 .disabled(!notificationsEnabled)
         }
+        .frame(width: 400, height: 120)
     }
 }

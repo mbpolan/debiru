@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		272F03EC26642E0600D28E88 /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */; };
+		272F03EE2664326E00D28E88 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03ED2664326E00D28E88 /* Settings.swift */; };
 		275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275F8F102641FC7300CB2D7B /* PlaceholderView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460B25FD9E5A001DCCE3 /* ContentView.swift */; };
@@ -77,6 +79,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
+		272F03ED2664326E00D28E88 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		275F8F102641FC7300CB2D7B /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
@@ -211,14 +215,21 @@
 			isa = PBXGroup;
 			children = (
 				27B5E77E26239D9800178F1B /* AnimatedImageView.swift */,
+				272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */,
+				27B06E152643762700FCBC0B /* AssetView.swift */,
 				27BBF1F2260436BF00534CB7 /* BoardListItemView.swift */,
 				279CFF7C25FFE06400884724 /* BoardListView.swift */,
+				27B06E1B2645DC1A00FCBC0B /* CacheSettingsView.swift */,
+				27E4B801265C708900E183CB /* CaptchaView.swift */,
 				279CFF7F25FFEA6900884724 /* CatalogView.swift */,
 				2799460B25FD9E5A001DCCE3 /* ContentView.swift */,
 				27BA39B7262D2A8100C9C519 /* CountryFlagImage.swift */,
+				27B06E1D26475F2300FCBC0B /* FilterSettingsView.swift */,
 				27C055FF260FBC130037A91B /* FullImageView.swift */,
 				27C055FB260F8CF10037A91B /* GeneralSettingsView.swift */,
 				27B5E78B262A5D0700178F1B /* NotificationSettingsView.swift */,
+				275F8F102641FC7300CB2D7B /* PlaceholderView.swift */,
+				27E4B803265C778F00E183CB /* PostEditorView.swift */,
 				27C05604260FF8470037A91B /* PostView.swift */,
 				27C05623261694130037A91B /* QuickSearchView.swift */,
 				27C0561126128DCB0037A91B /* RefreshTimerView.swift */,
@@ -234,13 +245,7 @@
 				27BBC9D7260AC67B005D8183 /* ThreadView.swift */,
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
-				275F8F102641FC7300CB2D7B /* PlaceholderView.swift */,
-				27B06E152643762700FCBC0B /* AssetView.swift */,
 				27B06E172644A7B800FCBC0B /* WebVideoView.swift */,
-				27B06E1B2645DC1A00FCBC0B /* CacheSettingsView.swift */,
-				27B06E1D26475F2300FCBC0B /* FilterSettingsView.swift */,
-				27E4B801265C708900E183CB /* CaptchaView.swift */,
-				27E4B803265C778F00E183CB /* PostEditorView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -249,12 +254,13 @@
 			isa = PBXGroup;
 			children = (
 				27C0562C2618D49B0037A91B /* Commands.swift */,
+				27B06E1F264F293E00FCBC0B /* DataManager.swift */,
 				2799460925FD9E5A001DCCE3 /* DebiruApp.swift */,
+				27B06E21264F499500FCBC0B /* Events.swift */,
 				27B5E788262A5BCC00178F1B /* NotificationManager.swift */,
 				27B5E76E2621311000178F1B /* Persistance.swift */,
+				272F03ED2664326E00D28E88 /* Settings.swift */,
 				27BA39AE262B837300C9C519 /* ThreadWatcher.swift */,
-				27B06E1F264F293E00FCBC0B /* DataManager.swift */,
-				27B06E21264F499500FCBC0B /* Events.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -447,6 +453,7 @@
 				27BBC9C126057E09005D8183 /* SearchBarView.swift in Sources */,
 				27B06E182644A7B800FCBC0B /* WebVideoView.swift in Sources */,
 				27BBC9CE2606C6BD005D8183 /* View.swift in Sources */,
+				272F03EE2664326E00D28E88 /* Settings.swift in Sources */,
 				27C0562D2618D49B0037A91B /* Commands.swift in Sources */,
 				27C05624261694130037A91B /* QuickSearchView.swift in Sources */,
 				275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */,
@@ -493,6 +500,7 @@
 				27E4B804265C778F00E183CB /* PostEditorView.swift in Sources */,
 				27C05605260FF8470037A91B /* PostView.swift in Sources */,
 				27BBC9D5260AC265005D8183 /* Post.swift in Sources */,
+				272F03EC26642E0600D28E88 /* AppearanceSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

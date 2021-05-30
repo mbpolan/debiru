@@ -18,6 +18,12 @@ struct SettingsView: View {
                 }
                 .tag(Tabs.general)
             
+            AppearanceSettingsView()
+                .tabItem {
+                    Label("Appearance", systemImage: "paintpalette")
+                }
+                .tag(Tabs.appearance)
+            
             NotificationSettingsView()
                 .tabItem {
                     Label("Notifications", systemImage: "exclamationmark.bubble")
@@ -41,6 +47,7 @@ struct SettingsView: View {
     
     private enum Tabs {
         case general
+        case appearance
         case notifications
         case cache
         case filters

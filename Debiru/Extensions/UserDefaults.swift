@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension UserDefaults {
     func bool(forKey key: String, defaultValue: Bool) -> Bool {
@@ -18,6 +19,10 @@ extension UserDefaults {
     
     func contains(key: String) -> Bool {
         return object(forKey: key) != nil
+    }
+    
+    func colorScheme() -> UserColorScheme {
+        return .default
     }
     
     /// Returns the default auto-refresh timeout.
