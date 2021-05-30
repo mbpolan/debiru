@@ -289,6 +289,11 @@ struct ThreadView: View {
     }
     
     private func handleNavigation(_ destination: NavigateNotification, proxy: ScrollViewProxy) {
+        // do not perform navigation if the post editor is open
+        if viewModel.replyToPost != nil {
+            return
+        }
+        
         switch destination {
         case .back:
             handleBackToCatalog()
