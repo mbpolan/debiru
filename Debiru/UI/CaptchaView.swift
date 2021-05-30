@@ -11,6 +11,8 @@ import WebKit
 // MARK: - View
 
 struct CaptchaView: NSViewRepresentable {
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    
     private let captchaHTML = """
 <html>
   <head>
@@ -39,7 +41,7 @@ struct CaptchaView: NSViewRepresentable {
   </head>
   <body>
     <div class="g-recaptcha"
-         data-theme="dark"
+         data-theme="$THEME"
          data-size="normal"
          data-callback="onCaptchaResponse"
          data-expired-callback="onCaptchaExpired"
@@ -75,7 +77,9 @@ struct CaptchaView: NSViewRepresentable {
     }
     
     private var template: String {
-        return captchaHTML.replacingOccurrences(of: "$SITE_KEY", with: Parameters.shared.siteKey)
+        return captchaHTML
+            .replacingOccurrences(of: "$THEME", with: colorScheme == .dark ? "dark" : "light")
+            .replacingOccurrences(of: "$SITE_KEY", with: Parameters.shared.siteKey)
     }
 }
 
