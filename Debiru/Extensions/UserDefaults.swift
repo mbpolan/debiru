@@ -25,6 +25,10 @@ extension UserDefaults {
         return .default
     }
     
+    func autoWatchReplied() -> Bool {
+        return true
+    }
+    
     /// Returns the default auto-refresh timeout.
     ///
     /// - Returns: The timeout, in seconds.

@@ -17,7 +17,7 @@ struct FourChanDataProvider: DataProvider {
     private let imageBaseUrl = "https://i.4cdn.org"
     private let staticBaseUrl = "https://s.4cdn.org"
     
-    func post(_ submission: Submission, to board: Board, completion: @escaping(_: Result<Void, Error>) -> Void) {
+    func post(_ submission: Submission, to board: Board, completion: @escaping(_: SubmissionResult) -> Void) {
         let body = MutableFormData()
         body.addField("resto", value: String(submission.replyTo ?? 0))
         body.addField("com", value: String(submission.content))
@@ -62,9 +62,10 @@ struct FourChanDataProvider: DataProvider {
                 return
             }
             
-            // TODO: check response to validate we got a "post successful" message
-            print(responseData)
-            completion(.success(()))
+            // validate the response to determine the actual result.
+            // this is not a rest api call, so we unfortunately need to do some html parsing to
+            // figure out what most likely happened after posting.
+            completion(determinePostResult(responseData))
         }.resume()
     }
     
@@ -275,6 +276,49 @@ struct FourChanDataProvider: DataProvider {
             return .webm
         default:
             return .image
+        }
+    }
+    
+    private func determinePostResult(_ response: String) -> SubmissionResult {
+        do {
+            let doc = try SwiftSoup.parse(response)
+            let bodyText = try doc.body()?.text()
+            
+            // completed posts result in a success message and a redirect in a meta tag
+            // errors usually appear in an element with id "errmsg"
+            if (bodyText ?? "").contains("Post successful") {
+                let metas = try doc.select("meta")
+                let redirect = try metas.array()
+                    .first { try $0.attr("http-equiv") == "refresh" }?.attr("content")
+                
+                let postId = redirect?.components(separatedBy: "#").last?.dropFirst() ?? ""
+                if let postId = Int(postId) {
+                    return .success(postId: postId)
+                }
+            } else if let error = try doc.select("#errmsg").first() {
+                // strip all embedded links
+                try error.select("a").remove()
+                
+                // sanitize the remaining html and stringify it
+                var text = String(try SwiftSoup.clean(try error.text(), Whitelist.none()) ?? "Unknown error")
+                
+                // do some "best effort" clean up to remove any stray characters after sanitizing.
+                // error messages sometimes have text like the following:
+                //
+                // lorem ipsum [<a ...>Click here</a>].
+                //
+                // we can clean up the square brackets and other similar artifacts to make the
+                // message look more readable.
+                text = text.replacingOccurrences(of: " []", with: "")
+                
+                return .failure(NetworkError.postError(text))
+            }
+            
+            return .indeterminate
+        } catch Exception.Error(_, let message) {
+            return .failure(NetworkError.postError(message))
+        } catch {
+            return .failure(NetworkError.postError("Unknown error"))
         }
     }
     

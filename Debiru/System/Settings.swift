@@ -33,6 +33,7 @@ enum UserColorScheme: Int, Identifiable, CaseIterable {
 
 struct StorageKeys {
     static let colorScheme = "colorScheme"
+    static let autoWatchReplied = "autoWatchReplied"
     static let refreshTimeout = "refreshTimeout"
     static let defaultImageLocation = "defaultImageLocation"
     static let maxQuickSearchResults = "maxQuickSearchResults"

@@ -158,10 +158,16 @@ struct PostEditorView: View {
                 viewModel.postButtonEnabled = true
                 
                 switch result {
-                case .success():
+                case .success(_),
+                     .indeterminate:
                     onComplete()
                 case .failure(let error):
-                    viewModel.error = "Failed to submit post: \(error.localizedDescription)"
+                    switch error {
+                    case NetworkError.postError(let text):
+                        viewModel.error = "Failed to submit post: \(text)"
+                    default:
+                        viewModel.error = "Failed to submit post: \(error.localizedDescription)"
+                    }
                     break
                 }
             }

@@ -20,3 +20,9 @@ struct AssetSubmission {
     let data: Data
     let fileName: String
 }
+
+enum SubmissionResult {
+    case success(postId: Int)
+    case indeterminate
+    case failure(Error)
+}

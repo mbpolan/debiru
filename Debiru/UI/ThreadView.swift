@@ -11,6 +11,7 @@ import SwiftUI
 // MARK: - View
 
 struct ThreadView: View {
+    @AppStorage(StorageKeys.autoWatchReplied) private var autoWatchReplied = UserDefaults.standard.autoWatchReplied()
     @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout = UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
     @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard = UserDefaults.standard.groupImagesByBoard()
@@ -315,7 +316,17 @@ struct ThreadView: View {
         }
     }
     
-    private func handleToggleWatched() {
+    private func addThreadToWatched() {
+        guard let thread = getThread(appState.currentItem) else { return }
+        
+        if !isWatched {
+            appState.watchedThreads.append(.initial(thread, posts: posts))
+            
+            PersistAppStateNotification().notify()
+        }
+    }
+    
+    private func removeThreadFromWatched() {
         guard let thread = getThread(appState.currentItem) else { return }
         
         if isWatched,
@@ -324,11 +335,16 @@ struct ThreadView: View {
            }) {
             
             appState.watchedThreads.remove(at: index)
-        } else {
-            appState.watchedThreads.append(.initial(thread, posts: posts))
+            PersistAppStateNotification().notify()
         }
-        
-        PersistAppStateNotification().notify()
+    }
+    
+    private func handleToggleWatched() {
+        if isWatched {
+           removeThreadFromWatched()
+        } else {
+            addThreadToWatched()
+        }
     }
     
     private func handleReplyTo(_ post: Post) {
@@ -348,6 +364,11 @@ struct ThreadView: View {
         viewModel.replyPopoverPostId = viewModel.replyToPost?.id
         
         handleHideReplySheet()
+        
+        // watch the thread if needed
+        if autoWatchReplied {
+            addThreadToWatched()
+        }
         
         // schedule the popover automatically hiding after a few seconds,
         // and refresh the thread afterwards

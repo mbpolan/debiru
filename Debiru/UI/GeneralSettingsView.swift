@@ -18,6 +18,7 @@ struct GeneralSettingsView: View {
         UserDefaults.standard.maxQuickSearchResults()
     @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard: Bool =
         UserDefaults.standard.groupImagesByBoard()
+    @AppStorage(StorageKeys.autoWatchReplied) private var autoWatchReplied: Bool = UserDefaults.standard.autoWatchReplied()
     
     var body: some View {
         let maxQuickSearchResultsBinding = Binding<String>(
@@ -58,8 +59,11 @@ struct GeneralSettingsView: View {
             }
             
             VStack {
-                Toggle("Save images in directories specific to their boards",
-                       isOn: $groupImagesByBoard)
+                Toggle("Automatically watch threads after posting", isOn: $autoWatchReplied)
+                    .horizontallyAligned(.leading)
+                
+                Toggle("Save images in directories specific to their boards", isOn: $groupImagesByBoard)
+                    .horizontallyAligned(.leading)
             }
         }
         .frame(width: 400, height: 120)
