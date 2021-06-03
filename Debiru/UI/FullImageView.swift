@@ -67,6 +67,9 @@ struct FullImageView: View {
         }
         .onImageMode { viewModel.scaleMode = $0 }
         .onImageZoom { handleImageZoom($0) }
+        .onDisappear {
+            appState.openImageData = nil
+        }
     }
     
     private func handleImageZoom(_ zoom: ImageZoomNotification) {
