@@ -97,7 +97,8 @@ struct FourChanDataProvider: DataProvider {
                            let thumbWidth = thread.thumbnailWidth,
                            let thumbHeight = thread.thumbnailHeight,
                            let filename = thread.filename,
-                           let ext = thread.extension {
+                           let ext = thread.extension,
+                           let size = thread.fileSize {
                             
                             asset = Asset(
                                 id: id,
@@ -108,7 +109,8 @@ struct FourChanDataProvider: DataProvider {
                                 thumbnailHeight: thumbHeight,
                                 filename: filename,
                                 extension: ext,
-                                fileType: determineFileType(ext))
+                                fileType: determineFileType(ext),
+                                size: size)
                         }
                         
                         var country: User.Country?
@@ -173,7 +175,8 @@ struct FourChanDataProvider: DataProvider {
                        let thumbWidth = post.thumbnailWidth,
                        let thumbHeight = post.thumbnailHeight,
                        let filename = post.filename,
-                       let ext = post.extension {
+                       let ext = post.extension,
+                       let size = post.fileSize {
                         
                         asset = Asset(
                             id: id,
@@ -184,7 +187,8 @@ struct FourChanDataProvider: DataProvider {
                             thumbnailHeight: thumbHeight,
                             filename: filename,
                             extension: ext,
-                            fileType: determineFileType(ext))
+                            fileType: determineFileType(ext),
+                            size: size)
                     }
                     
                     var threadStatistics: ThreadStatistics?
@@ -480,6 +484,7 @@ fileprivate struct ThreadModel: Codable {
     let thumbnailHeight: Int?
     let filename: String?
     let `extension`: String?
+    let fileSize: Int64?
     let replies: Int
     let images: Int
     let uniqueUsers: Int?
@@ -507,6 +512,7 @@ fileprivate struct ThreadModel: Codable {
         case thumbnailHeight = "tn_h"
         case filename
         case `extension` = "ext"
+        case fileSize = "fsize"
         case replies
         case images
         case uniqueUsers = "unique_ips"
@@ -541,6 +547,7 @@ fileprivate struct PostModel: Codable {
     let thumbnailHeight: Int?
     let filename: String?
     let `extension`: String?
+    let fileSize: Int64?
     let replies: Int?
     let images: Int?
     let uniqueUsers: Int?
@@ -571,6 +578,7 @@ fileprivate struct PostModel: Codable {
         case thumbnailHeight = "tn_h"
         case filename
         case `extension` = "ext"
+        case fileSize = "fsize"
         case replies
         case images
         case uniqueUsers = "unique_ips"

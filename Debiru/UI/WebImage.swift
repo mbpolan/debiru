@@ -201,7 +201,8 @@ struct WebImage_Previews: PreviewProvider {
                     thumbnailHeight: 50,
                     filename: "lol",
                     extension: ".jpg",
-                    fileType: .image),
+                    fileType: .image,
+                    size: 64),
                  saveLocation: URL(fileURLWithPath: "/foo"),
                  bounds: CGSize(width: 128.0, height: 128.0),
                  onOpen: { _ in })

@@ -13,6 +13,12 @@ struct AssetView: View {
     private let spoilerBlur: CGFloat = 10.0
     private let spoilerBlurDuration: Double = 0.1
     
+    private let byteFormatter = { () -> ByteCountFormatter in
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useAll]
+        return formatter
+    }()
+    
     @StateObject private var viewModel: AssetViewModel = AssetViewModel()
     let asset: Asset
     let saveLocation: URL
@@ -21,7 +27,7 @@ struct AssetView: View {
     let onOpen: (_: Data?, _: Asset) -> Void
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .center) {
             ZStack(alignment: .center) {
                 WebImage(viewableAsset,
                          saveLocation: saveLocation,
@@ -35,6 +41,15 @@ struct AssetView: View {
                         .font(.system(size: 32, weight: .medium))
                 }
             }
+            
+            Text("\(asset.filename)\(asset.extension)")
+                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .truncationMode(.tail)
+                .lineLimit(1)
+                .frame(maxWidth: bounds?.width ?? .infinity)
+            
+            Text("\(byteFormatter.string(fromByteCount: asset.size))")
+                .foregroundColor(Color(NSColor.secondaryLabelColor))
             
             Spacer()
         }
@@ -61,7 +76,8 @@ struct AssetView: View {
                 thumbnailHeight: asset.thumbnailHeight,
                 filename: asset.filename,
                 extension: "s.jpg", // thumbnails use the "s.jpg" suffix
-                fileType: asset.fileType)
+                fileType: asset.fileType,
+                size: 64)
         }
         
         return asset
@@ -86,7 +102,8 @@ struct AssetView_Preview: PreviewProvider {
                 thumbnailHeight: 16,
                 filename: "lol",
                 extension: ".png",
-                fileType: .image),
+                fileType: .image,
+                size: 64),
             saveLocation: URL(string: "/Users")!,
             spoilered: true,
             bounds: CGSize(width: 128, height: 128),

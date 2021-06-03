@@ -15,6 +15,7 @@ struct Asset: Identifiable, Hashable, Equatable, Codable {
     let filename: String
     let `extension`: String
     let fileType: FileType
+    let size: Int64
     
     var fullName: String {
         return "\(filename)\(`extension`)"
