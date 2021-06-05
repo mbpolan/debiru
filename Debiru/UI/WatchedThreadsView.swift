@@ -124,23 +124,17 @@ struct WatchedThreadsView: View {
     private func handleClearUnread(_ watchedThread: WatchedThread) {
         guard let index = appState.watchedThreads.firstIndex(of: watchedThread) else { return }
         
-        dataProvider.getPosts(for: watchedThread.thread) { result in
-            switch result {
-            case .success(let posts):
-                // update the last known post id and clear the number of unread posts
-                appState.watchedThreads[index] = WatchedThread(
-                    thread: watchedThread.thread,
-                    lastPostId: posts.last?.id ?? watchedThread.lastPostId,
-                    totalNewPosts: 0,
-                    nowArchived: watchedThread.nowArchived,
-                    nowDeleted: watchedThread.nowDeleted)
-                
-                PersistAppStateNotification().notify()
-                
-            case .failure(let error):
-                print("Failed to get posts for thread: \(error.localizedDescription)")
-            }
-        }?.store(in: &viewModel.cancellables)
+        // update the last read post id to the last currently known id, and clear the
+        // number of unread posts
+        appState.watchedThreads[index] = WatchedThread(
+            thread: watchedThread.thread,
+            lastPostId: watchedThread.currentLastPostId,
+            currentLastPostId: watchedThread.currentLastPostId,
+            totalNewPosts: 0,
+            nowArchived: watchedThread.nowArchived,
+            nowDeleted: watchedThread.nowDeleted)
+        
+        PersistAppStateNotification().notify()
     }
     
     private func handleRemoveWatchedThread(_ watchedThread: WatchedThread) {

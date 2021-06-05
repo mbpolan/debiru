@@ -10,6 +10,7 @@ import SwiftUI
 // MARK: - View
 
 struct SidebarView: View {
+    @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: SidebarViewModel = SidebarViewModel()
     
     var body: some View {

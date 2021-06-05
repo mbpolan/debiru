@@ -75,6 +75,9 @@ struct CatalogView: View {
                 
                 HStack(alignment: .firstTextBaseline) {
                     Spacer()
+                    
+                    NewPostCountView()
+                    
                     RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
                 }
                 .padding([.bottom, .leading, .trailing], 5)

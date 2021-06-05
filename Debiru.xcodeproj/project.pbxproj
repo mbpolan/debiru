@@ -10,6 +10,7 @@
 		272F03EC26642E0600D28E88 /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */; };
 		272F03EE2664326E00D28E88 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03ED2664326E00D28E88 /* Settings.swift */; };
 		272F03F0266477B700D28E88 /* AlignedViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03EF266477B700D28E88 /* AlignedViewModifier.swift */; };
+		272F03F2266B013C00D28E88 /* NewPostCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03F1266B013C00D28E88 /* NewPostCountView.swift */; };
 		275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275F8F102641FC7300CB2D7B /* PlaceholderView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460B25FD9E5A001DCCE3 /* ContentView.swift */; };
@@ -83,6 +84,7 @@
 		272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
 		272F03ED2664326E00D28E88 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		272F03EF266477B700D28E88 /* AlignedViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlignedViewModifier.swift; sourceTree = "<group>"; };
+		272F03F1266B013C00D28E88 /* NewPostCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostCountView.swift; sourceTree = "<group>"; };
 		275F8F102641FC7300CB2D7B /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
 				27B06E172644A7B800FCBC0B /* WebVideoView.swift */,
+				272F03F1266B013C00D28E88 /* NewPostCountView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -477,6 +480,7 @@
 				27E4B802265C708900E183CB /* CaptchaView.swift in Sources */,
 				27B5E78C262A5D0700178F1B /* NotificationSettingsView.swift in Sources */,
 				27B5E789262A5BCC00178F1B /* NotificationManager.swift in Sources */,
+				272F03F2266B013C00D28E88 /* NewPostCountView.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				27E4B806265C7F8F00E183CB /* Submission.swift in Sources */,
 				27C0561226128DCB0037A91B /* RefreshTimerView.swift in Sources */,

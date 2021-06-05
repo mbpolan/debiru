@@ -264,6 +264,8 @@ struct ThreadView: View {
             
             Spacer()
             
+            NewPostCountView()
+            
             RefreshTimerView(lastUpdate: $viewModel.lastUpdate)
         }
         .padding([.bottom, .leading, .trailing], 5)
@@ -418,6 +420,7 @@ struct ThreadView: View {
         appState.watchedThreads[index] = WatchedThread(
             thread: watchedThread.thread,
             lastPostId: lastPost.id,
+            currentLastPostId: lastPost.id,
             totalNewPosts: 0,
             nowArchived: firstPost.archived,
             nowDeleted: watchedThread.nowDeleted)

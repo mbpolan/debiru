@@ -97,6 +97,7 @@ struct StateLoader {
             watchedThreads: state.watchedThreads.map { watchedThread in
                 return WatchedThreadSnapshot(
                     lastPostId: watchedThread.lastPostId,
+                    currentLastPostId: watchedThread.currentLastPostId,
                     totalNewPosts: watchedThread.totalNewPosts,
                     nowArchived: watchedThread.nowArchived,
                     nowDeleted: watchedThread.nowDeleted,
@@ -128,6 +129,7 @@ struct StateLoader {
                     attachment: nil,
                     statistics: .unknown),
                 lastPostId: watchedThread.lastPostId,
+                currentLastPostId: watchedThread.currentLastPostId,
                 totalNewPosts: watchedThread.totalNewPosts,
                 nowArchived: watchedThread.nowDeleted,
                 nowDeleted: watchedThread.nowDeleted)
@@ -158,6 +160,7 @@ fileprivate struct ThreadSnapshot: Codable {
 
 fileprivate struct WatchedThreadSnapshot: Codable {
     let lastPostId: Int
+    let currentLastPostId: Int
     let totalNewPosts: Int
     let nowArchived: Bool
     let nowDeleted: Bool

@@ -59,6 +59,7 @@ struct ThreadStatistics: Equatable, Hashable, Codable {
 struct WatchedThread: Identifiable, Hashable, Codable {
     let thread: Thread
     let lastPostId: Int
+    let currentLastPostId: Int
     let totalNewPosts: Int
     let nowArchived: Bool
     let nowDeleted: Bool
@@ -73,6 +74,7 @@ extension WatchedThread {
         return WatchedThread(
             thread: thread,
             lastPostId: thread.id, // corresponds to the first post
+            currentLastPostId: thread.id,
             totalNewPosts: 0,
             nowArchived: false,
             nowDeleted: false)
@@ -82,6 +84,7 @@ extension WatchedThread {
         return WatchedThread(
             thread: thread,
             lastPostId: posts.last?.id ?? 0,
+            currentLastPostId: posts.last?.id ?? 0,
             totalNewPosts: 0,
             nowArchived: posts.first?.archived ?? false,
             nowDeleted: false)

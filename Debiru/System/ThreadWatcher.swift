@@ -45,7 +45,7 @@ class ThreadWatcher {
                     
                     // are there any new posts since the last known post was checked?
                     let lastKnownIndex = posts
-                        .firstIndex { $0.id == watchedThread.lastPostId } ?? 0
+                        .firstIndex { $0.id == watchedThread.currentLastPostId } ?? 0
                     
                     let newPosts = posts.count - lastKnownIndex - 1
                     print("New: \(watchedThread.thread.boardId) - \(watchedThread.id) = \(newPosts)")
@@ -53,6 +53,7 @@ class ThreadWatcher {
                     updatedWatchedThreads.append(WatchedThread(
                                                     thread: watchedThread.thread,
                                                     lastPostId: watchedThread.lastPostId,
+                                                    currentLastPostId: posts.last?.id ?? watchedThread.lastPostId,
                                                     totalNewPosts: newPosts,
                                                     nowArchived: archived,
                                                     nowDeleted: false))
@@ -114,6 +115,7 @@ class ThreadWatcher {
             
             // update the dock tile badge to reflect the total count of new posts
             NotificationManager.shared?.updateApplicationBadge(withPostCount: countNewPosts)
+            self?.appState.newPostCount = countNewPosts
             
             // update the app state with our newly gathered thread statistics, and schedule
             // the next iteration. however, only update the state if at least some kind of
