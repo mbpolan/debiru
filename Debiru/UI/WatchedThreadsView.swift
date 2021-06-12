@@ -63,6 +63,15 @@ struct WatchedThreadsView: View {
                 }
             }
         }
+        .contextMenu {
+            Button("Mark All as Read") {
+                handleClearAllUnread()
+            }
+            
+            Button("Remove All") {
+                handleRemoveAllWatchedThreads()
+            }
+        }
         .padding(1)
     }
     
@@ -121,9 +130,20 @@ struct WatchedThreadsView: View {
             .notify()
     }
     
+    private func handleClearAllUnread() {
+        for index in appState.watchedThreads.indices {
+            clearUnread(appState.watchedThreads[index], at: index)
+        }
+    }
+    
     private func handleClearUnread(_ watchedThread: WatchedThread) {
         guard let index = appState.watchedThreads.firstIndex(of: watchedThread) else { return }
+        clearUnread(watchedThread, at: index)
         
+        PersistAppStateNotification().notify()
+    }
+    
+    private func clearUnread(_ watchedThread: WatchedThread, at index: Int) {
         // update the last read post id to the last currently known id, and clear the
         // number of unread posts
         appState.watchedThreads[index] = WatchedThread(
@@ -133,7 +153,10 @@ struct WatchedThreadsView: View {
             totalNewPosts: 0,
             nowArchived: watchedThread.nowArchived,
             nowDeleted: watchedThread.nowDeleted)
-        
+    }
+    
+    private func handleRemoveAllWatchedThreads() {
+        appState.watchedThreads = []
         PersistAppStateNotification().notify()
     }
     
