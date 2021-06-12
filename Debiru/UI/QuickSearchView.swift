@@ -53,6 +53,9 @@ struct QuickSearchView: View {
         .onDisappear {
             if let monitor = viewModel.monitor {
                 NSEvent.removeMonitor(monitor)
+                
+                // avoid retain cycles when this view disappears
+                viewModel.monitor = nil
             }
         }
         .onChange(of: viewModel.text) { filter in
