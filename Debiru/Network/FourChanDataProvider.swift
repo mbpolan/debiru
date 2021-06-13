@@ -338,7 +338,9 @@ struct FourChanDataProvider: DataProvider {
                         throw NetworkError.invalidResponse("Unreadable data response")
                     }
                     
-                    if response.statusCode != 200 {
+                    if response.statusCode == 404 {
+                        throw NetworkError.notFound
+                    } else if response.statusCode != 200 {
                         throw NetworkError.invalidResponse("Failed to fetch data: \(response.statusCode)")
                     }
                     

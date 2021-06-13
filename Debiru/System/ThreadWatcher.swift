@@ -23,15 +23,27 @@ class ThreadWatcher {
     }
     
     func start() {
-        timer = scheduleNextThreadCheck()
+        timer = Timer.scheduledTimer(
+            withTimeInterval: TimeInterval(10),
+            repeats: true) { [weak self] _ in
+                self?.handleCheckWatchedThreads()
+        }
     }
     
-    private func handleCheckWatchedThreads(_ timer: Timer) {
+    private func handleCheckWatchedThreads() {
         let group = DispatchGroup()
         var updatedWatchedThreads: [WatchedThread] = []
         var tasks: [AnyCancellable] = []
         
         appState.watchedThreads.forEach { watchedThread in
+            // do not process deleted threads
+            if watchedThread.nowDeleted {
+                print("Ignoring deleted: \(watchedThread.thread.boardId) - \(watchedThread.id)")
+                
+                updatedWatchedThreads.append(watchedThread)
+                return
+            }
+            
             group.enter()
             
             print("Checking: \(watchedThread.thread.boardId) - \(watchedThread.id)")
@@ -59,8 +71,19 @@ class ThreadWatcher {
                                                     nowDeleted: false))
                     
                 case .failure(let error):
-                    print("*** ERROR: \(error.localizedDescription)")
-                    // TODO: handle errors and edge cases where the thread has been deleted
+                    switch error {
+                    case NetworkError.notFound:
+                        // mark this thread as deleted so we don't consider it anymore
+                        updatedWatchedThreads.append(WatchedThread(
+                                                        thread: watchedThread.thread,
+                                                        lastPostId: watchedThread.lastPostId,
+                                                        currentLastPostId: watchedThread.lastPostId,
+                                                        totalNewPosts: 0,
+                                                        nowArchived: false,
+                                                        nowDeleted: true))
+                    default:
+                        print("*** ERROR: \(error.localizedDescription)")
+                    }
                 }
                 
                 group.leave()
@@ -123,15 +146,6 @@ class ThreadWatcher {
             if unwatched || deleted || newPosts || archived {
                 self?.appState.watchedThreads = updatedWatchedThreads
             }
-            
-            self?.timer = self?.scheduleNextThreadCheck()
         }
-    }
-    
-    private func scheduleNextThreadCheck() -> Timer {
-        return Timer.scheduledTimer(
-            withTimeInterval: TimeInterval(10),
-            repeats: false,
-            block: handleCheckWatchedThreads)
     }
 }

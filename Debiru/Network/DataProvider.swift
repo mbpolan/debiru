@@ -32,4 +32,5 @@ protocol DataProvider {
 enum NetworkError: Error {
     case postError(String)
     case invalidResponse(String)
+    case notFound
 }
