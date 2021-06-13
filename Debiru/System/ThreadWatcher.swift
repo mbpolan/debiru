@@ -97,6 +97,8 @@ class ThreadWatcher {
         group.notify(queue: .main) { [weak self, tasks] in
             print("**** Update sweep finished for \(tasks.count) threads")
             
+            guard let `self` = self else { return }
+            
             // track different types of updates that can occur
             var unwatched = false
             var deleted = false
@@ -109,7 +111,7 @@ class ThreadWatcher {
             
             updatedWatchedThreads.forEach { updatedThread in
                 // find the previous watched metrics we have for this thread
-                let previousThread = self?.appState.watchedThreads.first {
+                let previousThread = self.appState.watchedThreads.first {
                     return $0.id == updatedThread.id &&
                         $0.thread.boardId == updatedThread.thread.boardId
                 }
@@ -138,13 +140,17 @@ class ThreadWatcher {
             
             // update the dock tile badge to reflect the total count of new posts
             NotificationManager.shared?.updateApplicationBadge(withPostCount: countNewPosts)
-            self?.appState.newPostCount = countNewPosts
+            
+            // avoid rerendering when nothing has changed in terms of post counts
+            if self.appState.newPostCount != countNewPosts {
+                self.appState.newPostCount = countNewPosts
+            }
             
             // update the app state with our newly gathered thread statistics, and schedule
             // the next iteration. however, only update the state if at least some kind of
             // change has happened, otherwise we unnecessarily will cause redraws.
             if unwatched || deleted || newPosts || archived {
-                self?.appState.watchedThreads = updatedWatchedThreads
+                self.appState.watchedThreads = updatedWatchedThreads
             }
         }
     }
