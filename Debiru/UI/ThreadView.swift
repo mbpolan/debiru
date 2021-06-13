@@ -25,69 +25,19 @@ struct ThreadView: View {
     }
     
     var body: some View {
-        let statistics = self.statistics
-        
         ScrollViewReader { scroll in
             VStack {
                 makeHeader()
                 
-                List(posts, id: \.self) { post in
-                    VStack {
-                        HStack {
-                            if let asset = post.attachment {
-                                AssetView(asset: asset,
-                                          saveLocation: imageSaveLocation,
-                                          spoilered: post.spoileredImage,
-                                          bounds: CGSize(width: 128.0, height: 128.0),
-                                          onOpen: { handleOpenImage($0, asset: $1) })
-                            }
-                            
-                            PostView(
-                                post.toPostContent(),
-                                boardId: post.boardId,
-                                threadId: post.threadId,
-                                onActivate: { handleReplyTo(post)} ,
-                                onLink: { link in
-                                    handleLink(link, scrollProxy: scroll)
-                                })
-                                .padding(.leading, 10)
-                            
-                            Spacer()
-                        }
-                        .popover(isPresented: makeReplyPopoverPresented(post), arrowEdge: .leading) {
-                            HStack {
-                                if viewModel.replyPopoverType == .success {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.green)
-                                    
-                                    Text("Post successful!")
-                                } else {
-                                    Image(systemName: "exclamationmark.circle")
-                                        .foregroundColor(.red)
-                                    
-                                    Text("Failed to submit post.")
-                                }
-                            }
-                            .padding()
-                        }
-                        
-                        if shouldShowNewPostDividerAfter(post) {
-                            TextDivider("New Posts", color: .red)
-                                .onAppear {
-                                    // schedule an update to reset the new post marker
-                                    Timer.scheduledTimer(
-                                        withTimeInterval: TimeInterval(5),
-                                        repeats: false,
-                                        block: { _ in handleUpdateLastPost() })
-                                }
-                        }
-                    }
-                    .id(post)
+                if viewModel.deleted {
+                    ErrorView(type: .threadDeleted)
+                } else {
+                    makeList(scroll)
                 }
                 
                 Divider()
                 
-                makeFooter(statistics)
+                makeFooter()
             }
             .onNavigate { handleNavigation($0, proxy: scroll) }
             .onChange(of: viewModel.targettedPostId) { targettedPostId in
@@ -232,6 +182,62 @@ struct ThreadView: View {
         return viewModel.posts
     }
     
+    private func makeList(_ scroll: ScrollViewProxy) -> some View {
+        List(posts, id: \.self) { post in
+            VStack {
+                HStack {
+                    if let asset = post.attachment {
+                        AssetView(asset: asset,
+                                  saveLocation: imageSaveLocation,
+                                  spoilered: post.spoileredImage,
+                                  bounds: CGSize(width: 128.0, height: 128.0),
+                                  onOpen: { handleOpenImage($0, asset: $1) })
+                    }
+                    
+                    PostView(
+                        post.toPostContent(),
+                        boardId: post.boardId,
+                        threadId: post.threadId,
+                        onActivate: { handleReplyTo(post)} ,
+                        onLink: { link in
+                            handleLink(link, scrollProxy: scroll)
+                        })
+                        .padding(.leading, 10)
+                    
+                    Spacer()
+                }
+                .popover(isPresented: makeReplyPopoverPresented(post), arrowEdge: .leading) {
+                    HStack {
+                        if viewModel.replyPopoverType == .success {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.green)
+                            
+                            Text("Post successful!")
+                        } else {
+                            Image(systemName: "exclamationmark.circle")
+                                .foregroundColor(.red)
+                            
+                            Text("Failed to submit post.")
+                        }
+                    }
+                    .padding()
+                }
+                
+                if shouldShowNewPostDividerAfter(post) {
+                    TextDivider("New Posts", color: .red)
+                        .onAppear {
+                            // schedule an update to reset the new post marker
+                            Timer.scheduledTimer(
+                                withTimeInterval: TimeInterval(5),
+                                repeats: false,
+                                block: { _ in handleUpdateLastPost() })
+                        }
+                }
+            }
+            .id(post)
+        }
+    }
+    
     private func makeHeader() -> some View {
         VStack {
             if isArchived {
@@ -251,7 +257,7 @@ struct ThreadView: View {
         }
     }
     
-    private func makeFooter(_ statistics: ThreadViewModel.Statistics) -> some View {
+    private func makeFooter() -> some View {
         HStack(alignment: .firstTextBaseline) {
             ThreadMetricsView(
                 replies: statistics.replies,
@@ -497,7 +503,12 @@ struct ThreadView: View {
                 appState.targettedPostId = nil
                 
             case .failure(let error):
-                print(error)
+                switch error {
+                case NetworkError.notFound:
+                    viewModel.deleted = true
+                default:
+                    print(error)
+                }
             }
             
             self.viewModel.pendingPosts = nil
@@ -519,6 +530,7 @@ class ThreadViewModel: ObservableObject {
     @Published var initialReplyToContent: String?
     @Published var replyPopoverPostId: Int?
     @Published var replyPopoverType: ReplyPopoverType?
+    @Published var deleted: Bool = false
     
     enum ReplyPopoverType: Identifiable {
         var id: Int { hashValue }
