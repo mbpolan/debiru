@@ -45,7 +45,7 @@ struct ThreadView: View {
                    let post = viewModel.posts.first(where: { $0.id == targettedPostId }) {
                     
                     scroll.scrollTo(post)
-                    appState.targettedPostId = nil
+                    viewModel.targettedPostId = nil
                 }
             }
         }
