@@ -113,16 +113,10 @@ struct FourChanDataProvider: DataProvider {
                                 size: size)
                         }
                         
-                        var country: User.Country?
-                        if let code = thread.countryCode,
-                           let name = thread.countryName {
-                            // XX indicates an unknown country code
-                            country = code == "XX" ? .unknown : .code(code: code, name: name)
-                            
-                        } else if let code = thread.trollCountryCode,
-                                  let name = thread.countryName {
-                            country = .fake(code: code, name: name)
-                        }
+                        let country = determineCountryFlag(
+                            code: thread.countryCode,
+                            fakeCode: thread.trollCountryCode,
+                            name: thread.countryName)
                         
                         return Thread(
                             id: thread.id,
@@ -209,16 +203,10 @@ struct FourChanDataProvider: DataProvider {
                         archivedDate = Date(timeIntervalSince1970: TimeInterval(archiveTime))
                     }
                     
-                    var country: User.Country?
-                    if let code = post.countryCode,
-                       let name = post.countryName {
-                        // XX indicates an unknown country code
-                        country = code == "XX" ? .unknown : .code(code: code, name: name)
-                        
-                    } else if let code = post.trollCountryCode,
-                              let name = post.countryName {
-                        country = .fake(code: code, name: name)
-                    }
+                    let country = determineCountryFlag(
+                        code: post.countryCode,
+                        fakeCode: post.trollCountryCode,
+                        name: post.countryName)
                     
                     return Post(
                         id: post.id,
@@ -281,6 +269,39 @@ struct FourChanDataProvider: DataProvider {
         default:
             return .image
         }
+    }
+    
+    private func determineCountryFlag(code: String?, fakeCode: String?, name: String?) -> User.Country? {
+        var country: User.Country?
+        
+        if let code = code,
+           let name = name {
+            // certain country codes are not standard, so we need to map them manually
+            // to match an available flag image from FlagKit
+            var realCode = code
+            switch realCode {
+            // england
+            case "XE":
+                realCode = "GB-ENG"
+            // scotland
+            case "XS":
+                realCode = "GB-SCT"
+            // wales
+            case "XW":
+                realCode = "GB-WLS"
+            default:
+                break
+            }
+            
+            // XX indicates an unknown country code
+            country = realCode == "XX" ? .unknown : .code(code: realCode, name: name)
+            
+        } else if let code = fakeCode,
+                  let name = name {
+            country = .fake(code: code, name: name)
+        }
+        
+        return country
     }
     
     private func determinePostResult(_ response: String) -> SubmissionResult {
