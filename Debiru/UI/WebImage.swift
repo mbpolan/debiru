@@ -161,6 +161,8 @@ struct WebImage: View {
             print(error)
             self.viewModel.state = .error(error.localizedDescription)
         }
+        
+        viewModel.pending = nil
     }
 }
 

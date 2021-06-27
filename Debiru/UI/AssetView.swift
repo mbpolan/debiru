@@ -10,14 +10,14 @@ import SwiftUI
 // MARK: - View
 
 struct AssetView: View {
-    private let spoilerBlur: CGFloat = 10.0
-    private let spoilerBlurDuration: Double = 0.1
-    
-    private let byteFormatter = { () -> ByteCountFormatter in
+    private static let byteFormatter = { () -> ByteCountFormatter in
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = [.useAll]
         return formatter
     }()
+    
+    private let spoilerBlur: CGFloat = 10.0
+    private let spoilerBlurDuration: Double = 0.1
     
     @StateObject private var viewModel: AssetViewModel = AssetViewModel()
     let asset: Asset
@@ -48,7 +48,7 @@ struct AssetView: View {
                 .lineLimit(1)
                 .frame(maxWidth: bounds?.width ?? .infinity)
             
-            Text("\(byteFormatter.string(fromByteCount: asset.size))")
+            Text("\(AssetView.byteFormatter.string(fromByteCount: asset.size))")
                 .foregroundColor(Color(NSColor.secondaryLabelColor))
             
             Spacer()
