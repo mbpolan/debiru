@@ -348,6 +348,10 @@ struct FourChanDataProvider: DataProvider {
                 }
                 .decode(type: S.self, decoder: JSONDecoder())
                 .eraseToAnyPublisher()
+                .receive(on: DispatchQueue.global(qos: .background))
+                .tryMap { value in
+                    return mapper(value)
+                }
                 .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { result in
                     switch result {
@@ -357,7 +361,7 @@ struct FourChanDataProvider: DataProvider {
                         completion(.failure(error))
                     }
                 }, receiveValue: { value in
-                    completion(.success(mapper(value)))
+                    completion(.success(value))
                 })
         }
         
