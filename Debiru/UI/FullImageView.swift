@@ -17,7 +17,7 @@ enum ImageScaleMode {
 
 struct FullImageView: View {
     @EnvironmentObject private var appState: AppState
-    @StateObject private var viewModel: FullImageViewModel = FullImageViewModel()
+    @ObservedObject private var viewModel: FullImageViewModel = FullImageViewModel()
     
     var body: some View {
         VStack {
