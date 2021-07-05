@@ -110,7 +110,7 @@ struct CatalogView: View {
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
-                .disabled(viewModel.pendingThreads != nil)
+                .disabled(viewModel.pendingThreads)
                 .help("Refresh the catalog")
                 
                 SearchBarView(
@@ -283,7 +283,9 @@ struct CatalogView: View {
     }
     
     private func reload(_ board: Board) {
-        viewModel.pendingThreads = dataProvider.getCatalog(for: board) { result in
+        self.viewModel.pendingThreads = true
+        
+        let cancellable = dataProvider.getCatalog(for: board) { result in
             switch result {
             case .success(let threads):
                 self.viewModel.threads = threads
@@ -292,7 +294,11 @@ struct CatalogView: View {
                 print(error)
             }
             
-            self.viewModel.pendingThreads = nil
+            self.viewModel.pendingThreads = false
+        }
+        
+        if let cancellable = cancellable {
+            viewModel.cancellables.insert(cancellable)
         }
     }
 }
@@ -301,13 +307,14 @@ struct CatalogView: View {
 
 class CatalogViewModel: ObservableObject {
     @Published var threads: [Thread] = []
-    @Published var pendingThreads: AnyCancellable?
+    @Published var pendingThreads: Bool = false
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
     @Published var refreshTimer: Timer?
     @Published var hasFilters: Bool = false
     @Published var filtersEnabled: Bool = false
+    var cancellables: Set<AnyCancellable> = Set()
 }
 
 // MARK: - Preview

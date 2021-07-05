@@ -19,6 +19,7 @@ struct ThreadView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
     private let dataProvider: DataProvider
+    private var bag: Set<AnyCancellable> = Set()
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
         self.dataProvider = dataProvider
@@ -68,7 +69,7 @@ struct ThreadView: View {
                 Button(action: reloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
-                .disabled(viewModel.pendingPosts != nil)
+                .disabled(viewModel.pendingPosts)
                 .help("Refresh the thread")
                 
                 SearchBarView(
@@ -492,7 +493,9 @@ struct ThreadView: View {
     }
     
     private func reload(_ thread: Thread) {
-        viewModel.pendingPosts = dataProvider.getPosts(for: thread) { result in
+        self.viewModel.pendingPosts = true
+        
+        let cancellable = dataProvider.getPosts(for: thread) { result in
             switch result {
             case .success(let posts):
                 self.viewModel.posts = posts
@@ -511,7 +514,11 @@ struct ThreadView: View {
                 }
             }
             
-            self.viewModel.pendingPosts = nil
+            self.viewModel.pendingPosts = false
+        }
+        
+        if let cancellable = cancellable {
+            viewModel.cancellables.insert(cancellable)
         }
     }
 }
@@ -520,7 +527,7 @@ struct ThreadView: View {
 
 class ThreadViewModel: ObservableObject {
     @Published var posts: [Post] = []
-    @Published var pendingPosts: AnyCancellable?
+    @Published var pendingPosts: Bool = false
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
@@ -531,6 +538,7 @@ class ThreadViewModel: ObservableObject {
     @Published var replyPopoverPostId: Int?
     @Published var replyPopoverType: ReplyPopoverType?
     @Published var deleted: Bool = false
+    var cancellables: Set<AnyCancellable> = Set()
     
     enum ReplyPopoverType: Identifiable {
         var id: Int { hashValue }
