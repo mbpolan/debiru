@@ -157,6 +157,10 @@ struct QuickSearchView: View {
             matches = matches + appState.boards
                 .filter { $0.id.contains(boardId) && $0.id != boardId }
                 .map { .board($0) }
+        } else {
+            matches = appState.boards
+                .filter { $0.title.localizedCaseInsensitiveContains(text) }
+                .map { .board($0) }
         }
         
         return Array(matches.prefix(maxResults))
