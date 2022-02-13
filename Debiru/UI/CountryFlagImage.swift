@@ -19,9 +19,7 @@ struct CountryFlagImage: View {
     var body: some View {
         makeImage()
             .help(name)
-            .onAppear {
-                loadImage()
-            }
+            .task(handleLoadImage)
     }
     
     private func makeImage() -> AnyView {
@@ -50,22 +48,20 @@ struct CountryFlagImage: View {
         return view
     }
     
-    private func loadImage() {
+    @Sendable private func handleLoadImage() async {
         viewModel.state = .loading
         
-        viewModel.pendingImage = dataProvider.getCountryFlagImage(for: code) { result in
-            switch result {
-            case .success(let data):
-                if let image = NSImage(data: data) {
-                    viewModel.state = .success
-                    viewModel.image = image
-                } else {
-                    viewModel.state = .error("Invalid image")
-                }
-                
-            case .failure(let error):
-                viewModel.state = .error(error.localizedDescription)
+        do {
+            let data = try await dataProvider.getCountryFlagImage(for: code)
+            if let data = data,
+               let image = NSImage(data: data) {
+                viewModel.state = .success
+                viewModel.image = image
+            } else {
+                viewModel.state = .error("Invalid image")
             }
+        } catch {
+            viewModel.state = .error(error.localizedDescription)
         }
     }
 }

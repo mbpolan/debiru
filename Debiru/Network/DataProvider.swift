@@ -9,18 +9,17 @@ import Combine
 import Foundation
 
 protocol DataProvider {
-    
     func post(_ submission: Submission, to board: Board, completion: @escaping(_: SubmissionResult) -> Void)
     
-    func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable?
+    func getBoards() async throws -> [Board]
     
-    func getCatalog(for board: Board, completion: @escaping(_: Result<[Thread], Error>) -> Void) -> AnyCancellable?
+    func getCatalog(for board: Board) async throws -> [Thread]
     
-    func getPosts(for thread: Thread, completion: @escaping(_: Result<[Post], Error>) -> Void) -> AnyCancellable?
+    func getPosts(for thread: Thread) async throws -> [Post]
     
-    func getImage(for asset: Asset, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?
+    func getImage(for asset: Asset) async throws -> Data?
     
-    func getCountryFlagImage(for countryCode: String, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?
+    func getCountryFlagImage(for countryCode: String) async throws -> Data?
     
     func getURL(for board: Board) -> URL?
     

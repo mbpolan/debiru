@@ -27,7 +27,7 @@ struct AssetView: View {
     let onOpen: (_: Data?, _: Asset) -> Void
     
     var body: some View {
-        VStack(alignment: .center) {
+        VStack {
             ZStack(alignment: .center) {
                 WebImage(viewableAsset,
                          saveLocation: saveLocation,

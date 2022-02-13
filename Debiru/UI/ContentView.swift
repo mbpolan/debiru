@@ -41,9 +41,7 @@ struct ContentView: View {
             }
         }
         .environmentObject(appState)
-        .onAppear {
-            viewModel.pendingBoards = dataProvider.getBoards(handleBoards)
-        }
+        .task(handleLoadBoards)
         .onDisappear {
             viewModel.threadWatcher?.invalidate()
             viewModel.threadWatcher = nil
@@ -90,6 +88,16 @@ struct ContentView: View {
         .padding()
     }
     
+    @Sendable private func handleLoadBoards() async {
+        do {
+            let boards = try await dataProvider.getBoards()
+            appState.boards = boards
+        } catch {
+            print("Failed to load boards: \(error)")
+            viewModel.error = ContentViewModel.ViewError(message: error.localizedDescription)
+        }
+    }
+    
     private func handleSheetDismiss() {
         switch viewModel.openSheet {
         case .error:
@@ -133,17 +141,6 @@ struct ContentView: View {
             appState.openWebVideo = asset
             openURL(url)
         }
-    }
-    
-    private func handleBoards(_ result: Result<[Board], Error>) {
-        switch result {
-        case .success(let boards):
-            appState.boards = boards
-        case .failure(let error):
-            viewModel.error = ContentViewModel.ViewError(message: error.localizedDescription)
-        }
-        
-        viewModel.pendingBoards = nil
     }
 }
 

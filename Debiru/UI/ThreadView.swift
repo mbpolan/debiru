@@ -66,7 +66,7 @@ struct ThreadView: View {
                 }
                 .help("Watch this thread")
                 
-                Button(action: reloadFromState) {
+                Button(action: handleReloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
                 .disabled(viewModel.pendingPosts)
@@ -77,9 +77,7 @@ struct ThreadView: View {
                     search: $viewModel.search)
             }
         }
-        .onRefreshView {
-            reloadFromState()
-        }
+        .onRefreshView(perform: handleReloadFromState)
         .onOpenInBrowser {
             guard let thread = getThread(appState.currentItem),
                   let url = dataProvider.getURL(for: thread) else { return }
@@ -87,14 +85,16 @@ struct ThreadView: View {
             NSWorkspace.shared.open(url)
         }
         .onChange(of: appState.currentItem) { item in
-            reload(from: item)
+            Task {
+                await reload(from: item)
+            }
         }
         .onChange(of: appState.autoRefresh) { refresh in
             if refresh {
-                startRefreshTimer()
+                runRefreshTimer()
             } else {
-                viewModel.refreshTimer?.invalidate()
-                viewModel.refreshTimer = nil
+                viewModel.refreshTask?.cancel()
+                viewModel.refreshTask = nil
             }
         }
         .sheet(item: $viewModel.replyToPost, onDismiss: handleHideReplySheet) { post in
@@ -110,11 +110,11 @@ struct ThreadView: View {
                     onComplete: handlePostComplete)
             }
         }
-        .onAppear {
-            reloadFromState()
+        .task {
+            await reloadFromState()
             
             if appState.autoRefresh {
-                startRefreshTimer()
+                runRefreshTimer()
             }
         }
     }
@@ -298,6 +298,12 @@ struct ThreadView: View {
         }
     }
     
+    private func handleReloadFromState() {
+        Task {
+            await reloadFromState()
+        }
+    }
+    
     private func handleNavigation(_ destination: NavigateNotification, proxy: ScrollViewProxy) {
         // do not perform navigation if the post editor is open
         if viewModel.replyToPost != nil {
@@ -382,10 +388,12 @@ struct ThreadView: View {
         // schedule the popover automatically hiding after a few seconds,
         // and refresh the thread afterwards
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            viewModel.replyPopoverType = nil
-            viewModel.replyPopoverPostId = nil
-            
-            reloadFromState()
+            Task {
+                viewModel.replyPopoverType = nil
+                viewModel.replyPopoverPostId = nil
+                
+                await reloadFromState()
+            }
         }
     }
     
@@ -476,49 +484,39 @@ struct ThreadView: View {
         }
     }
     
-    private func startRefreshTimer() {
-        viewModel.refreshTimer = Timer.scheduledTimer(
-            withTimeInterval: TimeInterval(refreshTimeout),
-            repeats: true) { _ in reloadFromState() }
+    private func runRefreshTimer() {
+        viewModel.refreshTask = Task {
+            await reloadFromState()
+            try? await Task.sleep(nanoseconds: UInt64(refreshTimeout * 1_000_000_000))
+            
+            guard !Task.isCancelled else { return }
+            runRefreshTimer()
+        }
     }
     
-    private func reloadFromState() {
+    private func reloadFromState() async {
         guard let thread = getThread(appState.currentItem) else { return }
-        reload(thread)
+        await reload(thread)
     }
     
-    private func reload(from item: ViewableItem?) {
+    private func reload(from item: ViewableItem?) async {
         guard let thread = getThread(item) else { return }
-        reload(thread)
+        await reload(thread)
     }
     
-    private func reload(_ thread: Thread) {
+    private func reload(_ thread: Thread) async {
         self.viewModel.pendingPosts = true
         
-        let cancellable = dataProvider.getPosts(for: thread) { result in
-            switch result {
-            case .success(let posts):
-                self.viewModel.posts = posts
-                self.viewModel.lastUpdate = Date()
-                
-                // pop the targetted post id from the app state
-                self.viewModel.targettedPostId = appState.targettedPostId
-                appState.targettedPostId = nil
-                
-            case .failure(let error):
-                switch error {
-                case NetworkError.notFound:
-                    viewModel.deleted = true
-                default:
-                    print(error)
-                }
-            }
+        do {
+            self.viewModel.posts = try await dataProvider.getPosts(for: thread)
+            self.viewModel.lastUpdate = Date()
             
-            self.viewModel.pendingPosts = false
-        }
-        
-        if let cancellable = cancellable {
-            viewModel.cancellables.insert(cancellable)
+            // pop the targetted post id from the app state
+            self.viewModel.targettedPostId = appState.targettedPostId
+            appState.targettedPostId = nil
+        } catch {
+            // FIXME: handle image 404
+            print(error)
         }
     }
 }
@@ -531,7 +529,7 @@ class ThreadViewModel: ObservableObject {
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
-    @Published var refreshTimer: Timer?
+    @Published var refreshTask: Task<Void, Never>?
     @Published var targettedPostId: Int?
     @Published var replyToPost: Post?
     @Published var initialReplyToContent: String?

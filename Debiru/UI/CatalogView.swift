@@ -30,11 +30,13 @@ struct CatalogView: View {
                 List(threads, id: \.self) { thread in
                     HStack {
                         if let asset = thread.attachment {
-                            AssetView(asset: asset,
-                                      saveLocation: imageSaveLocation,
-                                      spoilered: thread.spoileredImage,
-                                      bounds: CGSize(width: 128.0, height: 128.0),
-                                      onOpen: { handleOpenImage($0, asset: $1) })
+                            VStack(alignment: .leading) {
+                                AssetView(asset: asset,
+                                          saveLocation: imageSaveLocation,
+                                          spoilered: thread.spoileredImage,
+                                          bounds: CGSize(width: 128.0, height: 128.0),
+                                          onOpen: { handleOpenImage($0, asset: $1) })
+                            }
                         }
                         
                         PostView(
@@ -84,11 +86,13 @@ struct CatalogView: View {
             }
             .onNavigate { handleNavigation($0, proxy: scroll) }
             .onChange(of: appState.autoRefresh) { refresh in
-                if refresh {
-                    startRefreshTimer()
-                } else {
-                    viewModel.refreshTimer?.invalidate()
-                    viewModel.refreshTimer = nil
+                Task {
+                    if refresh {
+                        runRefreshTimer()
+                    } else {
+                        viewModel.refreshTask?.cancel()
+                        viewModel.refreshTask = nil
+                    }
                 }
             }
         }
@@ -107,7 +111,7 @@ struct CatalogView: View {
                     Image(systemName: "text.badge.xmark")
                 }
                 
-                Button(action: reloadFromState) {
+                Button(action: handleReloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
                 .disabled(viewModel.pendingThreads)
@@ -118,9 +122,7 @@ struct CatalogView: View {
                     search: $viewModel.search)
             }
         }
-        .onRefreshView {
-            reloadFromState()
-        }
+        .onRefreshView(perform: handleReloadFromState)
         .onOpenInBrowser {
             guard let board = getBoard(appState.currentItem),
                   let url = dataProvider.getURL(for: board) else { return }
@@ -128,18 +130,20 @@ struct CatalogView: View {
             NSWorkspace.shared.open(url)
         }
         .onChange(of: appState.currentItem) { item in
-            reload(from: item)
+            Task {
+                await reload(from: item)
+            }
         }
         .onChange(of: viewModel.filtersEnabled) { enabled in
             guard let board = getBoard(appState.currentItem) else { return }
             appState.boardFilterEnablement[board.id] = enabled
         }
-        .onAppear {
-            reloadFromState()
+        .task {
+            await reloadFromState()
             updateFilterToggle()
             
             if appState.autoRefresh {
-                startRefreshTimer()
+                runRefreshTimer()
             }
         }
     }
@@ -200,6 +204,12 @@ struct CatalogView: View {
         appState.currentItem = nil
     }
     
+    private func handleReloadFromState() {
+        Task {
+            await reloadFromState()
+        }
+    }
+    
     private func handleNavigation(_ destination: NavigateNotification, proxy: ScrollViewProxy) {
         switch destination {
         case .top:
@@ -238,10 +248,14 @@ struct CatalogView: View {
         }
     }
     
-    private func startRefreshTimer() {
-        viewModel.refreshTimer = Timer.scheduledTimer(
-            withTimeInterval: TimeInterval(refreshTimeout),
-            repeats: true) { _ in reloadFromState() }
+    private func runRefreshTimer() {
+        viewModel.refreshTask = Task {
+            await reloadFromState()
+            try? await Task.sleep(nanoseconds: UInt64(refreshTimeout * 1_000_000_000))
+            
+            guard !Task.isCancelled else { return }
+            runRefreshTimer()
+        }
     }
     
     private func isThreadWatched(_ thread: Thread) -> Bool {
@@ -272,34 +286,27 @@ struct CatalogView: View {
         }
     }
     
-    private func reloadFromState() {
+    private func reloadFromState() async {
         guard let board = getBoard(appState.currentItem) else { return }
-        reload(board)
+        await reload(board)
     }
     
-    private func reload(from item: ViewableItem?) {
+    private func reload(from item: ViewableItem?) async {
         guard let board = getBoard(item) else { return }
-        reload(board)
+        await reload(board)
     }
     
-    private func reload(_ board: Board) {
+    private func reload(_ board: Board) async {
         self.viewModel.pendingThreads = true
         
-        let cancellable = dataProvider.getCatalog(for: board) { result in
-            switch result {
-            case .success(let threads):
-                self.viewModel.threads = threads
-                self.viewModel.lastUpdate = Date()
-            case .failure(let error):
-                print(error)
-            }
-            
-            self.viewModel.pendingThreads = false
+        do {
+            self.viewModel.threads = try await dataProvider.getCatalog(for: board)
+            self.viewModel.lastUpdate = Date()
+        } catch {
+            print(error)
         }
         
-        if let cancellable = cancellable {
-            viewModel.cancellables.insert(cancellable)
-        }
+        self.viewModel.pendingThreads = false
     }
 }
 
@@ -311,10 +318,9 @@ class CatalogViewModel: ObservableObject {
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false
     @Published var lastUpdate: Date = Date()
-    @Published var refreshTimer: Timer?
+    @Published var refreshTask: Task<Void, Never>?
     @Published var hasFilters: Bool = false
     @Published var filtersEnabled: Bool = false
-    var cancellables: Set<AnyCancellable> = Set()
 }
 
 // MARK: - Preview

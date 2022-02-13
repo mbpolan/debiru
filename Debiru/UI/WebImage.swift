@@ -55,7 +55,7 @@ struct WebImage: View {
                     Image(systemName: "exclamationmark.circle")
                         .foregroundColor(.red)
                 }
-
+                
                 Text(viewModel.popoverMessage ?? "Something went wrong!")
             }
             .padding()
@@ -66,12 +66,13 @@ struct WebImage: View {
         .onTapGesture(count: 1) {
             onOpen(viewModel.imageData)
         }
-        .onAppear(perform: self.load)
+        .task(handleLoad)
+        .onDisappear(perform: self.unload)
     }
     
     private func makeImage(_ data: Data) -> some View {
         let bounds = self.bounds ??
-            CGSize(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
+        CGSize(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
         
         // depending on the type of image this is, we need to either create a static
         // image view or an animated one instead. the set up is similar, but the underlying
@@ -110,11 +111,27 @@ struct WebImage: View {
         .frame(width: frame.width, height: frame.height)
     }
     
-    func load() {
-        if viewModel.state == .empty {
-            self.viewModel.state = .loading
-            self.viewModel.pending = dataProvider.getImage(for: asset, completion: handleCompletion)
+    @Sendable func handleLoad() async {
+        guard viewModel.state == .empty else { return }
+        
+        self.viewModel.state = .loading
+        
+        do {
+            if let data = try await dataProvider.getImage(for: asset) {
+                viewModel.imageData = data
+                self.viewModel.state = .done(data)
+            } else {
+                viewModel.state = .error("No data received")
+            }
+        } catch {
+            print(error)
+            self.viewModel.state = .error(error.localizedDescription)
         }
+    }
+    
+    func unload() {
+        print("UNLOAD: \(asset.filename)")
+        viewModel.state = .empty
     }
     
     private func handleSaveImage() {
@@ -149,21 +166,6 @@ struct WebImage: View {
         
         return CGSize(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
     }
-    
-    private func handleCompletion(_ result: Result<Data, Error>) {
-        switch result {
-        case .success(let data):
-            // save the data regardless if it is something we can render
-            viewModel.imageData = data
-            self.viewModel.state = .done(data)
-            
-        case .failure(let error):
-            print(error)
-            self.viewModel.state = .error(error.localizedDescription)
-        }
-        
-        viewModel.pending = nil
-    }
 }
 
 // MARK: - View Model
@@ -195,16 +197,16 @@ class WebImageViewModel: ObservableObject {
 struct WebImage_Previews: PreviewProvider {
     static var previews: some View {
         WebImage(Asset(
-                    id: 1594686780709,
-                    boardId: "g",
-                    width: 100,
-                    height: 50,
-                    thumbnailWidth: 100,
-                    thumbnailHeight: 50,
-                    filename: "lol",
-                    extension: ".jpg",
-                    fileType: .image,
-                    size: 64),
+            id: 1594686780709,
+            boardId: "g",
+            width: 100,
+            height: 50,
+            thumbnailWidth: 100,
+            thumbnailHeight: 50,
+            filename: "lol",
+            extension: ".png",
+            fileType: .image,
+            size: 64),
                  saveLocation: URL(fileURLWithPath: "/foo"),
                  bounds: CGSize(width: 128.0, height: 128.0),
                  onOpen: { _ in })

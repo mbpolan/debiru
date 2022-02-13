@@ -14,7 +14,7 @@ class ThreadWatcher {
     
     let appState: AppState
     let dataProvider: DataProvider
-    private var timer: Timer?
+    private var timer: Task<Void, Never>?
     
     init(appState: AppState, dataProvider: DataProvider = FourChanDataProvider()) {
         self.appState = appState
@@ -23,79 +23,80 @@ class ThreadWatcher {
     }
     
     func start() {
-        timer = Timer.scheduledTimer(
-            withTimeInterval: TimeInterval(10),
-            repeats: true) { [weak self] _ in
-                self?.handleCheckWatchedThreads()
+        timer = Task {
+            try? await Task.sleep(nanoseconds: 10 * 1_000_000_000)
+            guard !Task.isCancelled else { return }
+            
+            await self.handleCheckWatchedThreads()
         }
     }
     
-    private func handleCheckWatchedThreads() {
-        let group = DispatchGroup()
-        var updatedWatchedThreads: [WatchedThread] = []
-        var tasks: [AnyCancellable] = []
-        
-        appState.watchedThreads.forEach { watchedThread in
-            // do not process deleted threads
-            if watchedThread.nowDeleted {
-                print("Ignoring deleted: \(watchedThread.thread.boardId) - \(watchedThread.id)")
-                
-                updatedWatchedThreads.append(watchedThread)
-                return
-            }
+    private func handleCheckWatchedThreads() async {
+        let results = await withTaskGroup(of: WatchedThread?.self,
+                                          returning: [WatchedThread].self) { taskGroup in
             
-            group.enter()
-            
-            print("Checking: \(watchedThread.thread.boardId) - \(watchedThread.id)")
-            
-            // fetch posts for this thread
-            let task = dataProvider.getPosts(for: watchedThread.thread) { result in
-                switch result {
-                case .success(let posts):
-                    // has the thread been archived since the last time we checked?
-                    let archived = posts.first?.archived ?? false
+            for watchedThread in appState.watchedThreads {
+                taskGroup.addTask { () -> WatchedThread? in
+                    // do not process deleted threads
+                    if watchedThread.nowDeleted {
+                        print("Ignoring deleted: \(watchedThread.thread.boardId) - \(watchedThread.id)")
+                        return watchedThread
+                    }
                     
-                    // are there any new posts since the last known post was checked?
-                    let lastKnownIndex = posts
-                        .firstIndex { $0.id == watchedThread.currentLastPostId } ?? 0
+                    print("Checking: \(watchedThread.thread.boardId) - \(watchedThread.id)")
                     
-                    let newPosts = posts.count - lastKnownIndex - 1
-                    print("New: \(watchedThread.thread.boardId) - \(watchedThread.id) = \(newPosts)")
-                    
-                    updatedWatchedThreads.append(WatchedThread(
-                                                    thread: watchedThread.thread,
-                                                    lastPostId: watchedThread.lastPostId,
-                                                    currentLastPostId: posts.last?.id ?? watchedThread.lastPostId,
-                                                    totalNewPosts: newPosts,
-                                                    nowArchived: archived,
-                                                    nowDeleted: false))
-                    
-                case .failure(let error):
-                    switch error {
-                    case NetworkError.notFound:
-                        // mark this thread as deleted so we don't consider it anymore
-                        updatedWatchedThreads.append(WatchedThread(
-                                                        thread: watchedThread.thread,
-                                                        lastPostId: watchedThread.lastPostId,
-                                                        currentLastPostId: watchedThread.lastPostId,
-                                                        totalNewPosts: 0,
-                                                        nowArchived: false,
-                                                        nowDeleted: true))
-                    default:
-                        print("*** ERROR: \(error.localizedDescription)")
+                    // fetch posts for this thread
+                    do {
+                        let posts = try await self.dataProvider.getPosts(for: watchedThread.thread)
+                        
+                        // has the thread been archived since the last time we checked?
+                        let archived = posts.first?.archived ?? false
+                        
+                        // are there any new posts since the last known post was checked?
+                        let lastKnownIndex = posts
+                            .firstIndex { $0.id == watchedThread.currentLastPostId } ?? 0
+                        
+                        let newPosts = posts.count - lastKnownIndex - 1
+                        print("New: \(watchedThread.thread.boardId) - \(watchedThread.id) = \(newPosts)")
+                        
+                        return WatchedThread(
+                            thread: watchedThread.thread,
+                            lastPostId: watchedThread.lastPostId,
+                            currentLastPostId: posts.last?.id ?? watchedThread.lastPostId,
+                            totalNewPosts: newPosts,
+                            nowArchived: archived,
+                            nowDeleted: false)
+                    } catch {
+                        switch error {
+                        case NetworkError.notFound:
+                            // mark this thread as deleted so we don't consider it anymore
+                            return WatchedThread(
+                                thread: watchedThread.thread,
+                                lastPostId: watchedThread.lastPostId,
+                                currentLastPostId: watchedThread.lastPostId,
+                                totalNewPosts: 0,
+                                nowArchived: false,
+                                nowDeleted: true)
+                        default:
+                            print("*** ERROR: \(error.localizedDescription)")
+                            return nil
+                        }
                     }
                 }
-                
-                group.leave()
             }
             
-            if let task = task {
-                tasks.append(task)
+            var watchedThreads: [WatchedThread] = []
+            for await result in taskGroup {
+                if let watchedThread = result {
+                    watchedThreads.append(watchedThread)
+                }
             }
+            
+            return watchedThreads
         }
         
-        group.notify(queue: .main) { [weak self, tasks] in
-            print("**** Update sweep finished for \(tasks.count) threads")
+        DispatchQueue.main.async { [weak self, results] in
+            print("**** Update sweep finished for \(results.count) threads")
             
             guard let `self` = self else { return }
             
@@ -109,7 +110,7 @@ class ThreadWatcher {
             // track threads that previously had no new replies, but now do
             var activeThreads: [WatchedThread] = []
             
-            updatedWatchedThreads.forEach { updatedThread in
+            results.forEach { updatedThread in
                 // find the previous watched metrics we have for this thread
                 let previousThread = self.appState.watchedThreads.first {
                     return $0.id == updatedThread.id &&
@@ -150,7 +151,7 @@ class ThreadWatcher {
             // the next iteration. however, only update the state if at least some kind of
             // change has happened, otherwise we unnecessarily will cause redraws.
             if unwatched || deleted || newPosts || archived {
-                self.appState.watchedThreads = updatedWatchedThreads
+                self.appState.watchedThreads = results
             }
         }
     }

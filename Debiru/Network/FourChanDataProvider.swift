@@ -52,13 +52,13 @@ struct FourChanDataProvider: DataProvider {
             
             guard let data = data,
                   let responseData = String(data: data, encoding: .utf8) else {
-                completion(.failure(NetworkError.invalidResponse("Unreadable body")))
-                return
-            }
+                      completion(.failure(NetworkError.invalidResponse("Unreadable body")))
+                      return
+                  }
             
             if response.statusCode != 200 {
                 completion(.failure(NetworkError.invalidResponse(
-                                        "Unexpected status code: \(response.statusCode)")))
+                    "Unexpected status code: \(response.statusCode)")))
                 return
             }
             
@@ -69,8 +69,8 @@ struct FourChanDataProvider: DataProvider {
         }.resume()
     }
     
-    func getBoards(_ completion: @escaping(_: Result<[Board], Error>) -> Void) -> AnyCancellable? {
-        return getData(
+    func getBoards() async throws -> [Board] {
+        return try await getData(
             url: "\(apiBaseUrl)/boards.json",
             mapper: { (value: BoardsResponse) in
                 return value.boards.map { model in
@@ -79,13 +79,11 @@ struct FourChanDataProvider: DataProvider {
                         title: model.title,
                         description: model.description)
                 }
-            },
-            completion: completion)
+            }) ?? []
     }
     
-    func getCatalog(for board: Board, completion: @escaping(_: Result<[Thread], Error>) -> Void) -> AnyCancellable? {
-        
-        return getData(
+    func getCatalog(for board: Board) async throws -> [Thread] {
+        return try await getData(
             url: "\(apiBaseUrl)/\(board.id)/catalog.json",
             mapper: { (value: [CatalogModel]) in
                 return value.map { page in
@@ -143,13 +141,11 @@ struct FourChanDataProvider: DataProvider {
                                 page: page.page))
                     }
                 }.reduce([], +)
-            },
-            completion: completion)
+            }) ?? []
     }
     
-    func getPosts(for thread: Thread, completion: @escaping(_: Result<[Post], Error>) -> Void) -> AnyCancellable? {
-        
-        return getData(
+    func getPosts(for thread: Thread) async throws -> [Post] {
+        return try await getData(
             url: "\(apiBaseUrl)/\(thread.boardId)/thread/\(thread.id).json",
             mapper: { (value: ThreadPostsModel) in
                 var postsToReplies: [Int: [Int]] = [:]
@@ -232,20 +228,17 @@ struct FourChanDataProvider: DataProvider {
                         archivedDate: archivedDate,
                         replies: postsToReplies[post.id] ?? [])
                 }
-            },
-            completion: completion)
+            }) ?? []
     }
     
-    func getImage(for asset: Asset, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
-        
+    func getImage(for asset: Asset) async throws -> Data? {
         let key = "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)"
-        return getImageData(key, completion: completion)
+        return try await getImageData(key)
     }
     
-    func getCountryFlagImage(for countryCode: String, completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable? {
-        
+    func getCountryFlagImage(for countryCode: String) async throws -> Data? {
         let key = "\(staticBaseUrl)/image/country/troll/\(countryCode.lowercased()).gif"
-        return getImageData(key, completion: completion)
+        return try await getImageData(key)
     }
     
     func getURL(for board: Board) -> URL? {
@@ -280,13 +273,13 @@ struct FourChanDataProvider: DataProvider {
             // to match an available flag image from FlagKit
             var realCode = code
             switch realCode {
-            // england
+                // england
             case "XE":
                 realCode = "GB-ENG"
-            // scotland
+                // scotland
             case "XS":
                 realCode = "GB-SCT"
-            // wales
+                // wales
             case "XW":
                 realCode = "GB-WLS"
             default:
@@ -347,85 +340,24 @@ struct FourChanDataProvider: DataProvider {
         }
     }
     
-    private func getData<S: Decodable, T>(
-        url: String,
-        mapper: @escaping(_ data: S) -> T,
-        completion: @escaping(_: Result<T, Error>) -> Void) -> AnyCancellable? {
+    private func getData<S: Decodable, T>(url: String, mapper: @escaping(_ data: S) -> T) async throws -> T? {
+        guard let url = URL(string: url) else { return nil }
+        let (data, _) = try await URLSession.shared.data(from: url)
         
-        if let url = URL(string: url) {
-            return URLSession.shared.dataTaskPublisher(for: url)
-                .tryMap { output in
-                    guard let response = output.response as? HTTPURLResponse else {
-                        throw NetworkError.invalidResponse("Unreadable data response")
-                    }
-                    
-                    if response.statusCode == 404 {
-                        throw NetworkError.notFound
-                    } else if response.statusCode != 200 {
-                        throw NetworkError.invalidResponse("Failed to fetch data: \(response.statusCode)")
-                    }
-                    
-                    return output.data
-                }
-                .decode(type: S.self, decoder: JSONDecoder())
-                .eraseToAnyPublisher()
-                .receive(on: DispatchQueue.global(qos: .background))
-                .tryMap { value in
-                    return mapper(value)
-                }
-                .receive(on: DispatchQueue.main)
-                .sink(receiveCompletion: { result in
-                    switch result {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }, receiveValue: { value in
-                    completion(.success(value))
-                })
-        }
-        
-        return nil
+        return mapper(try JSONDecoder().decode(S.self, from: data))
     }
     
-    private func getImageData(
-        _ urlString: String,
-        completion: @escaping(_: Result<Data, Error>) -> Void) -> AnyCancellable?  {
+    private func getImageData(_ urlString: String) async throws -> Data? {
+        guard let url = URL(string: urlString) else { return nil }
         
-        if let url = URL(string: urlString) {
-            if let cachedImage = DataCache.shared.get(forKey: urlString) {
-                completion(.success(cachedImage))
-                return nil
-            }
-            
-            return URLSession.shared.dataTaskPublisher(for: url)
-                .tryMap { output in
-                    guard let response = output.response as? HTTPURLResponse else {
-                        throw NetworkError.invalidResponse("Unreadable image response")
-                    }
-                    if response.statusCode != 200 {
-                        throw NetworkError.invalidResponse("Failed to fetch image: \(urlString): \(response.statusCode)")
-                    }
-                    
-                    return output.data
-                }
-                .eraseToAnyPublisher()
-                .receive(on: DispatchQueue.main)
-                .sink(receiveCompletion: { result in
-                    switch result {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }, receiveValue: { (value: Data) in
-                    DataCache.shared.set(urlString, value: value)
-                    completion(.success(value))
-                })
+        if let cachedImage = DataCache.shared.get(forKey: urlString) {
+            return cachedImage
         }
         
-        return nil
+        let (data, _) = try await URLSession.shared.data(from: url)
+        DataCache.shared.set(urlString, value: data)
+        
+        return data
     }
     
     private func parseRepliesTo(_ content: String) -> [Int] {
