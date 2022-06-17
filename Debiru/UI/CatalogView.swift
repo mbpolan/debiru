@@ -296,6 +296,7 @@ struct CatalogView: View {
         await reload(board)
     }
     
+    @MainActor
     private func reload(_ board: Board) async {
         self.viewModel.pendingThreads = true
         

@@ -88,6 +88,7 @@ struct ContentView: View {
         .padding()
     }
     
+    @MainActor
     @Sendable private func handleLoadBoards() async {
         do {
             let boards = try await dataProvider.getBoards()

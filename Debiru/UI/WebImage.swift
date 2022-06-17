@@ -111,8 +111,14 @@ struct WebImage: View {
         .frame(width: frame.width, height: frame.height)
     }
     
+    @MainActor
     @Sendable func handleLoad() async {
-        guard viewModel.state == .empty else { return }
+        guard viewModel.state == .empty else {
+            print("SKIP: \(asset.filename)")
+            return
+        }
+        
+        print("LOAD: \(asset.filename)")
         
         self.viewModel.state = .loading
         

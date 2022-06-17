@@ -504,6 +504,7 @@ struct ThreadView: View {
         await reload(thread)
     }
     
+    @MainActor
     private func reload(_ thread: Thread) async {
         self.viewModel.pendingPosts = true
         

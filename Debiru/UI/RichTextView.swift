@@ -136,24 +136,22 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         view.autoresizingMask = .init([.width, .height])
         view.delegate = context.coordinator
         
-        makeString { result in
-            switch result {
-            case .success(let string):
-                context.coordinator.string = string
-                view.textStorage?.setAttributedString(string)
-                
-                // apply additional constructs to the text (links, etc.) at this point.
-                // we need to make the view editable *before* calling checkTextInDocument,
-                // otherwise it will have no effect.
-                view.isEditable = true
-                view.checkTextInDocument(nil)
-                view.isEditable = false
-                
-                recalculateHeight(string)
-            case .failure(let error):
-                print("Cannot render content: \(error.localizedDescription)")
-            }
+        guard let string = makeString() else {
+            print("Cannot render content")
+            return view
         }
+        
+        context.coordinator.string = string
+        view.textStorage?.setAttributedString(string)
+        
+        // apply additional constructs to the text (links, etc.) at this point.
+        // we need to make the view editable *before* calling checkTextInDocument,
+        // otherwise it will have no effect.
+        view.isEditable = true
+        view.checkTextInDocument(nil)
+        view.isEditable = false
+        
+        recalculateHeight(string)
         
         return view
     }
@@ -172,25 +170,19 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         onUpdate(ceil(rect.height))
     }
     
-    private func makeString(_ handler: @escaping(_: Result<NSMutableAttributedString, Error>) -> Void) -> Void {
-        DispatchQueue.main.async {
-            guard let string = NSMutableAttributedString(
-                    html: Data(html.utf8),
-                    options: [
-                        .documentType: NSAttributedString.DocumentType.html,
-                        .characterEncoding: String.Encoding.utf8.rawValue
-                    ],
-                    documentAttributes: nil) else {
-                
-                handler(.failure(NSError()))
-                return
-            }
+    private func makeString() -> NSMutableAttributedString? {
+        guard let string = NSMutableAttributedString(
+            html: Data(html.utf8),
+            options: [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ],
+            documentAttributes: nil) else {
             
-//            let range = NSMakeRange(0, string.length)
-//            string.addAttribute(.font, value: NSFont.preferredFont(forTextStyle: .body, options: [:]), range: range)
-            
-            handler(.success(string))
+            return nil
         }
+        
+        return string
     }
 }
 
