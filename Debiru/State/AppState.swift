@@ -12,7 +12,7 @@ class AppState: ObservableObject, Codable {
     @Published var currentItem: ViewableItem?
     @Published var boards: [Board] = []
     @Published var openItems: [ViewableItem]
-    @Published var openImageData: DownloadedAsset?
+    @Published var openImageAsset: Asset?
     @Published var openWebVideo: Asset?
     @Published var newPostCount: Int = 0
     @Published var autoRefresh: Bool = false
@@ -39,7 +39,7 @@ class AppState: ObservableObject, Codable {
         currentItem = try values.decode(ViewableItem.self, forKey: .currentItem)
         boards = try values.decode([Board].self, forKey: .boards)
         openItems = try values.decode([ViewableItem].self, forKey: .openItems)
-        openImageData = try values.decode(DownloadedAsset.self, forKey: .openImageData)
+        openImageAsset = try values.decode(Asset.self, forKey: .openImageAsset)
         openWebVideo = try values.decode(Asset.self, forKey: .openWebVideo)
         autoRefresh = try values.decode(Bool.self, forKey: .autoRefresh)
         watchedThreads = try values.decode([WatchedThread].self, forKey: .watchedThreads)
@@ -52,7 +52,7 @@ extension AppState {
         case currentItem
         case boards
         case openItems
-        case openImageData
+        case openImageAsset
         case openWebVideo
         case autoRefresh
         case watchedThreads
@@ -64,7 +64,7 @@ extension AppState {
         try container.encode(currentItem, forKey: .currentItem)
         try container.encode(boards, forKey: .boards)
         try container.encode(openItems, forKey: .openItems)
-        try container.encode(openImageData, forKey: .openImageData)
+        try container.encode(openImageAsset, forKey: .openImageAsset)
         try container.encode(autoRefresh, forKey: .autoRefresh)
         try container.encode(watchedThreads, forKey: .watchedThreads)
     }

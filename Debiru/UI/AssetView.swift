@@ -24,15 +24,16 @@ struct AssetView: View {
     let saveLocation: URL
     let spoilered: Bool
     let bounds: CGSize?
-    let onOpen: (_: Data?, _: Asset) -> Void
+    let onOpen: (_: Asset) -> Void
     
     var body: some View {
         VStack {
             ZStack(alignment: .center) {
                 WebImage(viewableAsset,
+                         variant: .thumbnail,
                          saveLocation: saveLocation,
                          bounds: bounds,
-                         onOpen: { onOpen($0, asset)})
+                         onOpen: onOpen)
                     .blur(radius: viewModel.blur)
                 
                 // show a play icon indicator for videos
@@ -107,7 +108,7 @@ struct AssetView_Preview: PreviewProvider {
             saveLocation: URL(string: "/Users")!,
             spoilered: true,
             bounds: CGSize(width: 128, height: 128),
-            onOpen: { _, _ in })
+            onOpen: { _ in })
             .frame(width: 200, height: 200)
     }
 }

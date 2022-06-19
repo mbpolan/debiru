@@ -23,6 +23,11 @@ struct Asset: Identifiable, Hashable, Equatable, Codable {
 }
 
 extension Asset {
+    enum Variant {
+        case thumbnail
+        case original
+    }
+    
     enum FileType: String, Codable {
         case image
         case animatedImage

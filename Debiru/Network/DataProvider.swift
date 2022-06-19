@@ -17,7 +17,7 @@ protocol DataProvider {
     
     func getPosts(for thread: Thread) async throws -> [Post]
     
-    func getImage(for asset: Asset) async throws -> Data?
+    func getImage(for asset: Asset, variant: Asset.Variant) async throws -> Data?
     
     func getCountryFlagImage(for countryCode: String) async throws -> Data?
     

@@ -38,7 +38,7 @@ struct PersistAppStateNotification: Notifiable {
 
 struct ShowImageNotification: Notifiable {
     static var name = Notification.Name("showImage")
-    let asset: DownloadedAsset
+    let asset: Asset
     
     func notify() {
         NotificationCenter.default.post(name: ShowImageNotification.name, object: asset)
@@ -151,7 +151,7 @@ extension View {
         return onNotification(ToggleSidebarNotification.name, perform: perform)
     }
     
-    func onShowImage(perform: @escaping(_: DownloadedAsset) -> Void) -> some View {
+    func onShowImage(perform: @escaping(_: Asset) -> Void) -> some View {
         return onNotification(ShowImageNotification.name, perform: perform)
     }
     

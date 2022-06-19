@@ -192,7 +192,7 @@ struct ThreadView: View {
                                   saveLocation: imageSaveLocation,
                                   spoilered: post.spoileredImage,
                                   bounds: CGSize(width: 128.0, height: 128.0),
-                                  onOpen: { handleOpenImage($0, asset: $1) })
+                                  onOpen: handleOpenImage)
                     }
                     
                     PostView(
@@ -285,15 +285,12 @@ struct ThreadView: View {
         )
     }
     
-    private func handleOpenImage(_ data: Data?, asset: Asset) {
+    private func handleOpenImage(_ asset: Asset) {
         if asset.fileType == .webm {
             ShowVideoNotification(asset: asset)
                 .notify()
-        } else if let data = data {
-            ShowImageNotification(
-                asset: DownloadedAsset(
-                    data: data,
-                    asset: asset))
+        } else {
+            ShowImageNotification(asset: asset)
                 .notify()
         }
     }

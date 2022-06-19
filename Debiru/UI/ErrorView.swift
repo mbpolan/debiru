@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ErrorView: View {
     let type: ErrorType
+    var additionalMessage: String?
     
     var body: some View {
         makeErrorView()
@@ -21,6 +22,16 @@ struct ErrorView: View {
         let message: String
         
         switch type {
+        case .imageLoadFailed:
+            iconName = "exclamationmark.circle"
+            
+            var text = "Failed to load image!"
+            if let additionalMessage = additionalMessage {
+                text = " \(additionalMessage)"
+            }
+            
+            message = text
+            
         case .threadDeleted:
             iconName = "exclamationmark.circle"
             message = "This thread has been deleted."
@@ -41,6 +52,7 @@ struct ErrorView: View {
 
 extension ErrorView {
     enum ErrorType {
+        case imageLoadFailed
         case threadDeleted
     }
 }

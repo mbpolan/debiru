@@ -13,17 +13,20 @@ import SwiftUI
 struct WebImage: View {
     @StateObject private var viewModel: WebImageViewModel = WebImageViewModel()
     private let asset: Asset
+    private let variant: Asset.Variant
     private let dataProvider: DataProvider = FourChanDataProvider()
     private let saveLocation: URL
     private let bounds: CGSize?
-    private let onOpen: (_: Data?) -> Void
+    private let onOpen: (_: Asset) -> Void
     
     init(_ asset: Asset,
+         variant: Asset.Variant,
          saveLocation: URL,
          bounds: CGSize? = nil,
-         onOpen: @escaping(_: Data?) -> Void) {
+         onOpen: @escaping(_: Asset) -> Void) {
         
         self.asset = asset
+        self.variant = variant
         self.saveLocation = saveLocation
         self.bounds = bounds
         self.onOpen = onOpen
@@ -64,7 +67,7 @@ struct WebImage: View {
             handleSaveImage()
         }
         .onTapGesture(count: 1) {
-            onOpen(viewModel.imageData)
+            onOpen(self.asset)
         }
         .task(handleLoad)
         .onDisappear(perform: self.unload)
@@ -123,7 +126,7 @@ struct WebImage: View {
         self.viewModel.state = .loading
         
         do {
-            if let data = try await dataProvider.getImage(for: asset) {
+            if let data = try await dataProvider.getImage(for: asset, variant: variant) {
                 viewModel.imageData = data
                 self.viewModel.state = .done(data)
             } else {
@@ -213,6 +216,7 @@ struct WebImage_Previews: PreviewProvider {
             extension: ".png",
             fileType: .image,
             size: 64),
+                 variant: .original,
                  saveLocation: URL(fileURLWithPath: "/foo"),
                  bounds: CGSize(width: 128.0, height: 128.0),
                  onOpen: { _ in })

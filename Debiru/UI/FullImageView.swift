@@ -18,27 +18,49 @@ enum ImageScaleMode {
 struct FullImageView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject private var viewModel: FullImageViewModel = FullImageViewModel()
+    private let dataProvider: DataProvider
+    
+    init(_ dataProvider: DataProvider = FourChanDataProvider()) {
+        self.dataProvider = dataProvider
+    }
     
     var body: some View {
         VStack {
-            if let image = appState.openImageData {
-                if viewModel.scaleMode == .stretch {
-                    StretchedImageView(
-                        image: image,
-                        scale: viewModel.scale)
-                } else if viewModel.scaleMode == .aspectRatio {
-                    AspectRatioImageView(
-                        image: image,
-                        scale: viewModel.scale)
+            switch viewModel.state {
+            case .error(let error):
+                ErrorView(type: .imageLoadFailed, additionalMessage: error.localizedDescription)
+                    .centered(.both)
+            case .loading:
+                Text("Loading")
+                    .centered(.both)
+                    .foregroundColor(.secondary)
+            case .empty:
+                Text("Nothing to see here")
+                    .centered(.both)
+                    .foregroundColor(Color(NSColor.placeholderTextColor))
+            case .done(let data):
+                if let image = appState.openImageAsset {
+                    if viewModel.scaleMode == .stretch {
+                        StretchedImageView(
+                            image: image,
+                            data: data,
+                            scale: viewModel.scale)
+                    } else if viewModel.scaleMode == .aspectRatio {
+                        AspectRatioImageView(
+                            image: image,
+                            data: data,
+                            scale: viewModel.scale)
+                    } else {
+                        OriginalImageView(
+                            image: image,
+                            data: data,
+                            scale: viewModel.scale)
+                    }
                 } else {
-                    OriginalImageView(
-                        image: image,
-                        scale: viewModel.scale)
-                }
-            } else {
-                Image(nsImage: NSImage(
+                    Image(nsImage: NSImage(
                         systemSymbolName: "exclamationmark.circle",
                         accessibilityDescription: nil) ?? NSImage())
+                }
             }
         }
         .frame(minWidth: 100, minHeight: 100)
@@ -46,29 +68,49 @@ struct FullImageView: View {
         .toolbar {
             Button(action: handleOriginalMode) {
                 Image(systemName: viewModel.scaleMode == .original
-                        ? "photo.fill"
-                        : "photo")
+                      ? "photo.fill"
+                      : "photo")
             }
             .help("Show image in its original size")
             
             Button(action: handleAspectRatioMode) {
                 Image(systemName: viewModel.scaleMode == .aspectRatio
-                        ? "arrow.up.right.circle.fill"
-                        : "arrow.up.right.circle")
+                      ? "arrow.up.right.circle.fill"
+                      : "arrow.up.right.circle")
             }
             .help("Show image resized with respect to its aspect ratio")
             
             Button(action: handleStretchMode) {
                 Image(systemName: viewModel.scaleMode == .stretch
-                        ? "arrow.up.left.and.arrow.down.right.circle.fill"
-                        : "arrow.up.left.and.arrow.down.right.circle")
+                      ? "arrow.up.left.and.arrow.down.right.circle.fill"
+                      : "arrow.up.left.and.arrow.down.right.circle")
             }
             .help("Show image stretched to fit the window")
         }
         .onImageMode { viewModel.scaleMode = $0 }
         .onImageZoom { handleImageZoom($0) }
+        .task(handleLoadImage)
         .onDisappear {
-            appState.openImageData = nil
+            appState.openImageAsset = nil
+            viewModel.state = .empty
+        }
+    }
+    
+    @Sendable
+    private func handleLoadImage() async {
+        do {
+            if let asset = appState.openImageAsset {
+                viewModel.state = .loading
+                if let data = try await dataProvider.getImage(for: asset, variant: .original) {
+                    viewModel.state = .done(data)
+                } else {
+                    viewModel.state = .error(ImageError("Failed to load image"))
+                }
+            } else {
+                viewModel.state = .empty
+            }
+        } catch {
+            viewModel.state = .error(ImageError(error.localizedDescription))
         }
     }
     
@@ -99,13 +141,14 @@ struct FullImageView: View {
 // MARK: - Original Image View
 
 fileprivate struct OriginalImageView: View {
-    let image: DownloadedAsset
+    let image: Asset
+    let data: Data
     let scale: CGFloat
     
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
-            ImageContainerView(image: image, resizable: false)
-                .frame(width: CGFloat(image.asset.width), height: CGFloat(image.asset.height))
+            ImageContainerView(image: image, data: data, resizable: false)
+                .frame(width: CGFloat(image.width), height: CGFloat(image.height))
                 .scaleEffect(scale)
                 .centered(.both)
         }
@@ -115,12 +158,13 @@ fileprivate struct OriginalImageView: View {
 // MARK: - Stretched Image View
 
 fileprivate struct StretchedImageView: View {
-    let image: DownloadedAsset
+    let image: Asset
+    let data: Data
     let scale: CGFloat
     
     var body: some View {
         GeometryReader { geo in
-            ImageContainerView(image: image, resizable: true)
+            ImageContainerView(image: image, data: data, resizable: true)
                 .scaleEffect(scale)
                 .frame(
                     width: geo.size.width,
@@ -133,12 +177,13 @@ fileprivate struct StretchedImageView: View {
 // MARK: - Aspect Ratio Image View
 
 fileprivate struct AspectRatioImageView: View {
-    let image: DownloadedAsset
+    let image: Asset
+    let data: Data
     let scale: CGFloat
     
     var body: some View {
         GeometryReader { geo in
-            ImageContainerView(image: image, resizable: true)
+            ImageContainerView(image: image, data: data, resizable: true)
                 .aspectRatio(contentMode: .fit)
                 .scaleEffect(scale)
                 .frame(
@@ -150,14 +195,15 @@ fileprivate struct AspectRatioImageView: View {
 }
 
 fileprivate struct ImageContainerView: View {
-    let image: DownloadedAsset
+    let image: Asset
+    let data: Data
     let resizable: Bool
     
     var body: some View {
-        if image.asset.extension.hasSuffix(".gif") {
+        if image.extension.hasSuffix(".gif") {
             AnimatedImageView(
-                data: image.data,
-                frame: NSSize(width: image.asset.width, height: image.asset.height))
+                data: data,
+                frame: NSSize(width: image.width, height: image.height))
         } else {
             makeStaticImage()
         }
@@ -165,7 +211,7 @@ fileprivate struct ImageContainerView: View {
     
     private func makeStaticImage() -> Image {
         var nsImage: NSImage
-        if let img = NSImage(data: image.data) {
+        if let img = NSImage(data: data) {
             nsImage = img
         } else {
             nsImage = NSImage(
@@ -187,6 +233,26 @@ fileprivate struct ImageContainerView: View {
 class FullImageViewModel: ObservableObject {
     @Published var scaleMode: ImageScaleMode = .aspectRatio
     @Published var scale: CGFloat = 1.0
+    @Published var state: ImageState = .loading
+    
+    enum ImageState {
+        case empty
+        case loading
+        case done(Data)
+        case error(ImageError)
+    }
+}
+
+struct ImageError: Error {
+    let message: String
+    
+    init (_ message: String) {
+        self.message = message
+    }
+    
+    var localizedDescription: String {
+        message
+    }
 }
 
 // MARK: - Preview

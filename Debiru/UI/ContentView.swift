@@ -130,9 +130,9 @@ struct ContentView: View {
         }
     }
     
-    private func handleShowImage(_ data: DownloadedAsset) {
+    private func handleShowImage(_ asset: Asset) {
         if let url = URL(string: "debiru://image") {
-            appState.openImageData = data
+            appState.openImageAsset = asset
             openURL(url)
         }
     }
