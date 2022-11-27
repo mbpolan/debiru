@@ -17,6 +17,7 @@ struct AppCommands: Commands {
             Button("Go Back") {
                 NavigateNotification.back.notify()
             }
+            .keyboardShortcut("[", modifiers: .command)
             .keyboardShortcut(.leftArrow, modifiers: .command)
             
             Button("Go to Top") {
@@ -39,6 +40,7 @@ struct AppCommands: Commands {
             Button("Toggle Quick Search") {
                 onShowQuickSearch()
             }
+            .keyboardShortcut("o", modifiers: [.command, .shift])
             .keyboardShortcut(.space, modifiers: .option)
             
             Button("Refresh Current View") {

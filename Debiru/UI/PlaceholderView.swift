@@ -12,7 +12,7 @@ import SwiftUI
 struct PlaceholderView: View {
     var body: some View {
         VStack(alignment: .center) {
-            Text("Use Option + Space to bring up quick search")
+            Text("Use ⇧⌘O to bring up quick search")
                 .foregroundColor(Color(NSColor.placeholderTextColor))
         }
     }
