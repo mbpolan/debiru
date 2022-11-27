@@ -53,7 +53,7 @@ struct PostView<T>: View where T: View {
                 }
                 
                 Group {
-                    Text("#\(String(content.id)) ")
+                    Text(" #\(String(content.id)) ")
                         .bold()
                         .hoverEffect()
                         .onTapGesture(perform: onActivate)

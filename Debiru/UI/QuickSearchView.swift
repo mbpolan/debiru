@@ -1,5 +1,5 @@
 //
-//  FloatingPanel.swift
+//  QuickSearchView.swift
 //  Debiru
 //
 //  Created by Mike Polan on 4/1/21.
@@ -20,10 +20,10 @@ struct QuickSearchView: View {
     @Binding var shown: Bool
     
     var body: some View {
-        return VStack {
+        VStack {
             TextField("Search", text: $viewModel.text)
                 .textFieldStyle(PlainTextFieldStyle())
-                .font(.largeTitle)
+                .font(.title)
                 .padding(.top, 10)
                 .padding([.leading, .bottom, .trailing], 5)
                 .introspectTextField { (view: NSTextField) in
@@ -36,8 +36,10 @@ struct QuickSearchView: View {
             
             Divider()
             
+            // show a view for each matched item, with some padding added after the last result
             ForEach(0..<viewModel.matches.count, id: \.self) { i in
                 makeResultText(viewModel.matches[i], index: i)
+                    .padding(.bottom, i == viewModel.matches.count - 1 ? 5 : 0)
             }
             
             if !viewModel.text.isEmpty && viewModel.matches.isEmpty {
@@ -67,6 +69,7 @@ struct QuickSearchView: View {
                 : viewModel.selected
         }
         .frame(minWidth: 400)
+        .padding([.leading, .trailing], 5)
         .edgesIgnoringSafeArea(.top)
     }
     
@@ -79,15 +82,19 @@ struct QuickSearchView: View {
             text = Text("\(thread.id) - \(thread.subject ?? thread.content ?? "")")
         }
         
+        // build a view containing the matching result, and set a background color if this is
+        // the currently selected item in the list
         return HStack {
             Spacer()
-            text.font(.title)
+            text.font(.title2)
+                .padding([.top, .bottom], 1)
             Spacer()
             
         }
         .background(viewModel.selected == index
-                        ? Color(NSColor.selectedTextBackgroundColor)
+                        ? Color.accentColor
                         : Color.clear)
+        .clipShape(RoundedRectangle(cornerSize: CGSize(width: 5.0, height: 5.0)))
         .frame(maxWidth: .infinity)
     }
     

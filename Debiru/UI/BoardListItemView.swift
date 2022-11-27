@@ -19,10 +19,7 @@ struct BoardListItemView: View {
     var body: some View {
         HStack(alignment: .center) {
             Text("/\(board.id)/")
-                .font(.title)
-            
             Text(board.title)
-                .font(.headline)
         }
     }
 }

@@ -75,6 +75,7 @@ struct CatalogView: View {
                 
                 Divider()
                 
+                // footer
                 HStack(alignment: .firstTextBaseline) {
                     Spacer()
                     
