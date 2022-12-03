@@ -17,6 +17,7 @@ struct PostEditorView: View {
     let initialContent: String?
     let onDismiss: () -> Void
     let onComplete: () -> Void
+    var dataProvider: DataProvider = FourChanDataProvider()
     
     var body: some View {
         VStack {
@@ -50,8 +51,11 @@ struct PostEditorView: View {
             
             TextEditor(text: $viewModel.content)
             
-            CaptchaView(onCaptchaResponse: handleCaptchaResponse)
-                .frame(height: 100)
+            CaptchaV3View(challenge: $viewModel.captchaChallenge,
+                          solution: $viewModel.captchaSolution,
+                          boardId: board.id,
+                          threadId: replyTo ?? 0,
+                          dataProvider: dataProvider)
             
             if let error = viewModel.error {
                 Text(error)
@@ -76,7 +80,6 @@ struct PostEditorView: View {
     
     private var canPost: Bool {
         return viewModel.content.count > 0 &&
-            viewModel.captchaToken != nil &&
             viewModel.postButtonEnabled
     }
     
@@ -129,8 +132,7 @@ struct PostEditorView: View {
     }
     
     private func handlePost() {
-        guard let captchaToken = viewModel.captchaToken,
-              viewModel.content.count > 0 else { return }
+        guard viewModel.content.count > 0 else { return }
         
         viewModel.error = nil
         viewModel.postButtonEnabled = false
@@ -151,7 +153,8 @@ struct PostEditorView: View {
                                         asset: asset,
                                         bump: viewModel.bump,
                                         content: viewModel.content,
-                                        captchaToken: captchaToken),
+                                        captchaResponse: viewModel.captchaSolution,
+                                        captchaChallenge: viewModel.captchaChallenge),
                                     to: board) { result in
             
             DispatchQueue.main.async {
@@ -185,6 +188,8 @@ class PostEditorViewModel: ObservableObject {
     @Published var captchaToken: String?
     @Published var error: String?
     @Published var postButtonEnabled: Bool = true
+    @Published var captchaChallenge: String = ""
+    @Published var captchaSolution: String = ""
 }
 
 // MARK: - Preview

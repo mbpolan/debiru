@@ -11,6 +11,8 @@
 		272F03EE2664326E00D28E88 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03ED2664326E00D28E88 /* Settings.swift */; };
 		272F03F0266477B700D28E88 /* AlignedViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03EF266477B700D28E88 /* AlignedViewModifier.swift */; };
 		272F03F2266B013C00D28E88 /* NewPostCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03F1266B013C00D28E88 /* NewPostCountView.swift */; };
+		273CBF162933DA1C00D17677 /* CaptchaV3View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273CBF152933DA1C00D17677 /* CaptchaV3View.swift */; };
+		273CBF1A2933FA1500D17677 /* CaptchaV3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273CBF192933FA1500D17677 /* CaptchaV3.swift */; };
 		275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275F8F102641FC7300CB2D7B /* PlaceholderView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460C25FD9E5A001DCCE3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460B25FD9E5A001DCCE3 /* ContentView.swift */; };
@@ -86,6 +88,8 @@
 		272F03ED2664326E00D28E88 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		272F03EF266477B700D28E88 /* AlignedViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlignedViewModifier.swift; sourceTree = "<group>"; };
 		272F03F1266B013C00D28E88 /* NewPostCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostCountView.swift; sourceTree = "<group>"; };
+		273CBF152933DA1C00D17677 /* CaptchaV3View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaV3View.swift; sourceTree = "<group>"; };
+		273CBF192933FA1500D17677 /* CaptchaV3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaV3.swift; sourceTree = "<group>"; };
 		275F8F102641FC7300CB2D7B /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
@@ -254,6 +258,7 @@
 				279CFF7925FFDBB100884724 /* WatchedThreadsView.swift */,
 				27C568352602D83A00983ECD /* WebImage.swift */,
 				27B06E172644A7B800FCBC0B /* WebVideoView.swift */,
+				273CBF152933DA1C00D17677 /* CaptchaV3View.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -303,6 +308,7 @@
 				27C056082610F5130037A91B /* User.swift */,
 				27C056142612998D0037A91B /* Link.swift */,
 				27E4B805265C7F8F00E183CB /* Submission.swift */,
+				273CBF192933FA1500D17677 /* CaptchaV3.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -475,10 +481,12 @@
 				27BFE1D8263B82DA004E7E2F /* ReplyHStack.swift in Sources */,
 				27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */,
 				27BA39BD26347F4F00C9C519 /* CenteredViewModifier.swift in Sources */,
+				273CBF162933DA1C00D17677 /* CaptchaV3View.swift in Sources */,
 				27BFE1DD263CAE83004E7E2F /* DownloadedAsset.swift in Sources */,
 				27B06E1E26475F2300FCBC0B /* FilterSettingsView.swift in Sources */,
 				279CFF7D25FFE06400884724 /* BoardListView.swift in Sources */,
 				27BA39B8262D2A8100C9C519 /* CountryFlagImage.swift in Sources */,
+				273CBF1A2933FA1500D17677 /* CaptchaV3.swift in Sources */,
 				279CFF7A25FFDBB100884724 /* WatchedThreadsView.swift in Sources */,
 				27BBF1ED2604308700534CB7 /* RichTextView.swift in Sources */,
 				27E4B802265C708900E183CB /* CaptchaView.swift in Sources */,

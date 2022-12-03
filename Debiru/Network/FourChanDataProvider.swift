@@ -19,10 +19,12 @@ struct FourChanDataProvider: DataProvider {
     
     func post(_ submission: Submission, to board: Board, completion: @escaping(_: SubmissionResult) -> Void) {
         let body = MutableFormData()
+        body.addField("MAX_FILE_SIZE", value: "2097152")
         body.addField("resto", value: String(submission.replyTo ?? 0))
         body.addField("com", value: String(submission.content))
         body.addField("mode", value: "regist")
-        body.addField("g-recaptcha-response", value: submission.captchaToken)
+        body.addField("t-response", value: submission.captchaResponse)
+        body.addField("t-challenge", value: submission.captchaChallenge)
         
         if !submission.bump {
             body.addField("email", value: "sage")
@@ -231,6 +233,66 @@ struct FourChanDataProvider: DataProvider {
             }) ?? []
     }
     
+    func getCaptchaV3(from html: String) throws -> CaptchaV3Challenge {
+        // parse the response as html and find the script tag containing the captcha message
+        let root = try SwiftSoup.parse(html)
+        guard let script = try root.head()?.getElementsByTag("script").first() else {
+            throw NetworkError.captchaError("Failed to parse captcha response")
+        }
+        
+        let scriptData = script.data()
+        if scriptData.count == 0 {
+            throw NetworkError.captchaError("Failed to find captcha message")
+        }
+        
+        guard let start = scriptData.firstIndex(of: "{"),
+              let end = scriptData.lastIndex(of: "}") else {
+            throw NetworkError.captchaError("Failed to extract captcha message")
+        }
+        
+        let message = scriptData[start...end]
+        print(message)
+        
+        guard let jsonData = message.data(using: .utf8) else {
+            throw NetworkError.captchaError("Failed to read captcha message")
+        }
+        
+        let json = try JSONDecoder().decode(CaptchaV3MessageModel.self, from: jsonData)
+        
+        var twister: CaptchaV3Twister?
+        if let twstr = json.twister {
+            if let error = twstr.error {
+                throw NetworkError.captchaError(error)
+            }
+            
+            guard let image = twstr.image,
+                  let imageData = Data(base64Encoded: image) else {
+                throw NetworkError.captchaError("Invalid captcha image data")
+            }
+            
+            guard let background = twstr.background,
+                  let bgData = Data(base64Encoded: background) else {
+                throw NetworkError.captchaError("Invalid captcha background data")
+            }
+            
+            guard let challenge = twstr.challenge,
+                  let imageWidth = twstr.imageWidth,
+                  let imageHeight = twstr.imageHeight,
+                  let backgroundWidth = twstr.backgroundWidth else {
+                throw NetworkError.captchaError("Missing captcha challenge data")
+            }
+            
+            twister = CaptchaV3Twister(
+                challenge: challenge,
+                image: imageData,
+                background: bgData,
+                imageSize: CGSize(width: imageWidth, height: imageWidth),
+                backgroundSize: CGSize(width: backgroundWidth, height: imageHeight))
+        }
+        
+        return CaptchaV3Challenge(twister: twister)
+    }
+    
     func getImage(for asset: Asset, variant: Asset.Variant) async throws -> Data? {
         // for thumbnail images, append an "s" to the asset id. some assets only have thumbnail variants available,
         // in which case don't modify the id
@@ -238,7 +300,6 @@ struct FourChanDataProvider: DataProvider {
         let fileExtension = variant == .thumbnail ? ".jpg" : asset.extension
         
         let key = "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)"
-        print(key)
         return try await getImageData(key)
     }
     
@@ -257,6 +318,10 @@ struct FourChanDataProvider: DataProvider {
     
     func getURL(for asset: Asset) -> URL? {
         return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)")
+    }
+    
+    func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL? {
+        return URL(string: "https://sys.4chan.org/captcha?framed=1&board=\(captchaBoard.id)&thread_id=\(threadId)")
     }
     
     private func determineFileType(_ fileExtension: String) -> Asset.FileType {
@@ -551,5 +616,37 @@ fileprivate struct PostModel: Codable {
         case imageLimit
         case archived
         case archiveTime = "archived_on"
+    }
+}
+
+fileprivate struct CaptchaV3MessageModel: Codable {
+    let twister: CaptchaV3TwisterModel?
+    
+    private enum CodingKeys: String, CodingKey {
+        case twister = "twister"
+    }
+}
+
+fileprivate struct CaptchaV3TwisterModel: Codable {
+    let challenge: String?
+    let ttl: Int?
+    let cd: Int?
+    let image: String?
+    let imageWidth: Int?
+    let imageHeight: Int?
+    let background: String?
+    let backgroundWidth: Int?
+    let error: String?
+    
+    private enum CodingKeys: String, CodingKey {
+        case challenge
+        case ttl
+        case cd
+        case image = "img"
+        case imageWidth = "img_width"
+        case imageHeight = "img_height"
+        case background = "bg"
+        case backgroundWidth = "bg_width"
+        case error
     }
 }

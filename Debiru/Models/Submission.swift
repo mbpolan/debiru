@@ -13,7 +13,8 @@ struct Submission {
     let asset: AssetSubmission?
     let bump: Bool
     let content: String
-    let captchaToken: String
+    let captchaResponse: String
+    let captchaChallenge: String
 }
 
 struct AssetSubmission {
