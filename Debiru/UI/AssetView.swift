@@ -33,7 +33,7 @@ struct AssetView: View {
                          variant: .thumbnail,
                          saveLocation: saveLocation,
                          bounds: bounds,
-                         onOpen: onOpen)
+                         onOpen: handleOpen)
                     .blur(radius: viewModel.blur)
                 
                 // show a play icon indicator for videos
@@ -55,8 +55,12 @@ struct AssetView: View {
             Spacer()
         }
         .onHover { hovering in
+            if !spoilered {
+                return
+            }
+            
             withAnimation(.linear(duration: spoilerBlurDuration)) {
-                viewModel.blur = hovering ? .zero : spoilered ? spoilerBlur : .zero
+                viewModel.blur = hovering ? .zero : spoilerBlur
             }
         }
         .onAppear {
@@ -82,6 +86,12 @@ struct AssetView: View {
         }
         
         return asset
+    }
+    
+    private func handleOpen(_ _: Asset) {
+        // open the original asset, and not the one shown in the view which could potentially be
+        // a thumbnail/scaled down version of the original
+        onOpen(asset)
     }
 }
 

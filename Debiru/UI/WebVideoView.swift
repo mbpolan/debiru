@@ -14,8 +14,13 @@ struct WebVideoView: NSViewRepresentable {
     @EnvironmentObject private var appState: AppState
     var dataProvider: DataProvider = FourChanDataProvider()
     
+    func makeCoordinator() -> Coordinator {
+        return WebVideoView.Coordinator()
+    }
+    
     func makeNSView(context: Context) -> WKWebView {
         let view = WKWebView()
+        view.navigationDelegate = context.coordinator
         
         DispatchQueue.main.async {
             if let video = appState.openWebVideo,
@@ -28,6 +33,14 @@ struct WebVideoView: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: WKWebView, context: Context) {
+    }
+}
+
+extension WebVideoView {
+    class Coordinator: NSObject, WKNavigationDelegate {
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print(error)
+        }
     }
 }
 
