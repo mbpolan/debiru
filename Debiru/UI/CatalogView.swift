@@ -111,6 +111,7 @@ struct CatalogView: View {
                 Toggle(isOn: $viewModel.filtersEnabled) {
                     Image(systemName: "text.badge.xmark")
                 }
+                .help("Toggle word filters")
                 
                 Button(action: handleReloadFromState) {
                     Image(systemName: "arrow.clockwise")
