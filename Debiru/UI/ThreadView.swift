@@ -66,6 +66,11 @@ struct ThreadView: View {
                 }
                 .help("Watch this thread")
                 
+                Button(action: handleChangeOrder) {
+                    Image(systemName: viewModel.order.rawValue)
+                }
+                .help("Toggle post ordering")
+                
                 Button(action: handleReloadFromState) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -162,10 +167,12 @@ struct ThreadView: View {
     }
     
     private var posts: [Post] {
+        var posts = viewModel.posts
+        
         if viewModel.searchExpanded && !viewModel.search.isEmpty {
             let query = viewModel.search.trimmingCharacters(in: .whitespaces)
             
-            return viewModel.posts.filter { post in
+            posts = viewModel.posts.filter { post in
                 if let subject = post.subject,
                    subject.localizedCaseInsensitiveContains(query) {
                     return true
@@ -180,7 +187,14 @@ struct ThreadView: View {
             }
         }
         
-        return viewModel.posts
+        return posts.sorted { a, b in
+            switch viewModel.order {
+            case .descending:
+                return a.date < b.date
+            case .ascending:
+                return a.date > b.date
+            }
+        }
     }
     
     private func makeList(_ scroll: ScrollViewProxy) -> some View {
@@ -293,6 +307,17 @@ struct ThreadView: View {
             ShowImageNotification(asset: asset)
                 .notify()
         }
+    }
+    
+    private func handleChangeOrder() {
+        switch viewModel.order {
+        case .descending:
+            viewModel.order = .ascending
+        case .ascending:
+            viewModel.order = .descending
+        }
+        
+        
     }
     
     private func handleReloadFromState() {
@@ -534,6 +559,7 @@ class ThreadViewModel: ObservableObject {
     @Published var replyPopoverPostId: Int?
     @Published var replyPopoverType: ReplyPopoverType?
     @Published var deleted: Bool = false
+    @Published var order: ThreadOrder = .descending
     var cancellables: Set<AnyCancellable> = Set()
     
     enum ReplyPopoverType: Identifiable {
@@ -541,6 +567,11 @@ class ThreadViewModel: ObservableObject {
         
         case success
         case error
+    }
+    
+    enum ThreadOrder: String {
+        case ascending = "arrow.up"
+        case descending = "arrow.down"
     }
     
     struct Statistics {
