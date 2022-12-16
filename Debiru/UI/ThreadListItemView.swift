@@ -21,8 +21,6 @@ struct ThreadListItemView: View {
         
         HStack(alignment: .center) {
             Text("/\(thread.boardId)/")
-                .font(.title)
-            
             Text(content?.removeHTML().unescapeHTML() ?? "")
         }
     }
