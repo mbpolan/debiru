@@ -55,24 +55,54 @@ struct RichTextView: View {
 fileprivate struct TextStyles {
     private static let baseStyles = { () -> String in
         let font = NSFont.preferredFont(forTextStyle: .body)
+        let text = TextStyles.color(.textColor)
+        let blue = TextStyles.color(.systemBlue)
+        let yellow = TextStyles.color(.systemYellow)
+        let violet = TextStyles.color(.systemPurple)
+        let green = TextStyles.color(.systemGreen)
         
         return """
         <style>
         * {
-          color: white;
+          color: \(text);
           font-family: -apple-system;
           font-size: \(font.pointSize)px;
         }
+        
+        /* greentext and memes */
         .quote {
-          color: green;
+          color: \(green);
         }
+        
+        /* spoilers */
         s {
           color: black;
           background-color: black;
           text-decoration: none;
         }
-        code {
+        
+        /* code styles */
+        .prettyprint {
           font-family: monospace;
+        }
+        .pln {
+          font-family: monospace;
+        }
+        .kwd {
+          font-family: monospace;
+          color: \(blue);
+        }
+        .typ {
+          font-family: monospace;
+          color: \(violet);
+        }
+        .pun {
+          font-family: monospace;
+          color: \(yellow);
+        }
+        .str {
+          font-family: monospace;
+          color: \(green);
         }
         </style>
     """
@@ -233,7 +263,12 @@ This is not a spoiler. <s>But this is</s>. And not this.
 """
     
     private static let quotes = "<span class=\"quote\">&gt;218664916</span><br>That looks cool."
-    private static let code = "Leading text<br><code class=\"prettyprint\">def myfunc() {}</code>"
+    
+    private static let code = """
+Leading text<br>
+<pre class="prettyprint prettyprinted"><span class="pln">$var </span><span class="pun">=</span><span class="pln">&nbsp;</span><span class="kwd">GetStuff</span>
+</pre>
+"""
     private static let empty = ""
     private static let html = code
     
@@ -248,6 +283,6 @@ This is not a spoiler. <s>But this is</s>. And not this.
                 threadId: 123,
                 onLink: { _ in })
         }
-        .frame(width: 300, height: 100)
+        .frame(width: 500, height: 400)
     }
 }
