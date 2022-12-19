@@ -531,7 +531,15 @@ struct ThreadView: View {
         self.viewModel.pendingPosts = true
         
         do {
-            self.viewModel.posts = try await dataProvider.getPosts(for: thread)
+            let posts = try await dataProvider.getPosts(for: thread)
+            
+            // process post contents depending on what features the board supports
+            if let board = appState.boards.first(where: { $0.id == thread.boardId }) {
+                self.viewModel.posts = ContentProvider.instance.processPosts(posts, in: board)
+            } else {
+                self.viewModel.posts = posts
+            }
+            
             self.viewModel.lastUpdate = Date()
             
             // pop the targetted post id from the app state

@@ -200,7 +200,8 @@ struct PostEditorView_Preview: PreviewProvider {
             board: Board(
                 id: "f",
                 title: "foo",
-                description: "Foo bar"),
+                description: "Foo bar",
+                features: .init(supportsCode: false)),
             replyTo: nil,
             initialContent: nil,
             onDismiss: { },

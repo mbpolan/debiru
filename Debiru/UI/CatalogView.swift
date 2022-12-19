@@ -329,7 +329,8 @@ struct CatalogView_Previews: PreviewProvider {
     private static let board = Board(
         id: "f",
         title: "Foobar",
-        description: "whatever")
+        description: "whatever",
+        features: .init(supportsCode: false))
     
     static var previews: some View {
         CatalogView()

@@ -11,4 +11,13 @@ struct Board: Identifiable, Hashable, Codable {
     let id: String
     let title: String
     let description: String
+    let features: BoardFeatures
+    
+    var hasFeatures: Bool {
+        return features.supportsCode
+    }
+}
+
+struct BoardFeatures: Hashable, Codable {
+    let supportsCode: Bool
 }

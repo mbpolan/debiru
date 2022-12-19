@@ -33,7 +33,8 @@ struct BoardListView_Previews: PreviewProvider {
     private static let board = Board(
         id: "f",
         title: "Foobar",
-        description: "Foobar is an board on some imageboard for discussing imageboards")
+        description: "Foobar is an board on some imageboard for discussing imageboards",
+        features: .init(supportsCode: false))
     
     static var previews: some View {
         BoardListView()

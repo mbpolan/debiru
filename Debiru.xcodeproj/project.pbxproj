@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2718391A294E7F6C007C9A43 /* ContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27183919294E7F6C007C9A43 /* ContentProvider.swift */; };
 		272F03EC26642E0600D28E88 /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */; };
 		272F03EE2664326E00D28E88 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03ED2664326E00D28E88 /* Settings.swift */; };
 		272F03F0266477B700D28E88 /* AlignedViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F03EF266477B700D28E88 /* AlignedViewModifier.swift */; };
@@ -84,6 +85,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		27183919294E7F6C007C9A43 /* ContentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentProvider.swift; sourceTree = "<group>"; };
 		272F03EB26642E0600D28E88 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
 		272F03ED2664326E00D28E88 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		272F03EF266477B700D28E88 /* AlignedViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlignedViewModifier.swift; sourceTree = "<group>"; };
@@ -274,6 +276,7 @@
 				27B5E76E2621311000178F1B /* Persistance.swift */,
 				272F03ED2664326E00D28E88 /* Settings.swift */,
 				27BA39AE262B837300C9C519 /* ThreadWatcher.swift */,
+				27183919294E7F6C007C9A43 /* ContentProvider.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -471,6 +474,7 @@
 				272F03EE2664326E00D28E88 /* Settings.swift in Sources */,
 				272F03F0266477B700D28E88 /* AlignedViewModifier.swift in Sources */,
 				279FE9C82676933C00402E23 /* ErrorView.swift in Sources */,
+				2718391A294E7F6C007C9A43 /* ContentProvider.swift in Sources */,
 				27C0562D2618D49B0037A91B /* Commands.swift in Sources */,
 				27C05624261694130037A91B /* QuickSearchView.swift in Sources */,
 				275F8F112641FC7300CB2D7B /* PlaceholderView.swift in Sources */,

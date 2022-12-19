@@ -55,12 +55,16 @@ struct RichTextView: View {
 fileprivate struct TextStyles {
     private static let baseStyles = { () -> String in
         let font = NSFont.preferredFont(forTextStyle: .body)
+        let black = TextStyles.color(.black)
         let text = TextStyles.color(.textColor)
         let blue = TextStyles.color(.systemBlue)
         let yellow = TextStyles.color(.systemYellow)
         let violet = TextStyles.color(.systemPurple)
         let green = TextStyles.color(.systemGreen)
         
+        // define standard styles. many of these come directly from the data source, and others are
+        // ones that we inject ourselves via ContentProvider
+        // TODO: find a way to generalize this with what's produced by ContentProvider
         return """
         <style>
         * {
@@ -76,8 +80,8 @@ fileprivate struct TextStyles {
         
         /* spoilers */
         s {
-          color: black;
-          background-color: black;
+          color: \(black);
+          background-color: \(black);
           text-decoration: none;
         }
         
@@ -112,7 +116,6 @@ fileprivate struct TextStyles {
     
     init() {
         self.styles = TextStyles.baseStyles
-            .replacingOccurrences(of: "green", with: TextStyles.color(NSColor.systemGreen))
     }
     
     func applyTo(_ html: String) -> String {

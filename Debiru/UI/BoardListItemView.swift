@@ -31,6 +31,7 @@ struct BoardListItemView_Previews: PreviewProvider {
         BoardListItemView(Board(
                             id: "f",
                             title: "Foobar",
-                            description: "The board for all things foobar"))
+                            description: "The board for all things foobar",
+                            features: .init(supportsCode: false)))
     }
 }

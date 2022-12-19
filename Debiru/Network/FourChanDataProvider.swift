@@ -79,7 +79,8 @@ struct FourChanDataProvider: DataProvider {
                     Board(
                         id: model.id,
                         title: model.title,
-                        description: model.description)
+                        description: model.description,
+                        features: .init(supportsCode: model.codeTags == 1))
                 }
             }) ?? []
     }
@@ -480,11 +481,13 @@ fileprivate struct BoardModel: Codable, Hashable {
     let id: String
     let title: String
     let description: String
+    let codeTags: Int?
     
     private enum CodingKeys: String, CodingKey {
         case id = "board"
         case title
         case description = "meta_description"
+        case codeTags = "code_tags"
     }
 }
 
