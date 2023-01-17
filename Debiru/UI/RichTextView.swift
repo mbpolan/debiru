@@ -80,8 +80,7 @@ fileprivate struct TextStyles {
         
         /* spoilers */
         s {
-          color: \(black);
-          background-color: \(black);
+          background-color: \(text);
           text-decoration: none;
         }
         
