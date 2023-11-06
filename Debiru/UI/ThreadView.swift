@@ -243,20 +243,20 @@ struct ThreadView: View {
             VStack {
                 if let post = self.viewModel.posts[model.id] {
                     makePostRow(post, scroll: scroll)
+                    
+                    if shouldShowNewPostDividerAfter(model.id) {
+                        TextDivider("New Posts", color: .red)
+                            .onAppear {
+                                // schedule an update to reset the new post marker
+                                Timer.scheduledTimer(
+                                    withTimeInterval: TimeInterval(5),
+                                    repeats: false,
+                                    block: { _ in handleUpdateLastPost() })
+                            }
+                    }
                 }
             }
             .id(model.id)
-            
-            if shouldShowNewPostDividerAfter(model.id) {
-                TextDivider("New Posts", color: .red)
-                    .onAppear {
-                        // schedule an update to reset the new post marker
-                        Timer.scheduledTimer(
-                            withTimeInterval: TimeInterval(5),
-                            repeats: false,
-                            block: { _ in handleUpdateLastPost() })
-                    }
-            }
         }
     }
     
@@ -286,22 +286,23 @@ struct ThreadView: View {
 
             Spacer()
         }
-        .popover(isPresented: makeReplyPopoverPresented(post.id), arrowEdge: .leading) {
-            HStack {
-                if viewModel.replyPopoverType == .success {
-                    Image(systemName: "checkmark")
-                        .foregroundColor(.green)
-
-                    Text("Post successful!")
-                } else {
-                    Image(systemName: "exclamationmark.circle")
-                        .foregroundColor(.red)
-
-                    Text("Failed to submit post.")
-                }
-            }
-            .padding()
-        }
+        // TODO: this is now broken with the new captcha system :(
+//        .popover(isPresented: makeReplyPopoverPresented(post.id), arrowEdge: .leading) {
+//            HStack {
+//                if viewModel.replyPopoverType == .success {
+//                    Image(systemName: "checkmark")
+//                        .foregroundColor(.green)
+//
+//                    Text("Post successful!")
+//                } else {
+//                    Image(systemName: "exclamationmark.circle")
+//                        .foregroundColor(.red)
+//
+//                    Text("Failed to submit post.")
+//                }
+//            }
+//            .padding()
+//        }
     }
     
     private func makeHeader() -> some View {
@@ -596,10 +597,10 @@ struct ThreadView: View {
                 memo[cur.id] = cur
             }
             
-            //
+            // build a hierarchy of posts, starting from the top-level posts
             self.viewModel.data = posts
-                .filter { $0.isRoot }
-                .map { buildPostHierarchy(PostModel(post: $0), posts: self.viewModel.posts)}
+                .filter { $0.isRoot || $0.id == thread.id }
+                .map { buildPostHierarchy(PostModel(post: $0), threadId: thread.id, posts: self.viewModel.posts)}
             
             self.viewModel.lastUpdate = Date()
             
@@ -612,13 +613,14 @@ struct ThreadView: View {
         }
     }
     
-    private func buildPostHierarchy(_ model: PostModel, posts: [Int: Post]) -> PostModel {
-        guard let post = posts[model.id], post.replies.count > 0 else { return model }
+    private func buildPostHierarchy(_ model: PostModel, threadId: Int, posts: [Int: Post]) -> PostModel {
+        // skip posts without children and the thread starter post itself
+        guard let post = posts[model.id], model.id != threadId && post.replies.count > 0 else { return model }
         
         var children: [PostModel] = []
         for replyId in post.replies {
             if let reply = posts[replyId] {
-                children.append(buildPostHierarchy(PostModel(post: reply), posts: posts))
+                children.append(buildPostHierarchy(PostModel(post: reply), threadId: threadId, posts: posts))
             }
         }
         
