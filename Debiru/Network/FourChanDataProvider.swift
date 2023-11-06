@@ -154,15 +154,18 @@ struct FourChanDataProvider: DataProvider {
                 var postsToReplies: [Int: [Int]] = [:]
                 var rootPosts: [Int: Bool] = [:]
                 
-                // find all posts that this post references in its thread
+                // parse the conversations in this thread
+                // (a) build a map of post ids and the ids of posts that they are replying to
+                // (b) build a map of post ids to flags indicating the post is a top-level post
                 value.posts.forEach { post in
                     let replies = parseRepliesTo(post.content ?? "")
-                        
+                    
                     replies.forEach { reply in
                         postsToReplies[reply, default: [Int]()].append(post.id)
                     }
                     
-                    rootPosts[post.id] = replies.count == 0
+                    // this post if considered a root if it does not reply to other posts or if one of its replies is to the thread starter
+                    rootPosts[post.id] = replies.count == 0 || replies.contains { $0 == thread.id }
                 }
                 
                 return value.posts.map { post in
