@@ -125,13 +125,10 @@ extension AnimatedImageView {
 struct AnimatedImageView_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
-            if let data = try! Data(contentsOf: URL(string: "file:///Users/mike/test.gif")!) {
-                AnimatedImageView(data: data,
-                                  frame: NSSize(width: 128, height: 128))
-                    .frame(width: 128, height: 128)
-            } else {
-                Text("Cannot load data")
-            }
+            let data = try! Data(contentsOf: URL(string: "file:///Users/mike/test.gif")!)
+            AnimatedImageView(data: data,
+                              frame: NSSize(width: 128, height: 128))
+                .frame(width: 128, height: 128)
             
             Text("Content")
         }

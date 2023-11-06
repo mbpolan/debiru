@@ -55,7 +55,7 @@ struct PostView<T>: View where T: View {
                 Group {
                     Text(" #\(String(content.id)) ")
                         .bold()
-                        .hoverEffect()
+                        .hoverEffect(backgroundColor: .blue, foregroundColor: .white)
                         .onTapGesture(perform: onActivate)
                     
                     makeAuthorText(content.author)
