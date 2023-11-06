@@ -37,7 +37,7 @@ struct FullImageView: View {
             case .empty:
                 Text("Nothing to see here")
                     .centered(.both)
-                    .foregroundColor(Color(NSColor.placeholderTextColor))
+                    .foregroundColor(Color(PFPlaceholderTextColor))
             case .done(let data):
                 if let image = appState.openImageAsset {
                     if viewModel.scaleMode == .stretch {
@@ -57,9 +57,7 @@ struct FullImageView: View {
                             scale: viewModel.scale)
                     }
                 } else {
-                    Image(nsImage: NSImage(
-                        systemSymbolName: "exclamationmark.circle",
-                        accessibilityDescription: nil) ?? NSImage())
+                    PFMakeImage(systemName: "exclamationmark.circle")
                 }
             }
         }
@@ -203,23 +201,20 @@ fileprivate struct ImageContainerView: View {
         if image.extension.hasSuffix(".gif") {
             AnimatedImageView(
                 data: data,
-                frame: NSSize(width: image.width, height: image.height))
+                frame: PFSize(width: image.width, height: image.height))
         } else {
             makeStaticImage()
         }
     }
     
     private func makeStaticImage() -> Image {
-        var nsImage: NSImage
-        if let img = NSImage(data: data) {
-            nsImage = img
+        var image: Image
+        if let img = PFMakeImage(data: data) {
+            image = img
         } else {
-            nsImage = NSImage(
-                systemSymbolName: "exclamationmark.circle",
-                accessibilityDescription: nil) ?? NSImage()
+            image = PFMakeImage(systemName: "exclamationmark.circle")
         }
         
-        var image = Image(nsImage: nsImage)
         if resizable {
             image = image.resizable()
         }

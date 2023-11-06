@@ -37,7 +37,7 @@ struct CountryFlagImage: View {
             
         case .success:
             if let image = viewModel.image {
-                view = Image(nsImage: image)
+                view = PFMakeImage(image)
                     .toErasedView()
             } else {
                 view = Image(systemName: "exclamationmark.circle")
@@ -54,7 +54,7 @@ struct CountryFlagImage: View {
         do {
             let data = try await dataProvider.getCountryFlagImage(for: code)
             if let data = data,
-               let image = NSImage(data: data) {
+               let image = PFImage(data: data) {
                 viewModel.state = .success
                 viewModel.image = image
             } else {
@@ -69,7 +69,7 @@ struct CountryFlagImage: View {
 // MARK: - View Model
 
 class CountryFlagImageViewModel: ObservableObject {
-    @Published var image: NSImage?
+    @Published var image: PFImage?
     @Published var state: ImageState = .loading
     @Published var pendingImage: AnyCancellable?
     

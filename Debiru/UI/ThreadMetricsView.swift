@@ -39,11 +39,11 @@ struct ThreadMetricsView: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             makeMetricView(.replies, icon: "message.fill", value: replies)
-                .foregroundColor(Color(bumpLimit ? NSColor.systemRed : NSColor.textColor))
+                .foregroundColor(Color(bumpLimit ? PFColor.systemRed : PFTextColor))
                 .help("Number of replies to original post")
             
             makeMetricView(.images, icon: "photo.fill", value: images)
-                .foregroundColor(Color(imageLimit ? NSColor.systemRed : NSColor.textColor))
+                .foregroundColor(Color(imageLimit ? PFColor.systemRed : PFTextColor))
                 .help("Number of replies containing images")
             
             makeMetricView(.uniquePosters, icon: "person.2.fill", value: uniquePosters)

@@ -9,6 +9,8 @@ import SwiftUI
 
 // MARK: - View
 
+#if os(macOS)
+
 struct FilterSettingsView: View {
     @EnvironmentObject private var appState: AppState
     @AppStorage(StorageKeys.boardWordFilters) private var boardWordFilters: Data = Data()
@@ -25,7 +27,7 @@ struct FilterSettingsView: View {
                     Text("/\(item)/")
                 }
             }
-            .border(Color(NSColor.darkGray), width: 1)
+            .border(Color(PFColor.darkGray), width: 1)
             .layoutPriority(1)
             
             Spacer()
@@ -64,7 +66,7 @@ struct FilterSettingsView: View {
                         .centered(.both)
                 }
             }
-            .border(Color(NSColor.darkGray), width: 1)
+            .border(Color(PFColor.darkGray), width: 1)
             .layoutPriority(3)
         }
         .onChange(of: appState.boardFilters) { _ in
@@ -191,7 +193,7 @@ fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: Vi
                     onAdd()
                 }, label: {
                     Image(systemName: "plus")
-                        .foregroundColor(Color(NSColor.systemGray))
+                        .foregroundColor(Color(PFColor.systemGray))
                 })
                 .buttonStyle(PlainButtonStyle())
                 .contentShape(Rectangle())
@@ -202,7 +204,7 @@ fileprivate struct EditableList<T, Content>: View where T: Hashable, Content: Vi
                     }
                 }, label: {
                     Image(systemName: "minus")
-                        .foregroundColor(Color(NSColor.systemGray))
+                        .foregroundColor(Color(PFColor.systemGray))
                 })
                 .buttonStyle(PlainButtonStyle())
                 .contentShape(Rectangle())
@@ -225,3 +227,5 @@ struct FilterSettingsView_Preview: PreviewProvider {
             .environmentObject(appState)
     }
 }
+
+#endif

@@ -29,17 +29,19 @@ struct ReplyHStack: View {
         return ZStack(alignment: .topLeading) {
             ForEach(postIds, id: \.self) { postId in
                 Text(">>\(String(postId))")
-                    .foregroundColor(Color(NSColor.linkColor))
+                    .foregroundColor(Color(PFLinkColor))
                     .fixedSize()
                     .lineLimit(nil)
                     .padding(.trailing, 5)
                     .onTapGesture { onTap(postId) }
                     .onHover { hover in
+                        #if os(macOS)
                         if hover {
                             NSCursor.pointingHand.push()
                         } else {
                             NSCursor.pop()
                         }
+                        #endif
                     }
                     .alignmentGuide(.leading) { area in
                         if abs(area.width - origin.x) > geo.size.width {

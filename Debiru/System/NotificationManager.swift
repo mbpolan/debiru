@@ -43,7 +43,9 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             return memo + watchedThread.totalNewPosts
         }
         
+#if os(macOS)
         NSApplication.shared.dockTile.badgeLabel = countNewPosts > 0 ? "\(countNewPosts)" : nil
+#endif
     }
     
     func pushNewPostNotification() {

@@ -50,9 +50,11 @@ struct SidebarView: View {
     }
     
     private func handleToggleSidebar() {
+#if os(macOS)
         NSApp.keyWindow?.firstResponder?.tryToPerform(
             #selector(NSSplitViewController.toggleSidebar(_:)),
             with: nil)
+#endif
     }
     
     private func handleShowAllBoards() {

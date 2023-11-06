@@ -13,7 +13,7 @@ struct PlaceholderView: View {
     var body: some View {
         VStack(alignment: .center) {
             Text("Use ⇧⌘O to bring up quick search")
-                .foregroundColor(Color(NSColor.placeholderTextColor))
+                .foregroundColor(Color(PFPlaceholderTextColor))
         }
     }
 }

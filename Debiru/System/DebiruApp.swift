@@ -60,10 +60,11 @@ struct DebiruApp: App {
         .commands {
             AppCommands(onShowQuickSearch: handleShowQuickSearch)
         }
+#if os(macOS)
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
-        
+#endif
+      
         // image viewer window
-
         WindowGroup {
             FullImageView()
                 .environmentObject(appState)
@@ -73,8 +74,10 @@ struct DebiruApp: App {
         .commands {
             FullImageViewCommands()
         }
-        .windowStyle(HiddenTitleBarWindowStyle())
         .handlesExternalEvents(matching: Set(arrayLiteral: "image"))
+#if os(macOS)
+        .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
+#endif
         
         // web video window
 
@@ -84,14 +87,18 @@ struct DebiruApp: App {
                 .preferredColorScheme(colorScheme.identifier)
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "webVideo"), allowing: Set(arrayLiteral: "webVideo"))
         }
-        .windowStyle(HiddenTitleBarWindowStyle())
-        .handlesExternalEvents(matching: Set(arrayLiteral: "webVideo"))
-        
+        .handlesExternalEvents(matching: Set(arrayLiteral: "webVideo"))  
+#if os(macOS)
+        .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
+#endif
+
+#if os(macOS)
         Settings {
             SettingsView()
                 .environmentObject(appState)
                 .preferredColorScheme(colorScheme.identifier)
         }
+#endif
     }
     
     private func handleShowQuickSearch() {

@@ -39,6 +39,7 @@ struct DataManager {
     }
     
     func checkSaveDirectory() -> Result<Void, Error> {
+#if os(macOS)
         guard let bookmark = UserDefaults.standard.data(forKey: StorageKeys.bookmarkSaveDirectory) else {
             return .failure(DataError.noSaveDirectoryDefined)
         }
@@ -58,9 +59,12 @@ struct DataManager {
         } catch (let error) {
             return .failure(error)
         }
+#endif
+        return .success(())
     }
     
     func bookmarkSaveDirectory(_ url: URL) -> Result<Void, Error> {
+#if os(macOS)
         do {
             let data = try url.bookmarkData(
                 options: .withSecurityScope,
@@ -73,6 +77,8 @@ struct DataManager {
         } catch (let error) {
             return .failure(error)
         }
+#endif
+        return .success(())
     }
 }
 

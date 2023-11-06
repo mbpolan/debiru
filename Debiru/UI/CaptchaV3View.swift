@@ -68,6 +68,7 @@ fileprivate class CaptchaV3ViewModel: ObservableObject {
     }
 }
 
+#if os(macOS)
 fileprivate struct CaptchaV3LoaderView: NSViewRepresentable {
     let boardId: String
     let threadId: Int
@@ -92,6 +93,34 @@ fileprivate struct CaptchaV3LoaderView: NSViewRepresentable {
     func updateNSView(_ nsView: WKWebView, context: Context) {
     }
 }
+
+#elseif os(iOS)
+fileprivate struct CaptchaV3LoaderView: UIViewRepresentable {
+    let boardId: String
+    let threadId: Int
+    let onReady: (_ captcha: CaptchaV3Challenge) -> Void
+    var dataProvider: DataProvider = FourChanDataProvider()
+    
+    func makeCoordinator() -> Coordinator {
+        CaptchaV3LoaderView.Coordinator(self)
+    }
+    
+    func makeUIView(context: Context) -> WKWebView {
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 200, height: 75))
+        view.setValue(false, forKey: "drawsBackground")
+        view.navigationDelegate = context.coordinator
+        
+        // FIXME: this shouldn't be in the view
+        view.load(URLRequest(url: URL(string: "https://sys.4chan.org/captcha?framed=1&board=\(boardId)&thread_id=\(threadId)")!))
+        
+        return view
+    }
+    
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+    }
+}
+
+#endif
 
 extension CaptchaV3LoaderView {
     fileprivate class Coordinator: NSObject, WKNavigationDelegate {
@@ -143,29 +172,29 @@ fileprivate struct CaptchaV3TwisterView: View {
     
     var body: some View {
         ScrollView(.horizontal) {
-            Image(nsImage: image)
+            image
                 .frame(width: fgSize.width * 2, height: fgSize.height)
         }
         .background {
-            Image(nsImage: background)
+            background
         }
         .frame(width: bgSize.width, height: bgSize.height)
     }
     
-    private var image: NSImage {
-        if let img = NSImage(data: fgImage) {
+    private var image: Image {
+        if let img = PFMakeImage(data: fgImage) {
             return img
         }
         
-        return NSImage()
+        return PFMakeImage(PFImage())
     }
     
-    private var background: NSImage {
-        if let img = NSImage(data: bgImage) {
+    private var background: Image {
+        if let img = PFMakeImage(data: bgImage) {
             return img
         }
         
-        return NSImage()
+        return PFMakeImage(PFImage())
     }
 }
 

@@ -14,7 +14,6 @@ struct ContentView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ContentViewModel = ContentViewModel()
-    
     private let dataProvider: DataProvider
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
@@ -144,6 +143,8 @@ struct ContentView: View {
         }
     }
 }
+
+
 
 // MARK: - View Model
 

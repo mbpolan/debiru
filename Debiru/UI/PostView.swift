@@ -45,13 +45,13 @@ struct PostView<T>: View where T: View {
             HStack(alignment: .firstTextBaseline, spacing: 3.0) {
                 if content.sticky {
                     Image(systemName: "pin.fill")
-                        .foregroundColor(Color(NSColor.systemGreen))
+                        .foregroundColor(Color(PFColor.systemGreen))
                         .help("This thread is stickied")
                 }
                 
                 if content.closed {
                     Image(systemName: "lock.fill")
-                        .foregroundColor(Color(NSColor.systemRed))
+                        .foregroundColor(Color(PFColor.systemRed))
                         .help("This thread is locked")
                 }
                 
@@ -108,22 +108,22 @@ struct PostView<T>: View where T: View {
         
         switch user.tag {
         case .administrator:
-            color = Color(NSColor.systemRed)
+            color = Color(PFColor.systemRed)
             help = "Administrator"
         case .developer:
-            color = Color(NSColor.systemOrange)
+            color = Color(PFColor.systemOrange)
             help = "Developer"
         case .founder:
-            color = Color(NSColor.systemPink)
+            color = Color(PFColor.systemPink)
             help = "Founder"
         case .manager:
-            color = Color(NSColor.systemBlue)
+            color = Color(PFColor.systemBlue)
             help = "Manager"
         case .moderator:
-            color = Color(NSColor.systemPurple)
+            color = Color(PFColor.systemPurple)
             help = "Moderator"
         case .verified:
-            color = Color(NSColor.systemTeal)
+            color = Color(PFColor.systemTeal)
             help = "Verified user"
         default:
             break
@@ -132,7 +132,7 @@ struct PostView<T>: View where T: View {
         return HStack {
             Text(username)
                 .bold()
-                .foregroundColor(color ?? Color(NSColor.textColor))
+                .foregroundColor(color ?? Color(PFTextColor))
                 .help(help ?? username)
             
             if let country = user.country {
@@ -145,10 +145,17 @@ struct PostView<T>: View where T: View {
         switch country {
         case .code(let code, let name):
             if let image = Flag(countryCode: code)?.originalImage {
+#if os(macOS)
                 return Image(nsImage: image)
                     .help(name)
                     .clipShape(Circle())
                     .toErasedView()
+#elseif os(iOS)
+                return Image(uiImage: image)
+                    .help(name)
+                    .clipShape(Circle())
+                    .toErasedView()
+#endif
             } else {
                 return Image(systemName: "flag")
                     .help(name)

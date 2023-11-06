@@ -83,12 +83,11 @@ struct WebImage: View {
         let view: AnyView
         if asset.extension.caseInsensitiveCompare(".gif") == .orderedSame {
             view = AnimatedImageView(data: data,
-                                     frame: NSSize(width: bounds.width, height: bounds.height))
-                .aspectRatio(contentMode: .fit)
+                                     frame: PFSize(width: bounds.width, height: bounds.height))
                 .frame(width: bounds.width, height: bounds.height)
                 .toErasedView()
-        } else if let nsImage = NSImage(data: data) {
-            view = Image(nsImage: nsImage)
+        } else if let nsImage = PFImage(data: data) {
+            view = PFMakeImage(nsImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: bounds.width, height: bounds.height)

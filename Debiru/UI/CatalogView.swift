@@ -5,9 +5,14 @@
 //  Created by Mike Polan on 3/15/21.
 //
 
-import AppKit
 import Combine
 import SwiftUI
+
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
+import UIKit
+#endif
 
 // MARK: - View
 
@@ -129,8 +134,12 @@ struct CatalogView: View {
         .onOpenInBrowser {
             guard let board = getBoard(appState.currentItem),
                   let url = dataProvider.getURL(for: board) else { return }
-            
+#if os(macOS)
             NSWorkspace.shared.open(url)
+#elseif os(iOS)
+            PFApplication.shared.open(url)
+#endif
+
         }
         .onChange(of: appState.currentItem) { item in
             Task {
@@ -244,7 +253,11 @@ struct CatalogView: View {
     
     private func handleLink(_ link: Link) {
         if let webLink = link as? WebLink {
+#if os(macOS)
             NSWorkspace.shared.open(webLink.url)
+#elseif os(iOS)
+            PFApplication.shared.open(webLink.url)
+#endif
         }
     }
     

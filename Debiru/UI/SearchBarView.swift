@@ -18,7 +18,7 @@ struct SearchBarView: View {
         HStack {
             if expanded {
                 TextField("Search...", text: $search)
-                    .introspectTextField { (textField: NSTextField) in
+                    .introspectTextField { (textField: PFTextField) in
                         textField.becomeFirstResponder()
                     }
                     .textFieldStyle(RoundedBorderTextFieldStyle())

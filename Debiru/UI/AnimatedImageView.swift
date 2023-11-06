@@ -10,9 +10,11 @@ import SwiftUI
 
 // MARK: - View
 
+#if os(macOS)
+
 struct AnimatedImageView: NSViewRepresentable {
     let data: Data
-    let frame: NSSize
+    let frame: PFSize
     
     func makeNSView(context: Context) -> NSImageView {
         let view = NSImageView()
@@ -134,3 +136,19 @@ struct AnimatedImageView_Previews: PreviewProvider {
         }
     }
 }
+
+#elseif os(iOS)
+
+// TODO
+struct AnimatedImageView: View {
+    let data: Data
+    let frame: PFSize
+    
+    var body: some View {
+        VStack {
+            
+        }
+    }
+}
+
+#endif

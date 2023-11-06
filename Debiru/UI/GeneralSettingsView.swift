@@ -70,6 +70,7 @@ struct GeneralSettingsView: View {
     }
     
     private func handleChooseSaveLocation() {
+#if os(macOS)
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
         panel.canChooseFiles = false
@@ -84,6 +85,7 @@ struct GeneralSettingsView: View {
                 print("Could not store save directory: \(error.localizedDescription)")
             }
         }
+#endif
     }
 }
 

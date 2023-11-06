@@ -54,9 +54,9 @@ struct RichTextView: View {
 
 fileprivate struct TextStyles {
     private static let baseStyles = { () -> String in
-        let font = NSFont.preferredFont(forTextStyle: .body)
+        let font = PFFont.preferredFont(forTextStyle: .body)
         let black = TextStyles.color(.black)
-        let text = TextStyles.color(.textColor)
+        let text = TextStyles.color(PFTextColor)
         let blue = TextStyles.color(.systemBlue)
         let yellow = TextStyles.color(.systemYellow)
         let violet = TextStyles.color(.systemPurple)
@@ -121,22 +121,22 @@ fileprivate struct TextStyles {
         return "\(styles)\(html)"
     }
     
-    private static func color(_ nsColor: NSColor) -> String {
+    private static func color(_ nsColor: PFColor) -> String {
         // convert an NSColor into a css hex string in the rgb colorspace
-        if let color = CIColor(color: nsColor) {
-            let r = Int(round(color.red * 0xFF))
-            let g = Int(round(color.green * 0xFF))
-            let b = Int(round(color.blue * 0xFF))
-            
-            return NSString(format: "#%02X%02X%02X", r, g, b) as String
-        }
+        let color = CIColor(color: nsColor)
+#if os(macOS)
+        guard let color = color else { return "inherit" }
+#endif
         
-        // default to inheritied color
-        return "inherit"
+        let r = Int(round(color.red * 0xFF))
+        let g = Int(round(color.green * 0xFF))
+        let b = Int(round(color.blue * 0xFF))
+        
+        return NSString(format: "#%02X%02X%02X", r, g, b) as String
     }
 }
 
-fileprivate struct TextViewWrapper: NSViewRepresentable {
+fileprivate struct TextViewWrapper: PFViewRepresentable {
     private static let styles: TextStyles = TextStyles()
     private let onLink: (_: URL) -> Void
     private let onUpdate: (_: CGFloat) -> Void
@@ -159,14 +159,34 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         Coordinator(onLink: onLink)
     }
     
-    func makeNSView(context: Context) -> NSTextView {
-        let view = NSTextView()
-        view.drawsBackground = false
+    func makeUIView(context: Context) -> PFTextView {
+        return makeView(context)
+    }
+    
+    func makeNSView(context: Context) -> PFTextView {
+        return makeView(context)
+    }
+    
+    func updateUIView(_ uiView: PFTextView, context: Context) {
+        updateView(uiView, context: context)
+    }
+    
+    func updateNSView(_ nsView: PFTextView, context: Context) {
+        if let string = context.coordinator.string {
+            recalculateHeight(string)
+        }
+    }
+    
+    private func makeView(_ context: Context) -> PFTextView {
+        let view = PFTextView()
         view.isEditable = false
-        view.enabledTextCheckingTypes = NSTextCheckingResult.CheckingType.link.rawValue
         view.autoresizesSubviews = true
-        view.autoresizingMask = .init([.width, .height])
         view.delegate = context.coordinator
+#if os(macOS)
+        view.drawsBackground = false
+        view.enabledTextCheckingTypes = NSTextCheckingResult.CheckingType.link.rawValue
+        view.autoresizingMask = .init([.width, .height])
+#endif
         
         guard let string = makeString() else {
             print("Cannot render content")
@@ -174,13 +194,19 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         }
         
         context.coordinator.string = string
+#if os(macOS)
         view.textStorage?.setAttributedString(string)
+#elseif os(iOS)
+        view.textStorage.setAttributedString(string)
+#endif
         
         // apply additional constructs to the text (links, etc.) at this point.
         // we need to make the view editable *before* calling checkTextInDocument,
         // otherwise it will have no effect.
         view.isEditable = true
+#if os(macOS)
         view.checkTextInDocument(nil)
+#endif
         view.isEditable = false
         
         recalculateHeight(string)
@@ -188,31 +214,44 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
         return view
     }
     
-    func updateNSView(_ nsView: NSTextView, context: Context) {
+    private func updateView(_ view: PFTextView, context: Context) {
         if let string = context.coordinator.string {
             recalculateHeight(string)
         }
     }
     
     private func recalculateHeight(_ string: NSMutableAttributedString) {
+#if os(macOS)
         let rect = string.boundingRect(
             with: NSMakeSize(width, .infinity),
             options: [.usesLineFragmentOrigin, .usesFontLeading])
+#elseif os(iOS)
+        let rect = string.boundingRect(with: CGSize(width: width, height: .infinity),
+                                       options: [.usesLineFragmentOrigin, .usesFontLeading],
+                                       context: nil)
+#endif
         
         onUpdate(ceil(rect.height))
     }
     
     private func makeString() -> NSMutableAttributedString? {
-        guard let string = NSMutableAttributedString(
+#if os(macOS)
+        let string = NSMutableAttributedString(
             html: Data(html.utf8),
             options: [
                 .documentType: NSAttributedString.DocumentType.html,
                 .characterEncoding: String.Encoding.utf8.rawValue
             ],
-            documentAttributes: nil) else {
-            
-            return nil
-        }
+            documentAttributes: nil)
+#elseif os(iOS)
+        let string = try? NSMutableAttributedString(
+            data: Data(html.utf8),
+            options: [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ],
+            documentAttributes: nil)
+#endif
         
         return string
     }
@@ -221,7 +260,7 @@ fileprivate struct TextViewWrapper: NSViewRepresentable {
 // MARK: - Coordinator
 
 extension TextViewWrapper {
-    final class Coordinator: NSObject, NSTextViewDelegate {
+    final class Coordinator: NSObject, PFTextViewDelegate {
         var string: NSMutableAttributedString?
         let onLink: (_: URL) -> Void
         
@@ -229,7 +268,7 @@ extension TextViewWrapper {
             self.onLink = onLink
         }
         
-        func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+        func textView(_ textView: PFTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
             if let nsURL = link as? NSURL,
                let url = nsURL.absoluteURL {
                 onLink(url)

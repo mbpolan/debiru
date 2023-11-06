@@ -82,6 +82,7 @@
 		27E4B808265C892400E183CB /* MutableFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B807265C892400E183CB /* MutableFormData.swift */; };
 		27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B80B265C9B1600E183CB /* Parameters.stencil */; };
 		27E4B80F265C9DA200E183CB /* Parameters.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B80E265C9DA200E183CB /* Parameters.generated.swift */; };
+		27EB5FF12AF8A00800A88BEA /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EB5FF02AF8A00800A88BEA /* Platform.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -160,6 +161,7 @@
 		27E4B807265C892400E183CB /* MutableFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableFormData.swift; sourceTree = "<group>"; };
 		27E4B80B265C9B1600E183CB /* Parameters.stencil */ = {isa = PBXFileReference; lastKnownFileType = text; path = Parameters.stencil; sourceTree = "<group>"; };
 		27E4B80E265C9DA200E183CB /* Parameters.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parameters.generated.swift; sourceTree = "<group>"; };
+		27EB5FF02AF8A00800A88BEA /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -261,6 +263,7 @@
 				27C568352602D83A00983ECD /* WebImage.swift */,
 				27B06E172644A7B800FCBC0B /* WebVideoView.swift */,
 				273CBF152933DA1C00D17677 /* CaptchaV3View.swift */,
+				27EB5FF02AF8A00800A88BEA /* Platform.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -512,6 +515,7 @@
 				27B06E162643762700FCBC0B /* AssetView.swift in Sources */,
 				279CFF8025FFEA6900884724 /* CatalogView.swift in Sources */,
 				27BA39B2262BA17100C9C519 /* String.swift in Sources */,
+				27EB5FF12AF8A00800A88BEA /* Platform.swift in Sources */,
 				27BA39AF262B837300C9C519 /* ThreadWatcher.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,
@@ -651,7 +655,9 @@
 		2799461725FD9E5B001DCCE3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon iOS";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = "AppIcon iOS";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=macosx*]" = "AppIcon macOS";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Debiru/Debiru.entitlements;
@@ -668,15 +674,20 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mbpolan.Debiru;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		2799461825FD9E5B001DCCE3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon iOS";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = "AppIcon (iOS)";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=macosx*]" = "AppIcon (macOS)";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Debiru/Debiru.entitlements;
@@ -693,7 +704,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mbpolan.Debiru;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

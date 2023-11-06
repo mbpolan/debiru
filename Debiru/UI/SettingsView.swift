@@ -36,11 +36,13 @@ struct SettingsView: View {
                 }
                 .tag(Tabs.cache)
             
+#if os(macOS)
             FilterSettingsView()
                 .tabItem {
                     Label("Filters", systemImage: "doc.plaintext")
                 }
                 .tag(Tabs.filters)
+#endif
         }
         .padding(20)
     }

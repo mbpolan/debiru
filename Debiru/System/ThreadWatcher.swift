@@ -5,9 +5,14 @@
 //  Created by Mike Polan on 4/17/21.
 //
 
-import AppKit
 import Combine
 import Foundation
+
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
+import UIKit
+#endif
 
 class ThreadWatcher {
     static var shared: ThreadWatcher?

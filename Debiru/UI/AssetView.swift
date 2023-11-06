@@ -44,13 +44,13 @@ struct AssetView: View {
             }
             
             Text("\(asset.filename)\(asset.extension)")
-                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .foregroundColor(Color(PFSecondaryLabelColor))
                 .truncationMode(.tail)
                 .lineLimit(1)
                 .frame(maxWidth: bounds?.width ?? .infinity)
             
             Text("\(AssetView.byteFormatter.string(fromByteCount: asset.size))")
-                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .foregroundColor(Color(PFSecondaryLabelColor))
             
             Spacer()
         }

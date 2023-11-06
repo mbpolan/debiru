@@ -104,8 +104,11 @@ struct ThreadView: View {
         .onOpenInBrowser {
             guard let thread = getThread(appState.currentItem),
                   let url = dataProvider.getURL(for: thread) else { return }
-            
+#if os(macOS)
             NSWorkspace.shared.open(url)
+#elseif os(iOS)
+            PFApplication.shared.open(url)
+#endif
         }
         .onChange(of: appState.currentItem) { item in
             Task {
@@ -497,7 +500,11 @@ struct ThreadView: View {
                 filter: boardLink.filter)
                 .notify()
         } else if let webLink = link as? WebLink {
+#if os(macOS)
             NSWorkspace.shared.open(webLink.url)
+#elseif os(iOS)
+            PFApplication.shared.open(webLink.url)
+#endif
         }
     }
     

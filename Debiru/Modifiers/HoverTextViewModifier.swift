@@ -30,7 +30,7 @@ struct HoverTextViewModifier: ViewModifier {
 
 extension View {
     func hoverEffect(backgroundColor: Color = Color(.systemBlue),
-                     foregroundColor: Color = Color(.textColor)) -> some View {
+                     foregroundColor: Color = Color(PFTextColor)) -> some View {
         
         self.modifier(HoverTextViewModifier(
                         backgroundColor: backgroundColor,
@@ -45,6 +45,6 @@ struct HoverText_Previews: PreviewProvider {
         Text("This is some text")
             .hoverEffect(
                 backgroundColor: Color(.systemBlue),
-                foregroundColor: Color(.textColor))
+                foregroundColor: Color(.black))
     }
 }

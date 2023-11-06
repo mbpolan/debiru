@@ -34,7 +34,7 @@ struct PostEditorView: View {
                         Text(imageURL.relativePath)
                     } else {
                         Text("Drag and drop or choose an image")
-                            .foregroundColor(Color(NSColor.placeholderTextColor))
+                            .foregroundColor(Color(PFPlaceholderTextColor))
                     }
                     
                     Spacer()
@@ -59,7 +59,7 @@ struct PostEditorView: View {
             
             if let error = viewModel.error {
                 Text(error)
-                    .foregroundColor(Color(NSColor.systemRed))
+                    .foregroundColor(Color(PFColor.systemRed))
             }
             
             HStack {
@@ -84,6 +84,7 @@ struct PostEditorView: View {
     }
     
     private func handleOpenImagePicker() {
+#if os(macOS)
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.image]
         panel.allowsMultipleSelection = false
@@ -96,6 +97,7 @@ struct PostEditorView: View {
                 viewModel.imageURL = panel.url
             }
         }
+#endif
     }
     
     private func handleDropImage(items: [NSItemProvider]) -> Bool {

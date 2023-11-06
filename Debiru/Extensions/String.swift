@@ -13,7 +13,11 @@ extension String {
     ///
     /// - Returns: A new string with HTML entities unescaped.
     func unescapeHTML() -> String {
+#if os(macOS)
         return CFXMLCreateStringByUnescapingEntities(nil, self as CFString, nil) as String
+#elseif os(iOS)
+        return self
+#endif
     }
     
     /// Removes all HTML tags from the string.

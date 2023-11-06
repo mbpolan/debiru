@@ -5,9 +5,12 @@
 //  Created by Mike Polan on 4/1/21.
 //
 
-import Carbon.HIToolbox.Events
 import Introspect
 import SwiftUI
+
+#if os(macOS)
+import Carbon.HIToolbox.Events
+#endif
 
 // MARK: - View
 
@@ -26,14 +29,17 @@ struct QuickSearchView: View {
                 .font(.title)
                 .padding(.top, 10)
                 .padding([.leading, .bottom, .trailing], 5)
-                .introspectTextField { (view: NSTextField) in
+                .introspectTextField { (view: PFTextField) in
                     view.becomeFirstResponder()
+#if os(macOS)
                     view.focusRingType = .none
+#endif
                 }
+#if os(macOS)
                 .onExitCommand {
                     shown = false
                 }
-            
+#endif
             Divider()
             
             // show a view for each matched item, with some padding added after the last result
@@ -48,17 +54,21 @@ struct QuickSearchView: View {
             }
         }
         .onAppear {
+#if os(macOS)
             viewModel.monitor = NSEvent.addLocalMonitorForEvents(
                 matching: .keyDown,
                 handler: handleKeyDown)
+#endif
         }
         .onDisappear {
+#if os(macOS)
             if let monitor = viewModel.monitor {
                 NSEvent.removeMonitor(monitor)
                 
                 // avoid retain cycles when this view disappears
                 viewModel.monitor = nil
             }
+#endif
         }
         .onChange(of: viewModel.text) { filter in
             // update matching results and update selected index if it's no longer
@@ -110,7 +120,7 @@ struct QuickSearchView: View {
             break
         }
     }
-    
+#if os(macOS)
     private func handleKeyDown(event: NSEvent) -> NSEvent? {
         switch Int(event.keyCode) {
         case kVK_UpArrow:
@@ -130,7 +140,7 @@ struct QuickSearchView: View {
             return event
         }
     }
-    
+#endif
     private func cycleSelectedResult(_ delta: Int) {
         DispatchQueue.main.async {
             let next = (viewModel.selected + delta) % viewModel.matches.count
