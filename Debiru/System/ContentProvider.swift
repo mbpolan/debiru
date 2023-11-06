@@ -33,6 +33,7 @@ struct ContentProvider {
                 processCodeTags(posts, into: &postsToContent)
             }
             
+            // build a map of post ids to their models
             return posts.map { post in
                 // did this post's content change?
                 guard let content = postsToContent[post.id],

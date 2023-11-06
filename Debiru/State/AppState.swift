@@ -16,6 +16,8 @@ class AppState: ObservableObject, Codable {
     @Published var openWebVideo: Asset?
     @Published var newPostCount: Int = 0
     @Published var autoRefresh: Bool = false
+    @Published var threadDisplayTree: Bool = true
+    @Published var threadDisplayList : Bool = false
     @Published var targettedPostId: Int?
     @Published var watchedThreads: [WatchedThread] = []
     @Published var boardFilters: [String: [OrderedFilter]] = [:]

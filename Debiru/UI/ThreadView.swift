@@ -43,7 +43,7 @@ struct ThreadView: View {
             .onNavigate { handleNavigation($0, proxy: scroll) }
             .onChange(of: viewModel.targettedPostId) { targettedPostId in
                 if let targettedPostId = targettedPostId,
-                   let post = viewModel.posts.first(where: { $0.id == targettedPostId }) {
+                   let post = viewModel.posts[targettedPostId] {
                     
                     scroll.scrollTo(post)
                     viewModel.targettedPostId = nil
@@ -65,6 +65,24 @@ struct ThreadView: View {
                     Image(systemName: isWatched ? "star.fill" : "star")
                 }
                 .help("Watch this thread")
+                
+                HStack {
+                    Divider()
+                }
+                
+                Toggle(isOn: $appState.threadDisplayTree) {
+                    Image(systemName: "list.bullet.indent")
+                }
+                .help("Display replies as conversations")
+                
+                Toggle(isOn: $appState.threadDisplayList) {
+                    Image(systemName: "list.bullet")
+                }
+                .help("Display replies as a flat list")
+                
+                HStack {
+                    Divider()
+                }
                 
                 Button(action: handleChangeOrder) {
                     Image(systemName: viewModel.order.rawValue)
@@ -102,6 +120,14 @@ struct ThreadView: View {
                 viewModel.refreshTask = nil
             }
         }
+        .onChange(of: appState.threadDisplayTree) { toggled in
+            appState.threadDisplayList = !toggled
+            
+        }
+        .onChange(of: appState.threadDisplayList) { toggled in
+            appState.threadDisplayTree = !toggled
+            
+        }
         .sheet(item: $viewModel.replyToPost, onDismiss: handleHideReplySheet) { post in
             // replies are always against the original post
             let replyTo = post.replyToId ?? post.id
@@ -129,7 +155,12 @@ struct ThreadView: View {
     }
     
     private var isArchived: Bool {
-        posts.first?.archived ?? false
+        rootPost?.archived ?? false
+    }
+    
+    private var rootPost: Post? {
+        guard let firstPostId = self.viewModel.posts.keys.min() else { return nil }
+        return self.viewModel.posts[firstPostId]
     }
     
     private var imageSaveLocation: URL {
@@ -144,7 +175,7 @@ struct ThreadView: View {
     private var statistics: ThreadViewModel.Statistics {
         // use the most up to date original post data
         // otherwise, use the thread-level data we have on hand
-        if let root = viewModel.posts.first(where: { $0.isRoot }),
+        if let root = viewModel.posts.values.first(where: { $0.replyToId == 0 }),
            let stats = root.threadStatistics {
             return ThreadViewModel.Statistics(
                 replies: stats.replies,
@@ -166,13 +197,23 @@ struct ThreadView: View {
         return .empty
     }
     
-    private var posts: [Post] {
-        var posts = viewModel.posts
+    private var posts: [PostModel] {
+        var models: [PostModel]
+        
+        // depending on the display mode, use either the precomputed hierarchy model or create a new model
+        // using the original post data
+        if appState.threadDisplayTree {
+            models = viewModel.data
+        } else {
+            models = viewModel.posts.map { PostModel(post: $1) }
+        }
         
         if viewModel.searchExpanded && !viewModel.search.isEmpty {
             let query = viewModel.search.trimmingCharacters(in: .whitespaces)
             
-            posts = viewModel.posts.filter { post in
+            models = models.filter { model in
+                guard let post = self.viewModel.posts[model.id] else { return false }
+                
                 if let subject = post.subject,
                    subject.localizedCaseInsensitiveContains(query) {
                     return true
@@ -187,70 +228,76 @@ struct ThreadView: View {
             }
         }
         
-        return posts.sorted { a, b in
+        return models.sorted { a, b in
             switch viewModel.order {
             case .descending:
-                return a.date < b.date
+                return a.id < b.id
             case .ascending:
-                return a.date > b.date
+                return a.id > b.id
             }
         }
     }
     
     private func makeList(_ scroll: ScrollViewProxy) -> some View {
-        List(posts, id: \.self) { post in
+        List(posts, children: \.children) { model in
             VStack {
-                HStack {
-                    if let asset = post.attachment {
-                        AssetView(asset: asset,
-                                  saveLocation: imageSaveLocation,
-                                  spoilered: post.spoileredImage,
-                                  bounds: CGSize(width: 128.0, height: 128.0),
-                                  onOpen: handleOpenImage)
-                    }
-                    
-                    PostView(
-                        post.toPostContent(),
-                        boardId: post.boardId,
-                        threadId: post.threadId,
-                        onActivate: { handleReplyTo(post)} ,
-                        onLink: { link in
-                            handleLink(link, scrollProxy: scroll)
-                        })
-                        .padding(.leading, 10)
-                    
-                    Spacer()
-                }
-                .popover(isPresented: makeReplyPopoverPresented(post), arrowEdge: .leading) {
-                    HStack {
-                        if viewModel.replyPopoverType == .success {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.green)
-                            
-                            Text("Post successful!")
-                        } else {
-                            Image(systemName: "exclamationmark.circle")
-                                .foregroundColor(.red)
-                            
-                            Text("Failed to submit post.")
-                        }
-                    }
-                    .padding()
-                }
-                
-                if shouldShowNewPostDividerAfter(post) {
-                    TextDivider("New Posts", color: .red)
-                        .onAppear {
-                            // schedule an update to reset the new post marker
-                            Timer.scheduledTimer(
-                                withTimeInterval: TimeInterval(5),
-                                repeats: false,
-                                block: { _ in handleUpdateLastPost() })
-                        }
+                if let post = self.viewModel.posts[model.id] {
+                    makePostRow(post, scroll: scroll)
                 }
             }
-            .id(post)
+            .id(model.id)
         }
+    }
+    
+    private func makePostRow(_ post: Post, scroll: ScrollViewProxy) -> some View {
+        HStack {
+            if let asset = post.attachment {
+                AssetView(asset: asset,
+                          saveLocation: imageSaveLocation,
+                          spoilered: post.spoileredImage,
+                          bounds: CGSize(width: 128.0, height: 128.0),
+                          onOpen: handleOpenImage)
+            }
+
+            PostView(
+                post.toPostContent(),
+                boardId: post.boardId,
+                threadId: post.threadId,
+                onActivate: { handleReplyTo(post)} ,
+                onLink: { link in
+                    handleLink(link, scrollProxy: scroll)
+                })
+                .padding(.leading, 10)
+
+            Spacer()
+        }
+//                .popover(isPresented: makeReplyPopoverPresented(post), arrowEdge: .leading) {
+//                    HStack {
+//                        if viewModel.replyPopoverType == .success {
+//                            Image(systemName: "checkmark")
+//                                .foregroundColor(.green)
+//
+//                            Text("Post successful!")
+//                        } else {
+//                            Image(systemName: "exclamationmark.circle")
+//                                .foregroundColor(.red)
+//
+//                            Text("Failed to submit post.")
+//                        }
+//                    }
+//                    .padding()
+//                }
+//
+//                if shouldShowNewPostDividerAfter(post) {
+//                    TextDivider("New Posts", color: .red)
+//                        .onAppear {
+//                            // schedule an update to reset the new post marker
+//                            Timer.scheduledTimer(
+//                                withTimeInterval: TimeInterval(5),
+//                                repeats: false,
+//                                block: { _ in handleUpdateLastPost() })
+//                        }
+//                }
     }
     
     private func makeHeader() -> some View {
@@ -336,11 +383,12 @@ struct ThreadView: View {
         case .back:
             handleBackToCatalog()
         case .top:
-            guard let first = posts.first else { return }
+            guard let first = self.rootPost else { return }
             proxy.scrollTo(first)
         case .down:
-            guard let last = posts.last else { return }
-            proxy.scrollTo(last)
+            guard let last = posts.last,
+                  let post = self.viewModel.posts[last.id] else { return }
+            proxy.scrollTo(post)
         }
     }
     
@@ -357,7 +405,7 @@ struct ThreadView: View {
         guard let thread = getThread(appState.currentItem) else { return }
         
         if !isWatched {
-            appState.watchedThreads.append(.initial(thread, posts: posts))
+            appState.watchedThreads.append(.initial(thread, posts: Array(self.viewModel.posts.values)))
             
             PersistAppStateNotification().notify()
         }
@@ -429,7 +477,8 @@ struct ThreadView: View {
         if let postLink = link as? PostLink,
            let thread = getThread(appState.currentItem),
            postLink.threadId == thread.id,
-           let targetPost = posts.first(where: { $0.id == postLink.postId }) {
+           let targetPostModel = posts.first(where: { $0.id == postLink.postId }),
+           let targetPost = self.viewModel.posts[targetPostModel.id] {
             
             // this must be the same post object we used in the list
             withAnimation {
@@ -451,25 +500,25 @@ struct ThreadView: View {
         // reset the new post count for the watched thread
         guard let watchedThread = getWatchedThread(),
               let index = appState.watchedThreads.firstIndex(of: watchedThread),
-              let firstPost = viewModel.posts.first,
-              let lastPost = viewModel.posts.last else { return }
+              let firstPostId = viewModel.posts.keys.min(),
+              let lastPostId = viewModel.posts.keys.max(),
+              let firstPost = viewModel.posts[firstPostId] else { return }
         
         appState.watchedThreads[index] = WatchedThread(
             thread: watchedThread.thread,
-            lastPostId: lastPost.id,
-            currentLastPostId: lastPost.id,
+            lastPostId: lastPostId,
+            currentLastPostId: lastPostId,
             totalNewPosts: 0,
             nowArchived: firstPost.archived,
             nowDeleted: watchedThread.nowDeleted)
     }
     
     private func shouldShowNewPostDividerAfter(_ post: Post) -> Bool {
-        guard let watchedThread = getWatchedThread(),
-              let postIndex = viewModel.posts.firstIndex(of: post) else { return false }
+        guard let watchedThread = getWatchedThread() else { return false }
         
         // show dividers only if there are new posts after this one
-        return watchedThread.lastPostId == post.id &&
-            postIndex < viewModel.posts.endIndex - 1
+        // we check this by comparing the max post id in the thread against this post's id
+        return watchedThread.lastPostId == post.id && (self.viewModel.posts.keys.max() ?? 0) > post.id
     }
     
     private func getNavigationTitle() -> String {
@@ -531,14 +580,22 @@ struct ThreadView: View {
         self.viewModel.pendingPosts = true
         
         do {
-            let posts = try await dataProvider.getPosts(for: thread)
+            var posts = try await dataProvider.getPosts(for: thread)
             
             // process post contents depending on what features the board supports
             if let board = appState.boards.first(where: { $0.id == thread.boardId }) {
-                self.viewModel.posts = ContentProvider.instance.processPosts(posts, in: board)
-            } else {
-                self.viewModel.posts = posts
+                posts = ContentProvider.instance.processPosts(posts, in: board)
             }
+            
+            // build a map of post ids to their models and count replies
+            self.viewModel.posts = posts.reduce(into: [Int: Post]()) { memo, cur in
+                memo[cur.id] = cur
+            }
+            
+            //
+            self.viewModel.data = posts
+                .filter { $0.isRoot }
+                .map { buildPostHierarchy(PostModel(post: $0), posts: self.viewModel.posts)}
             
             self.viewModel.lastUpdate = Date()
             
@@ -550,12 +607,36 @@ struct ThreadView: View {
             print(error)
         }
     }
+    
+    private func buildPostHierarchy(_ model: PostModel, posts: [Int: Post]) -> PostModel {
+        guard let post = posts[model.id], post.replies.count > 0 else { return model }
+        
+        var children: [PostModel] = []
+        for replyId in post.replies {
+            if let reply = posts[replyId] {
+                children.append(buildPostHierarchy(PostModel(post: reply), posts: posts))
+            }
+        }
+        
+        model.children = children
+        return model
+    }
 }
 
 // MARK: - View Model
 
-class ThreadViewModel: ObservableObject {
-    @Published var posts: [Post] = []
+fileprivate class PostModel: Identifiable {
+    let id: Int
+    var children: [PostModel]?
+    
+    init(post: Post) {
+        self.id = post.id
+    }
+}
+
+fileprivate class ThreadViewModel: ObservableObject {
+    @Published var posts: [Int: Post] = [:]
+    @Published var data: [PostModel] = []
     @Published var pendingPosts: Bool = false
     @Published var search: String = ""
     @Published var searchExpanded: Bool = false

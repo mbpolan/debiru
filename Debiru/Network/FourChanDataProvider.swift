@@ -152,12 +152,17 @@ struct FourChanDataProvider: DataProvider {
             url: "\(apiBaseUrl)/\(thread.boardId)/thread/\(thread.id).json",
             mapper: { (value: ThreadPostsModel) in
                 var postsToReplies: [Int: [Int]] = [:]
+                var rootPosts: [Int: Bool] = [:]
                 
                 // find all posts that this post references in its thread
                 value.posts.forEach { post in
-                    parseRepliesTo(post.content ?? "").forEach { reply in
+                    let replies = parseRepliesTo(post.content ?? "")
+                        
+                    replies.forEach { reply in
                         postsToReplies[reply, default: [Int]()].append(post.id)
                     }
+                    
+                    rootPosts[post.id] = replies.count == 0
                 }
                 
                 return value.posts.map { post in
@@ -211,7 +216,7 @@ struct FourChanDataProvider: DataProvider {
                         id: post.id,
                         boardId: thread.boardId,
                         threadId: thread.id,
-                        isRoot: post.replyTo == 0, // indicates original poster
+                        isRoot: rootPosts[post.id] ?? true,
                         author: User(
                             name: post.author,
                             tripCode: post.trip,
@@ -252,7 +257,6 @@ struct FourChanDataProvider: DataProvider {
         }
         
         let message = scriptData[start...end]
-        print(message)
         
         guard let jsonData = message.data(using: .utf8) else {
             throw NetworkError.captchaError("Failed to read captcha message")
