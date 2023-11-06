@@ -246,6 +246,17 @@ struct ThreadView: View {
                 }
             }
             .id(model.id)
+            
+            if shouldShowNewPostDividerAfter(model.id) {
+                TextDivider("New Posts", color: .red)
+                    .onAppear {
+                        // schedule an update to reset the new post marker
+                        Timer.scheduledTimer(
+                            withTimeInterval: TimeInterval(5),
+                            repeats: false,
+                            block: { _ in handleUpdateLastPost() })
+                    }
+            }
         }
     }
     
@@ -275,33 +286,22 @@ struct ThreadView: View {
 
             Spacer()
         }
-//                .popover(isPresented: makeReplyPopoverPresented(post), arrowEdge: .leading) {
-//                    HStack {
-//                        if viewModel.replyPopoverType == .success {
-//                            Image(systemName: "checkmark")
-//                                .foregroundColor(.green)
-//
-//                            Text("Post successful!")
-//                        } else {
-//                            Image(systemName: "exclamationmark.circle")
-//                                .foregroundColor(.red)
-//
-//                            Text("Failed to submit post.")
-//                        }
-//                    }
-//                    .padding()
-//                }
-//
-//                if shouldShowNewPostDividerAfter(post) {
-//                    TextDivider("New Posts", color: .red)
-//                        .onAppear {
-//                            // schedule an update to reset the new post marker
-//                            Timer.scheduledTimer(
-//                                withTimeInterval: TimeInterval(5),
-//                                repeats: false,
-//                                block: { _ in handleUpdateLastPost() })
-//                        }
-//                }
+        .popover(isPresented: makeReplyPopoverPresented(post.id), arrowEdge: .leading) {
+            HStack {
+                if viewModel.replyPopoverType == .success {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.green)
+
+                    Text("Post successful!")
+                } else {
+                    Image(systemName: "exclamationmark.circle")
+                        .foregroundColor(.red)
+
+                    Text("Failed to submit post.")
+                }
+            }
+            .padding()
+        }
     }
     
     private func makeHeader() -> some View {
@@ -343,9 +343,9 @@ struct ThreadView: View {
         .padding([.bottom, .leading, .trailing], 5)
     }
     
-    private func makeReplyPopoverPresented(_ post: Post) -> Binding<Bool> {
+    private func makeReplyPopoverPresented(_ postId: Int) -> Binding<Bool> {
         return Binding<Bool>(
-            get: { viewModel.replyPopoverPostId == post.id },
+            get: { viewModel.replyPopoverPostId == postId },
             set: { _ in }
         )
     }
@@ -517,12 +517,12 @@ struct ThreadView: View {
             nowDeleted: watchedThread.nowDeleted)
     }
     
-    private func shouldShowNewPostDividerAfter(_ post: Post) -> Bool {
+    private func shouldShowNewPostDividerAfter(_ postId: Int) -> Bool {
         guard let watchedThread = getWatchedThread() else { return false }
         
         // show dividers only if there are new posts after this one
         // we check this by comparing the max post id in the thread against this post's id
-        return watchedThread.lastPostId == post.id && (self.viewModel.posts.keys.max() ?? 0) > post.id
+        return watchedThread.lastPostId == postId && (self.viewModel.posts.keys.max() ?? 0) > postId
     }
     
     private func getNavigationTitle() -> String {
