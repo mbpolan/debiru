@@ -259,11 +259,15 @@ struct ThreadView: View {
                           onOpen: handleOpenImage)
             }
 
+            // display post contents and other controls
+            // we only show replies when in list display mode, since the tree display mode will automatically
+            // group replies into threads
             PostView(
                 post.toPostContent(),
                 boardId: post.boardId,
                 threadId: post.threadId,
-                onActivate: { handleReplyTo(post)} ,
+                showReplies: appState.threadDisplayList,
+                onActivate: { handleReplyTo(post)},
                 onLink: { link in
                     handleLink(link, scrollProxy: scroll)
                 })

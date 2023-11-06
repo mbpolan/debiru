@@ -14,6 +14,7 @@ struct PostView<T>: View where T: View {
     private let content: PostContent
     private let boardId: String
     private let threadId: Int
+    private let showReplies: Bool
     private let onActivate: () -> Void
     private let onLink: (_: Link) -> Void
     private let headerContent: (() -> T)?
@@ -21,6 +22,7 @@ struct PostView<T>: View where T: View {
     init(_ content: PostContent,
          boardId: String,
          threadId: Int,
+         showReplies: Bool,
          onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void,
          headerContent: (() -> T)? = nil) {
@@ -28,6 +30,7 @@ struct PostView<T>: View where T: View {
         self.content = content
         self.boardId = boardId
         self.threadId = threadId
+        self.showReplies = showReplies
         self.onActivate = onActivate
         self.onLink = onLink
         self.headerContent = headerContent
@@ -68,14 +71,16 @@ struct PostView<T>: View where T: View {
                 }
             }
             
-            ReplyHStack(postIds: content.replies) { postId in
-                guard let url = PostLink.makeURL(
+            if showReplies {
+                ReplyHStack(postIds: content.replies) { postId in
+                    guard let url = PostLink.makeURL(
                         boardId: boardId,
                         threadId: threadId,
                         postId: postId) else { return }
-                
-                guard let link = handleInternalLink(url) else { return }
-                onLink(link)
+                    
+                    guard let link = handleInternalLink(url) else { return }
+                    onLink(link)
+                }
             }
             
             RichTextView(
@@ -250,6 +255,7 @@ extension PostView where T == EmptyView {
     init(_ content: PostContent,
          boardId: String,
          threadId: Int,
+         showReplies: Bool,
          onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void) {
         
@@ -257,6 +263,7 @@ extension PostView where T == EmptyView {
             content,
             boardId: boardId,
             threadId: threadId,
+            showReplies: showReplies,
             onActivate: onActivate,
             onLink: onLink,
             headerContent: nil)
@@ -325,6 +332,7 @@ struct PostView_Previews: PreviewProvider {
                     replies: []),
                  boardId: "f",
                  threadId: 321,
+                 showReplies: false,
                  onActivate: { },
                  onLink: { _ in })
     }
