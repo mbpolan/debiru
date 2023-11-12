@@ -13,7 +13,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var appState: AppState
-    @StateObject private var viewModel: ContentViewModel = ContentViewModel()
+    @StateObject private var viewModel: ContentViewModel = .init()
     private let dataProvider: DataProvider
     
     init(dataProvider: DataProvider = FourChanDataProvider()) {
@@ -21,45 +21,34 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationSplitView {
-            SidebarView()
-        } detail: {
-            switch appState.currentItem {
-            case .board(_):
-                CatalogView()
-            
-            case .thread(_, _):
-                ThreadView()
-                
-            default:
-                if viewModel.pendingBoards != nil {
-                    ProgressView("Loading")
-                } else {
-                    PlaceholderView()
-                }
+#if os(macOS)
+        let view = SplitContentView(boardsLoading: viewModel.pendingBoards != nil)
+#elseif os(iOS)
+        let view = StackContentView(boardsLoading: viewModel.pendingBoards != nil)
+#endif
+        return view
+            .environmentObject(appState)
+            .task(handleLoadBoards)
+            .onDisappear {
+                viewModel.threadWatcher?.invalidate()
+                viewModel.threadWatcher = nil
             }
-        }
-        .environmentObject(appState)
-        .task(handleLoadBoards)
-        .onDisappear {
-            viewModel.threadWatcher?.invalidate()
-            viewModel.threadWatcher = nil
-        }
-        .onChange(of: appState.quickSearchOpen) { open in
-            viewModel.openSheet = open ? .quickSearch : nil
-        }
-        .onChange(of: appState.watchedThreads) { watchedThreads in
-            // update the application badge icon whenever a change is done on the
-            // list of watched threads
-            NotificationManager.shared?.updateApplicationBadge()
-        }
-        .onShowBoard { handleShowBoard($0) }
-        .onShowThread { handleShowThread($0) }
-        .onShowImage { handleShowImage($0) }
-        .onShowVideo { handleShowWebVideo($0) }
-        .sheet(item: $viewModel.openSheet, onDismiss: handleSheetDismiss) { sheet in
-            makeSheet(sheet)
-        }
+            .onChange(of: appState.quickSearchOpen) { open in
+                viewModel.openSheet = open ? .quickSearch : nil
+            }
+            .onChange(of: appState.watchedThreads) { watchedThreads in
+                // update the application badge icon whenever a change is done on the
+                // list of watched threads
+                NotificationManager.shared?.updateApplicationBadge()
+            }
+            .onShowBoard { handleShowBoard($0) }
+            .onShowThread { handleShowThread($0) }
+            .onShowImage { handleShowImage($0) }
+            .onShowVideo { handleShowWebVideo($0) }
+            .sheet(item: $viewModel.openSheet, onDismiss: handleSheetDismiss) { sheet in
+                makeSheet(sheet)
+            }
+        
     }
     
     private func makeSheet(_ sheet: ContentViewModel.Sheet) -> some View {
@@ -144,7 +133,56 @@ struct ContentView: View {
     }
 }
 
+struct SplitContentView: View {
+    @EnvironmentObject private var appState: AppState
+    let boardsLoading: Bool
+    
+    var body: some View {
+        NavigationSplitView {
+            SidebarView()
+        } detail: {
+            switch appState.currentItem {
+            case .board(_):
+                CatalogView()
+            
+            case .thread(_, _):
+                ThreadView()
+                
+            default:
+                if boardsLoading {
+                    ProgressView("Loading")
+                } else {
+                    PlaceholderView()
+                }
+            }
+        }
+    }
+}
 
+fileprivate struct StackContentView: View {
+    @EnvironmentObject private var appState: AppState
+    let boardsLoading: Bool
+    
+    var body: some View {
+        NavigationStack {
+            switch appState.currentItem {
+            case .board(_):
+                CatalogView()
+            
+            case .thread(_, _):
+                ThreadView()
+                
+            default:
+                if boardsLoading {
+                    ProgressView("Loading")
+                } else {
+                    SidebarView()
+                }
+            }
+        }
+    }
+    
+}
 
 // MARK: - View Model
 
