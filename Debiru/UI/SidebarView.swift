@@ -39,22 +39,6 @@ struct SidebarView: View {
                 WatchedThreadsView()
             }
         }
-        .toolbar {
-            ToolbarItemGroup(placement: .automatic) {
-                Button(action: handleToggleSidebar) {
-                    Image(systemName: "sidebar.left")
-                }
-            }
-        }
-        .onToggleSidebar(perform: handleToggleSidebar)
-    }
-    
-    private func handleToggleSidebar() {
-#if os(macOS)
-        NSApp.keyWindow?.firstResponder?.tryToPerform(
-            #selector(NSSplitViewController.toggleSidebar(_:)),
-            with: nil)
-#endif
     }
     
     private func handleShowAllBoards() {

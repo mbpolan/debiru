@@ -32,11 +32,6 @@ struct AppCommands: Commands {
             
             Divider()
             
-            Button("Toggle Sidebar") {
-                ToggleSidebarNotification().notify()
-            }
-            .keyboardShortcut(KeyEquivalent("0"), modifiers: .command)
-            
             Button("Toggle Quick Search") {
                 onShowQuickSearch()
             }

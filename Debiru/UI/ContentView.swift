@@ -21,9 +21,9 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationSplitView {
             SidebarView()
-            
+        } detail: {
             switch appState.currentItem {
             case .board(_):
                 CatalogView()
