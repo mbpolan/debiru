@@ -263,8 +263,16 @@ struct ThreadView: View {
         }
     }
     
+    private func makePostRowStack<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        #if os(macOS)
+        return HStack(content: content)
+        #elseif os(iOS)
+        return VStack(alignment: .leading, content: content)
+        #endif
+    }
+    
     private func makePostRow(_ post: Post, scroll: ScrollViewProxy) -> some View {
-        HStack {
+        makePostRowStack() {
             if let asset = post.attachment {
                 AssetView(asset: asset,
                           saveLocation: imageSaveLocation,

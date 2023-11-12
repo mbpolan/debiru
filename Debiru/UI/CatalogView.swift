@@ -33,7 +33,7 @@ struct CatalogView: View {
         ScrollViewReader { scroll in
             VStack {
                 List(threads, id: \.self) { thread in
-                    HStack {
+                    makeThreadStack() {
                         if let asset = thread.attachment {
                             VStack(alignment: .leading) {
                                 AssetView(asset: asset,
@@ -192,6 +192,14 @@ struct CatalogView: View {
         }
         
         return data
+    }
+    
+    private func makeThreadStack<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        #if os(macOS)
+        return HStack(content: content)
+        #elseif os(iOS)
+        return VStack(alignment: .leading, content: content)
+        #endif
     }
     
     private func updateFilterToggle() {

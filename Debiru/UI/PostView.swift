@@ -61,15 +61,23 @@ struct PostView<T>: View where T: View {
                         .hoverEffect(backgroundColor: .blue, foregroundColor: .white)
                         .onTapGesture(perform: onActivate)
                     
+                    // show the author and post date alongside the post id on macos
+#if os(macOS)
                     makeAuthorText(content.author)
-                    
                     Text("\(DateFormatter.standard().string(from: content.date))")
+#endif
                 }
                 
                 if let headerContent = self.headerContent {
                     headerContent()
                 }
             }
+           
+            // show the author and post date below the title on ios
+#if os(iOS)
+            makeAuthorText(content.author)
+            Text("\(DateFormatter.standard().string(from: content.date))")
+#endif
             
             if showReplies {
                 ReplyHStack(postIds: content.replies) { postId in
