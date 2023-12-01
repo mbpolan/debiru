@@ -6,14 +6,14 @@
 //
 
 import SwiftSoup
+import Foundation
 
 struct ContentProvider {
     static let instance: ContentProvider = .init()
     private let codeParser: CodeTagParser = .init()
     
     func processPosts(_ posts: [Post], in board: Board) -> [Post] {
-        // if this board doesn't support any additional content options, we don't need to process anything
-        guard board.hasFeatures else { return posts }
+        let threadId = posts.first?.threadId ?? 0
         
         do {
             // parse the content of all posts into html documents
@@ -23,6 +23,16 @@ struct ContentProvider {
                     html = try SwiftSoup.parseBodyFragment(content)
                 } else {
                     html = SwiftSoup.Document("")
+                }
+                
+                // parse anchors from the post content, and append text to indicate if a reply is for
+                // the thread author
+                let anchors = try html.getElementsByTag("a")
+                for anchor in anchors {
+                    // look for anchors in the form >>41923922 and compare the post id against the thread id
+                    if let match = try? />>([0-9]+)/.wholeMatch(in: anchor.text()), Int(match.1) == threadId {
+                        try anchor.text("\(anchor.text()) (OP)")
+                    }
                 }
                 
                 memo[cur.id] = .init(document: html, dirty: false)
