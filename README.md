@@ -10,6 +10,15 @@ This project is intended to build a simple yet functional viewer for browsing th
 
 As an aside, this is also an experiement to see how much SwiftUI has progressed since its inception. An app like this will most likely make use of a large surface area of SwiftUI's capabilities, and for me, it's a good benchmark to see what's missing and what's easier than using AppKit directly.
 
+### How about iOS?
+
+TL;DR maybe one day.
+
+Originally this project wasn't intended to support any target other than macOS, but there's been some traction to at least _try_ and see if an iOS flavor would work.
+There are some promising signs that getting this app to render nicely on a smaller screen is feasible thanks to SwiftUI, and there's a few TODOs in the codebase
+where additional work is needed to get to that point. This is open for contributions if anyone is interested in helping out. However, do note that it is not a high
+priority relative to supporting macOS as a first class citizen.
+
 ## Developing
 
 You'll need macOS 11.x and Xcode 12.4. 
