@@ -25,6 +25,9 @@ struct ContentProvider {
                     html = SwiftSoup.Document("")
                 }
                 
+                // remove all <wbr> tags since these cause links to break
+                try html.getElementsByTag("wbr").forEach { try? $0.remove() }
+                
                 // parse anchors from the post content
                 let anchors = try html.getElementsByTag("a")
                 for anchor in anchors {
