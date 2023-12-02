@@ -126,12 +126,23 @@ fileprivate struct TextStyles {
     func applyTo(_ html: String, parentPostId: Int?) -> String {
         var appliedStyles = styles
         
+        // if a parent post id is known, style all replies in this post not to said post using
+        // a more subtle color. for example, consider this post:
+        // -------------
+        // >>123
+        // foo bar
+        //
+        // >>999
+        // bar baz
+        //-------------
+        // if the parent post id is 123, we want to style the ">>999" more subtly since it's generally
+        // intended to be a reply to a different poster
         if let parentPostId = parentPostId {
             appliedStyles = """
                 \(appliedStyles)
                 
-                .reply-to-\(parentPostId) {
-                    color: \(TextStyles.color(.systemOrange)) !important;
+                a:not(.reply-to-\(parentPostId)) {
+                    color: \(TextStyles.color(.lightGray)) !important;
                 }
             """
         }
@@ -277,6 +288,7 @@ fileprivate struct TextViewWrapper: PFViewRepresentable {
         // remove default styles on links so that we can let our own css take precedence
         string.enumerateAttributes(in: NSRange(location: 0, length: string.length), options: []) { _, range, stop in
             string.removeAttribute(.link, range: range)
+            string.removeAttribute(.underlineStyle, range: range)
 
         }
         
