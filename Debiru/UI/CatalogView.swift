@@ -48,6 +48,7 @@ struct CatalogView: View {
                             thread.toPostContent(),
                             boardId: thread.boardId,
                             threadId: thread.id,
+                            parentPostId: nil,
                             showReplies: false,
                             onActivate: { handleShowThread(thread) },
                             onLink: handleLink) {

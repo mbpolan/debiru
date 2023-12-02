@@ -14,14 +14,16 @@ struct RichTextView: View {
     private let html: String
     private let boardId: String
     private let threadId: Int
+    private let parentPostId: Int?
     private let onLink: (_: URL) -> Void
     
-    init(_ html: String, boardId: String, threadId: Int, onLink: @escaping(_: URL) -> Void) {
+    init(_ html: String, boardId: String, threadId: Int, parentPostId: Int?, onLink: @escaping(_: URL) -> Void) {
         let normalized = RichTextView.updateLinks(html, boardId: boardId, threadId: threadId)
         
         self.html = normalized
         self.boardId = boardId
         self.threadId = threadId
+        self.parentPostId = parentPostId
         self.onLink = onLink
     }
     
@@ -30,6 +32,7 @@ struct RichTextView: View {
             TextViewWrapper(
                 html,
                 width: geo.size.width,
+                parentPostId: self.parentPostId,
                 onLink: onLink,
                 onUpdate: handleUpdate)
         }.frame(height: height)
@@ -58,6 +61,7 @@ fileprivate struct TextStyles {
         let black = TextStyles.color(.black)
         let text = TextStyles.color(PFTextColor)
         let blue = TextStyles.color(.systemBlue)
+        let link = TextStyles.color(.linkColor)
         let yellow = TextStyles.color(.systemYellow)
         let violet = TextStyles.color(.systemPurple)
         let green = TextStyles.color(.systemGreen)
@@ -66,7 +70,6 @@ fileprivate struct TextStyles {
         // ones that we inject ourselves via ContentProvider
         // TODO: find a way to generalize this with what's produced by ContentProvider
         return """
-        <style>
         * {
           color: \(text);
           font-family: -apple-system;
@@ -76,6 +79,10 @@ fileprivate struct TextStyles {
         /* greentext and memes */
         .quote {
           color: \(green);
+        }
+    
+        .quotelink {
+          color: \(link);
         }
         
         /* spoilers */
@@ -107,7 +114,6 @@ fileprivate struct TextStyles {
           font-family: monospace;
           color: \(green);
         }
-        </style>
     """
     }()
     
@@ -117,8 +123,20 @@ fileprivate struct TextStyles {
         self.styles = TextStyles.baseStyles
     }
     
-    func applyTo(_ html: String) -> String {
-        return "\(styles)\(html)"
+    func applyTo(_ html: String, parentPostId: Int?) -> String {
+        var appliedStyles = styles
+        
+        if let parentPostId = parentPostId {
+            appliedStyles = """
+                \(appliedStyles)
+                
+                .reply-to-\(parentPostId) {
+                    color: \(TextStyles.color(.systemOrange)) !important;
+                }
+            """
+        }
+        
+        return "<style>\(appliedStyles)</style>\(html)"
     }
     
     private static func color(_ nsColor: PFColor) -> String {
@@ -146,10 +164,11 @@ fileprivate struct TextViewWrapper: PFViewRepresentable {
     
     init(_ html: String,
          width: CGFloat,
+         parentPostId: Int?,
          onLink: @escaping(_: URL) -> Void,
          onUpdate: @escaping(_: CGFloat) -> Void) {
         
-        self.html = TextViewWrapper.styles.applyTo(html)
+        self.html = TextViewWrapper.styles.applyTo(html, parentPostId: parentPostId)
         self.width = width
         self.onLink = onLink
         self.onUpdate = onUpdate
@@ -253,6 +272,14 @@ fileprivate struct TextViewWrapper: PFViewRepresentable {
             documentAttributes: nil)
 #endif
         
+        guard let string = string else { return string }
+        
+        // remove default styles on links so that we can let our own css take precedence
+        string.enumerateAttributes(in: NSRange(location: 0, length: string.length), options: []) { _, range, stop in
+            string.removeAttribute(.link, range: range)
+
+        }
+        
         return string
     }
 }
@@ -296,7 +323,10 @@ Text line 2<br>
     private static let links = """
 <a href=\"#p218664916\" class=\"quotelink\">&gt;&gt;218664916</a><br>
 That looks cool.<br>
-But I'm not digging it.
+But I'm not digging it.<br>
+<br>
+<a href=\"#p218664919\" class=\"quotelink reply-to-218664919\">&gt;&gt;218664919</a><br>
+Sup.<br>
 """
     
     private static let spoiler = """
@@ -311,7 +341,7 @@ Leading text<br>
 </pre>
 """
     private static let empty = ""
-    private static let html = code
+    private static let html = links
     
     static var previews: some View {
         VStack(alignment: .leading){
@@ -322,6 +352,7 @@ Leading text<br>
                 html,
                 boardId: "f",
                 threadId: 123,
+                parentPostId: 218664919,
                 onLink: { _ in })
         }
         .frame(width: 500, height: 400)

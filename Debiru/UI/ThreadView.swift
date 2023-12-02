@@ -245,7 +245,7 @@ struct ThreadView: View {
         List(posts, children: \.children) { model in
             VStack {
                 if let post = self.viewModel.posts[model.id] {
-                    makePostRow(post, scroll: scroll)
+                    makePostRow(post, parentPostId: model.parentPostId, scroll: scroll)
                     
                     if shouldShowNewPostDividerAfter(model.id) {
                         TextDivider("New Posts", color: .red)
@@ -271,7 +271,7 @@ struct ThreadView: View {
         #endif
     }
     
-    private func makePostRow(_ post: Post, scroll: ScrollViewProxy) -> some View {
+    private func makePostRow(_ post: Post, parentPostId: Int?, scroll: ScrollViewProxy) -> some View {
         makePostRowStack() {
             if let asset = post.attachment {
                 AssetView(asset: asset,
@@ -288,6 +288,7 @@ struct ThreadView: View {
                 post.toPostContent(),
                 boardId: post.boardId,
                 threadId: post.threadId,
+                parentPostId: parentPostId,
                 showReplies: appState.threadDisplayList,
                 onActivate: { handleReplyTo(post)},
                 onLink: { link in
@@ -635,7 +636,7 @@ struct ThreadView: View {
         var children: [PostModel] = []
         for replyId in post.replies {
             if let reply = posts[replyId] {
-                children.append(buildPostHierarchy(PostModel(post: reply), threadId: threadId, posts: posts))
+                children.append(buildPostHierarchy(PostModel(post: reply, parentPostId: model.id), threadId: threadId, posts: posts))
             }
         }
         
@@ -648,10 +649,12 @@ struct ThreadView: View {
 
 fileprivate class PostModel: Identifiable {
     let id: Int
+    let parentPostId: Int?
     var children: [PostModel]?
     
-    init(post: Post) {
+    init(post: Post, parentPostId: Int? = nil) {
         self.id = post.id
+        self.parentPostId = parentPostId
     }
 }
 

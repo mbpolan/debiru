@@ -14,6 +14,7 @@ struct PostView<T>: View where T: View {
     private let content: PostContent
     private let boardId: String
     private let threadId: Int
+    private let parentPostId: Int?
     private let showReplies: Bool
     private let onActivate: () -> Void
     private let onLink: (_: Link) -> Void
@@ -22,6 +23,7 @@ struct PostView<T>: View where T: View {
     init(_ content: PostContent,
          boardId: String,
          threadId: Int,
+         parentPostId: Int?,
          showReplies: Bool,
          onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void,
@@ -30,6 +32,7 @@ struct PostView<T>: View where T: View {
         self.content = content
         self.boardId = boardId
         self.threadId = threadId
+        self.parentPostId = parentPostId
         self.showReplies = showReplies
         self.onActivate = onActivate
         self.onLink = onLink
@@ -95,6 +98,7 @@ struct PostView<T>: View where T: View {
                 content.content ?? "",
                 boardId: boardId,
                 threadId: threadId,
+                parentPostId: parentPostId,
                 onLink: handleLink)
             
             Spacer()
@@ -270,6 +274,7 @@ extension PostView where T == EmptyView {
     init(_ content: PostContent,
          boardId: String,
          threadId: Int,
+         parentPostId: Int?,
          showReplies: Bool,
          onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void) {
@@ -278,6 +283,7 @@ extension PostView where T == EmptyView {
             content,
             boardId: boardId,
             threadId: threadId,
+            parentPostId: parentPostId,
             showReplies: showReplies,
             onActivate: onActivate,
             onLink: onLink,
@@ -347,6 +353,7 @@ struct PostView_Previews: PreviewProvider {
                     replies: []),
                  boardId: "f",
                  threadId: 321,
+                 parentPostId: nil,
                  showReplies: false,
                  onActivate: { },
                  onLink: { _ in })

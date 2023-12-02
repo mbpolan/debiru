@@ -25,13 +25,18 @@ struct ContentProvider {
                     html = SwiftSoup.Document("")
                 }
                 
-                // parse anchors from the post content, and append text to indicate if a reply is for
-                // the thread author
+                // parse anchors from the post content
                 let anchors = try html.getElementsByTag("a")
                 for anchor in anchors {
                     // look for anchors in the form >>41923922 and compare the post id against the thread id
-                    if let match = try? />>([0-9]+)/.wholeMatch(in: anchor.text()), Int(match.1) == threadId {
-                        try anchor.text("\(anchor.text()) (OP)")
+                    if let match = try? />>([0-9]+)/.wholeMatch(in: anchor.text()), let replyToId = Int(match.1) {
+                        // if this reply is to the thread author, append some text to make it clearer
+                        if replyToId == threadId {
+                            try anchor.text("\(anchor.text()) (OP)")
+                        }
+                        
+                        // add a class so we can more easily style this reply
+                        try anchor.addClass("reply-to-\(String(replyToId))")
                     }
                 }
                 
