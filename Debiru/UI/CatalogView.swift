@@ -20,6 +20,7 @@ struct CatalogView: View {
     @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout = UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
     @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard = UserDefaults.standard.groupImagesByBoard()
+    @AppStorage(StorageKeys.showRelativeDates) private var showRelativeDates = UserDefaults.standard.showRelativeDates()
     
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: CatalogViewModel = CatalogViewModel()
@@ -50,6 +51,7 @@ struct CatalogView: View {
                             threadId: thread.id,
                             parentPostId: nil,
                             showReplies: false,
+                            showRelativeDates: showRelativeDates,
                             onActivate: { handleShowThread(thread) },
                             onLink: handleLink) {
                             

@@ -16,6 +16,7 @@ struct PostView<T>: View where T: View {
     private let threadId: Int
     private let parentPostId: Int?
     private let showReplies: Bool
+    private let showRelativeDates: Bool
     private let onActivate: () -> Void
     private let onLink: (_: Link) -> Void
     private let headerContent: (() -> T)?
@@ -25,6 +26,7 @@ struct PostView<T>: View where T: View {
          threadId: Int,
          parentPostId: Int?,
          showReplies: Bool,
+         showRelativeDates: Bool,
          onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void,
          headerContent: (() -> T)? = nil) {
@@ -34,6 +36,7 @@ struct PostView<T>: View where T: View {
         self.threadId = threadId
         self.parentPostId = parentPostId
         self.showReplies = showReplies
+        self.showRelativeDates = showRelativeDates
         self.onActivate = onActivate
         self.onLink = onLink
         self.headerContent = headerContent
@@ -67,7 +70,7 @@ struct PostView<T>: View where T: View {
                     // show the author and post date alongside the post id on macos
 #if os(macOS)
                     makeAuthorText(content.author)
-                    Text("\(DateFormatter.standard().string(from: content.date))")
+                    makeDateText(content.date)
 #endif
                 }
                 
@@ -79,7 +82,7 @@ struct PostView<T>: View where T: View {
             // show the author and post date below the title on ios
 #if os(iOS)
             makeAuthorText(content.author)
-            Text("\(DateFormatter.standard().string(from: content.date))")
+            makeDateText(content.date)
 #endif
             
             if showReplies {
@@ -103,6 +106,14 @@ struct PostView<T>: View where T: View {
             
             Spacer()
         }
+    }
+    
+    private func makeDateText(_ date: Date) -> some View {
+        let str = showRelativeDates ?
+            RelativeDateTimeFormatter().localizedString(for: date, relativeTo: .now) :
+            (DateFormatter.standard().string(from: date))
+        
+        return Text(str)
     }
     
     private func makeAuthorText(_ user: User) -> some View {
@@ -276,6 +287,7 @@ extension PostView where T == EmptyView {
          threadId: Int,
          parentPostId: Int?,
          showReplies: Bool,
+         showRelativeDates: Bool,
          onActivate: @escaping() -> Void,
          onLink: @escaping(_: Link) -> Void) {
         
@@ -285,6 +297,7 @@ extension PostView where T == EmptyView {
             threadId: threadId,
             parentPostId: parentPostId,
             showReplies: showReplies,
+            showRelativeDates: showRelativeDates,
             onActivate: onActivate,
             onLink: onLink,
             headerContent: nil)
@@ -355,6 +368,7 @@ struct PostView_Previews: PreviewProvider {
                  threadId: 321,
                  parentPostId: nil,
                  showReplies: false,
+                 showRelativeDates: false,
                  onActivate: { },
                  onLink: { _ in })
     }

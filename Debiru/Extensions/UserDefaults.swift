@@ -29,6 +29,10 @@ extension UserDefaults {
         return true
     }
     
+    func showRelativeDates() -> Bool {
+        return false
+    }
+    
     /// Returns the default auto-refresh timeout.
     ///
     /// - Returns: The timeout, in seconds.

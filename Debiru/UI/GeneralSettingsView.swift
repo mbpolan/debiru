@@ -19,6 +19,7 @@ struct GeneralSettingsView: View {
     @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard: Bool =
         UserDefaults.standard.groupImagesByBoard()
     @AppStorage(StorageKeys.autoWatchReplied) private var autoWatchReplied: Bool = UserDefaults.standard.autoWatchReplied()
+    @AppStorage(StorageKeys.showRelativeDates) private var showRelativeDates: Bool = UserDefaults.standard.showRelativeDates()
     
     var body: some View {
         let maxQuickSearchResultsBinding = Binding<String>(
@@ -59,6 +60,9 @@ struct GeneralSettingsView: View {
             }
             
             VStack {
+                Toggle("Show relative post dates", isOn: $showRelativeDates)
+                    .horizontallyAligned(.leading)
+                
                 Toggle("Automatically watch threads after posting", isOn: $autoWatchReplied)
                     .horizontallyAligned(.leading)
                 

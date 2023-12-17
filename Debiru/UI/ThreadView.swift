@@ -15,6 +15,7 @@ struct ThreadView: View {
     @AppStorage(StorageKeys.refreshTimeout) private var refreshTimeout = UserDefaults.standard.refreshTimeout()
     @AppStorage(StorageKeys.defaultImageLocation) private var defaultImageLocation = UserDefaults.standard.defaultImageLocation()
     @AppStorage(StorageKeys.groupImagesByBoard) private var groupImagesByBoard = UserDefaults.standard.groupImagesByBoard()
+    @AppStorage(StorageKeys.showRelativeDates) private var showRelativeDates = UserDefaults.standard.showRelativeDates()
     
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: ThreadViewModel = ThreadViewModel()
@@ -290,6 +291,7 @@ struct ThreadView: View {
                 threadId: post.threadId,
                 parentPostId: parentPostId,
                 showReplies: appState.threadDisplayList,
+                showRelativeDates: showRelativeDates,
                 onActivate: { handleReplyTo(post)},
                 onLink: { link in
                     handleLink(link, scrollProxy: scroll)
