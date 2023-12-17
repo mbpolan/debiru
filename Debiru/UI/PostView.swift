@@ -109,11 +109,14 @@ struct PostView<T>: View where T: View {
     }
     
     private func makeDateText(_ date: Date) -> some View {
-        let str = showRelativeDates ?
-            RelativeDateTimeFormatter().localizedString(for: date, relativeTo: .now) :
-            (DateFormatter.standard().string(from: date))
+        let absolute = DateFormatter.standard().string(from: date)
+        let relative = RelativeDateTimeFormatter().localizedString(for: date, relativeTo: .now)
         
-        return Text(str)
+        // show the preferred date format as the text and the non-preferred as help text
+        let text = showRelativeDates ? relative : absolute
+        let help = showRelativeDates ? absolute : relative
+        
+        return Text(text).help(help)
     }
     
     private func makeAuthorText(_ user: User) -> some View {
