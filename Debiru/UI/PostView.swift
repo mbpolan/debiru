@@ -20,6 +20,7 @@ struct PostView: View {
         VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline) {
                 Text(post.author.name ?? "Anonymous")
+                    .bold()
                 
                 if let country = post.author.country {
                     CountryFlagView(country: country)
@@ -37,6 +38,7 @@ struct PostView: View {
     }
 }
 
+/// A view that displays a media asset.
 fileprivate struct AssetView: View {
     let asset: Asset
     private let dataProvider: DataProvider = FourChanDataProvider()
@@ -53,6 +55,7 @@ fileprivate struct AssetView: View {
     }
 }
 
+/// A view that displays a country flag badge.
 fileprivate struct CountryFlagView: View {
     let country: User.Country
     

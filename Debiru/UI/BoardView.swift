@@ -16,16 +16,32 @@ struct BoardView: View {
     
     private func loadBoard() async {
         do {
+            viewModel.state = .loading
             viewModel.threads = try await FourChanDataProvider().getCatalog(for: board)
+            
+            viewModel.state = .ready
         } catch {
             print(error)
+            viewModel.state = .error("Failed to load boards: \(error.localizedDescription)")
         }
     }
     
     var body: some View {
-        List(viewModel.threads) { thread in
-            PostView(post: thread.toPost())
+        Group {
+            switch viewModel.state {
+            case .loading:
+                ProgressView()
+                
+            case .error(let message):
+                Text(message)
+                
+            case .ready:
+                List(viewModel.threads) { thread in
+                    PostView(post: thread.toPost())
+                }
+            }
         }
+        .navigationTitle(board.title)
         .task {
             await loadBoard()
         }
@@ -36,7 +52,14 @@ struct BoardView: View {
 
 @Observable
 fileprivate class ViewModel {
+    var state: State = .loading
     var threads: [Thread] = []
+    
+    enum State {
+        case loading
+        case ready
+        case error(_ message: String)
+    }
 }
 
 // MARK: - Previews

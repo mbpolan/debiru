@@ -23,6 +23,8 @@ struct SidebarView: View {
                 Text(board.title)
             }
         }
+        .listStyle(.sidebar)
+        .navigationTitle("Boards")
     }
     
     private var currentBoard: Binding<Board?> {
