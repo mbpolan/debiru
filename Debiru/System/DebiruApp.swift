@@ -33,7 +33,7 @@ struct DebiruApp: App {
     }
     
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(for: UUID.self) { _ in
             ContentView()
                 .environment(appState)
                 .task {

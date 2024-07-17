@@ -7,10 +7,14 @@
 
 import SwiftUI
 
+/// A view that displays the main content of the app.
 struct ContentView: View {
+    @State private var windowState: WindowState = .init()
+    
     var body: some View {
         NavigationSplitView {
             SidebarView()
+                .environment(windowState)
         } detail: {
             
         }

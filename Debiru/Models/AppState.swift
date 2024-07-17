@@ -11,7 +11,6 @@ import Observation
 @Observable
 class AppState: Codable {
     var boards: [Board] = []
-    var currentBoard: Board?
     
     init() {
         self.boards = []
@@ -30,7 +29,6 @@ class AppState: Codable {
 
 extension AppState {
     private enum CodingKeys: String, CodingKey {
-        case currentItem
         case boards
     }
     

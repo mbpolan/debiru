@@ -10,6 +10,7 @@ import SwiftUI
 /// A view that displays a list of selectable boards.
 struct SidebarView: View {
     @Environment(AppState.self) private var appState
+    @Environment(WindowState.self) private var windowState
     
     var body: some View {
         List(appState.boards, id: \.self, selection: self.currentBoard) { board in
@@ -24,8 +25,8 @@ struct SidebarView: View {
     
     private var currentBoard: Binding<Board?> {
         return Binding<Board?>(
-            get: { appState.currentBoard },
-            set: {appState.currentBoard = $0 }
+            get: { windowState.currentBoard },
+            set: { windowState.currentBoard = $0 }
         )
     }
 }
@@ -38,4 +39,5 @@ struct SidebarView: View {
                            description: "Animals and stuff",
                            features: .none)
             ]))
+        .environment(WindowState())
 }
