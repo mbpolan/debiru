@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - View
+
 /// A view that displays a list of selectable boards.
 struct SidebarView: View {
     @Environment(AppState.self) private var appState
@@ -25,11 +27,28 @@ struct SidebarView: View {
     
     private var currentBoard: Binding<Board?> {
         return Binding<Board?>(
-            get: { windowState.currentBoard },
-            set: { windowState.currentBoard = $0 }
+            get: {
+                switch windowState.currentItem {
+                case .board(let board):
+                    return board
+                case .thread(let board, _):
+                    return board
+                case .none:
+                    return nil
+                }
+            },
+            set: {
+                if let board = $0 {
+                    windowState.currentItem = .board(board)
+                } else {
+                    windowState.currentItem = nil
+                }
+            }
         )
     }
 }
+
+// MARK: - Previews
 
 #Preview {
     SidebarView()

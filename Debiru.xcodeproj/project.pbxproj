@@ -13,6 +13,8 @@
 		27662DCC2C474919002A678D /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCB2C474919002A678D /* Settings.swift */; };
 		27662DCE2C4749F8002A678D /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCD2C4749F8002A678D /* SidebarView.swift */; };
 		27662DD02C475E6C002A678D /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCF2C475E6C002A678D /* WindowState.swift */; };
+		27662DD22C47610D002A678D /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD12C47610D002A678D /* LandingView.swift */; };
+		27662DD42C4764DD002A678D /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD32C4764DD002A678D /* DetailView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -46,6 +48,8 @@
 		27662DCB2C474919002A678D /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		27662DCD2C4749F8002A678D /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		27662DCF2C475E6C002A678D /* WindowState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowState.swift; sourceTree = "<group>"; };
+		27662DD12C47610D002A678D /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
+		27662DD32C4764DD002A678D /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -134,6 +138,8 @@
 			children = (
 				27662DC92C47484F002A678D /* ContentView.swift */,
 				27662DCD2C4749F8002A678D /* SidebarView.swift */,
+				27662DD12C47610D002A678D /* LandingView.swift */,
+				27662DD32C4764DD002A678D /* DetailView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -292,6 +298,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				279CFF8625FFEC9000884724 /* Thread.swift in Sources */,
+				27662DD42C4764DD002A678D /* DetailView.swift in Sources */,
+				27662DD22C47610D002A678D /* LandingView.swift in Sources */,
 				27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */,
 				27662DCE2C4749F8002A678D /* SidebarView.swift in Sources */,
 				27C056092610F5130037A91B /* User.swift in Sources */,
