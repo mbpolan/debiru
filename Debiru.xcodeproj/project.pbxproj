@@ -151,7 +151,6 @@
 		2799462325FDA2DE001DCCE3 /* State */ = {
 			isa = PBXGroup;
 			children = (
-				2799462425FDA2EB001DCCE3 /* AppState.swift */,
 				27BFE1DC263CAE83004E7E2F /* DownloadedAsset.swift */,
 			);
 			path = State;
@@ -171,6 +170,7 @@
 		279CFF7325FEBCC900884724 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2799462425FDA2EB001DCCE3 /* AppState.swift */,
 				2799462825FDA32D001DCCE3 /* Board.swift */,
 				279CFF8525FFEC9000884724 /* Thread.swift */,
 				27C568322602D2A000983ECD /* Asset.swift */,

@@ -7,11 +7,12 @@
 
 import SwiftUI
 
+/// A view that displays a list of selectable boards.
 struct SidebarView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
     
     var body: some View {
-        List(appState.boards) { board in
+        List(appState.boards, id: \.self, selection: self.currentBoard) { board in
             HStack {
                 Text("/\(board.id)/")
                     .bold()
@@ -20,12 +21,18 @@ struct SidebarView: View {
             }
         }
     }
+    
+    private var currentBoard: Binding<Board?> {
+        return Binding<Board?>(
+            get: { appState.currentBoard },
+            set: {appState.currentBoard = $0 }
+        )
+    }
 }
 
 #Preview {
     SidebarView()
-        .environmentObject(AppState(
-            currentItem: nil,
+        .environment(AppState(
             boards: [Board(id: "a",
                            title: "Animals",
                            description: "Animals and stuff",

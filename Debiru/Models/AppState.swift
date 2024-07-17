@@ -5,44 +5,37 @@
 //  Created by Mike Polan on 3/13/21.
 //
 
-import SwiftUI
+import Observation
 
-class AppState: ObservableObject, Codable {
-    @Published var currentItem: ViewableItem?
-    @Published var boards: [Board] = []
+/// The global state of the app.
+@Observable
+class AppState: Codable {
+    var boards: [Board] = []
+    var currentBoard: Board?
     
     init() {
         self.boards = []
     }
     
-    init(currentItem: ViewableItem?, boards: [Board]) {
-        self.currentItem = currentItem
+    init(boards: [Board]) {
         self.boards = boards
     }
     
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        currentItem = try values.decode(ViewableItem.self, forKey: .currentItem)
         boards = try values.decode([Board].self, forKey: .boards)
     }
 }
 
 extension AppState {
     private enum CodingKeys: String, CodingKey {
-        case quickSearchOpen
         case currentItem
         case boards
-        case openItems
-        case openImageAsset
-        case openWebVideo
-        case autoRefresh
-        case watchedThreads
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(currentItem, forKey: .currentItem)
         try container.encode(boards, forKey: .boards)
     }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 
 @main
 struct DebiruApp: App {
-    private var appState: AppState = .init()
+    @State private var appState: AppState = .init()
     private let dataProvider: DataProvider = FourChanDataProvider()
     
     init() {
@@ -35,7 +35,7 @@ struct DebiruApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appState)
+                .environment(appState)
                 .task {
                     await loadBoards()
                 }
