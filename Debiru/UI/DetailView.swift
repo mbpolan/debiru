@@ -15,7 +15,7 @@ struct DetailView: View {
     var body: some View {
         switch windowState.currentItem {
         case .board(let board):
-            Text("Viewing: board \(board.id)")
+            BoardView(board: board)
         case .thread(let board, let thread):
             Text("Viewing: thread \(thread.id)")
         case .none:

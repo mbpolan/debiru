@@ -15,6 +15,7 @@
 		27662DD02C475E6C002A678D /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCF2C475E6C002A678D /* WindowState.swift */; };
 		27662DD22C47610D002A678D /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD12C47610D002A678D /* LandingView.swift */; };
 		27662DD42C4764DD002A678D /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD32C4764DD002A678D /* DetailView.swift */; };
+		27662DD62C47698C002A678D /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD52C47698C002A678D /* BoardView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -38,7 +39,6 @@
 		27C568332602D2A000983ECD /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C568322602D2A000983ECD /* Asset.swift */; };
 		27E4B806265C7F8F00E183CB /* Submission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B805265C7F8F00E183CB /* Submission.swift */; };
 		27E4B808265C892400E183CB /* MutableFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B807265C892400E183CB /* MutableFormData.swift */; };
-		27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */ = {isa = PBXBuildFile; fileRef = 27E4B80B265C9B1600E183CB /* Parameters.stencil */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +50,7 @@
 		27662DCF2C475E6C002A678D /* WindowState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowState.swift; sourceTree = "<group>"; };
 		27662DD12C47610D002A678D /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
 		27662DD32C4764DD002A678D /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		27662DD52C47698C002A678D /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -73,7 +74,6 @@
 		27C568322602D2A000983ECD /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		27E4B805265C7F8F00E183CB /* Submission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Submission.swift; sourceTree = "<group>"; };
 		27E4B807265C892400E183CB /* MutableFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableFormData.swift; sourceTree = "<group>"; };
-		27E4B80B265C9B1600E183CB /* Parameters.stencil */ = {isa = PBXFileReference; lastKnownFileType = text; path = Parameters.stencil; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,7 +97,6 @@
 				2799460725FD9E5A001DCCE3 /* Products */,
 				27C055F4260EA00B0037A91B /* README.md */,
 				27C055F3260EA00B0037A91B /* screenshot.png */,
-				27E4B80A265C9ADB00E183CB /* Templates */,
 			);
 			sourceTree = "<group>";
 		};
@@ -140,6 +139,7 @@
 				27662DCD2C4749F8002A678D /* SidebarView.swift */,
 				27662DD12C47610D002A678D /* LandingView.swift */,
 				27662DD32C4764DD002A678D /* DetailView.swift */,
+				27662DD52C47698C002A678D /* BoardView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -184,14 +184,6 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		27E4B80A265C9ADB00E183CB /* Templates */ = {
-			isa = PBXGroup;
-			children = (
-				27E4B80B265C9B1600E183CB /* Parameters.stencil */,
-			);
-			path = Templates;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -199,7 +191,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2799461625FD9E5B001DCCE3 /* Build configuration list for PBXNativeTarget "Debiru" */;
 			buildPhases = (
-				27E4B809265C8D4000E183CB /* Generate Secrets */,
 				2799460225FD9E5A001DCCE3 /* Sources */,
 				2799460325FD9E5A001DCCE3 /* Frameworks */,
 				2799460425FD9E5A001DCCE3 /* Resources */,
@@ -271,27 +262,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		27E4B809265C8D4000E183CB /* Generate Secrets */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Generate Secrets";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ -f './variables.env' ]; then\n  . ./variables.env\nfi\n\necho $GRC_SITE_KEY\n\nsourcery \\\n  --templates ./Templates \\\n  --sources Debiru \\\n  --output Debiru/Generated \\\n  --args siteKey=$GRC_SITE_KEY\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		2799460225FD9E5A001DCCE3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -308,7 +278,6 @@
 				27E4B808265C892400E183CB /* MutableFormData.swift in Sources */,
 				27662DD02C475E6C002A678D /* WindowState.swift in Sources */,
 				27B06E20264F293E00FCBC0B /* DataManager.swift in Sources */,
-				27E4B80C265C9B1600E183CB /* Parameters.stencil in Sources */,
 				27662DCA2C47484F002A678D /* ContentView.swift in Sources */,
 				27BFE1DD263CAE83004E7E2F /* DownloadedAsset.swift in Sources */,
 				273CBF1A2933FA1500D17677 /* CaptchaV3.swift in Sources */,
@@ -319,6 +288,7 @@
 				27C568332602D2A000983ECD /* Asset.swift in Sources */,
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
+				27662DD62C47698C002A678D /* BoardView.swift in Sources */,
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,
 				27BBC9D5260AC265005D8183 /* Post.swift in Sources */,
 			);
