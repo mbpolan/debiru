@@ -19,5 +19,7 @@ struct Board: Identifiable, Hashable, Codable {
 }
 
 struct BoardFeatures: Hashable, Codable {
+    static let none = BoardFeatures(supportsCode: false)
+    
     let supportsCode: Bool
 }

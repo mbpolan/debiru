@@ -8,43 +8,23 @@
 import SwiftUI
 
 class AppState: ObservableObject, Codable {
-    @Published var quickSearchOpen: Bool = false
     @Published var currentItem: ViewableItem?
     @Published var boards: [Board] = []
-    @Published var openItems: [ViewableItem]
-    @Published var openImageAsset: Asset?
-    @Published var openWebVideo: Asset?
-    @Published var newPostCount: Int = 0
-    @Published var autoRefresh: Bool = false
-    @Published var threadDisplayTree: Bool = true
-    @Published var threadDisplayList : Bool = false
-    @Published var targettedPostId: Int?
-    @Published var watchedThreads: [WatchedThread] = []
-    @Published var boardFilters: [String: [OrderedFilter]] = [:]
-    @Published var boardFilterEnablement: [String: Bool] = [:]
     
     init() {
         self.boards = []
-        self.openItems = []
     }
     
-    init(currentItem: ViewableItem?, boards: [Board], openItems: [ViewableItem]) {
+    init(currentItem: ViewableItem?, boards: [Board]) {
         self.currentItem = currentItem
         self.boards = boards
-        self.openItems = openItems
     }
     
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        quickSearchOpen = try values.decode(Bool.self, forKey: .quickSearchOpen)
         currentItem = try values.decode(ViewableItem.self, forKey: .currentItem)
         boards = try values.decode([Board].self, forKey: .boards)
-        openItems = try values.decode([ViewableItem].self, forKey: .openItems)
-        openImageAsset = try values.decode(Asset.self, forKey: .openImageAsset)
-        openWebVideo = try values.decode(Asset.self, forKey: .openWebVideo)
-        autoRefresh = try values.decode(Bool.self, forKey: .autoRefresh)
-        watchedThreads = try values.decode([WatchedThread].self, forKey: .watchedThreads)
     }
 }
 
@@ -62,13 +42,8 @@ extension AppState {
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(quickSearchOpen, forKey: .quickSearchOpen)
         try container.encode(currentItem, forKey: .currentItem)
         try container.encode(boards, forKey: .boards)
-        try container.encode(openItems, forKey: .openItems)
-        try container.encode(openImageAsset, forKey: .openImageAsset)
-        try container.encode(autoRefresh, forKey: .autoRefresh)
-        try container.encode(watchedThreads, forKey: .watchedThreads)
     }
 }
 
