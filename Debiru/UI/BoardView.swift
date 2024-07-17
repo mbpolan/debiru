@@ -24,7 +24,7 @@ struct BoardView: View {
     
     var body: some View {
         List(viewModel.threads) { thread in
-            Text("\(thread.id)")
+            PostView(post: thread.toPost())
         }
         .task {
             await loadBoard()

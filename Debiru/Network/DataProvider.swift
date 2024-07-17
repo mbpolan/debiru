@@ -27,7 +27,7 @@ protocol DataProvider {
     
     func getURL(for thread: Thread) -> URL?
     
-    func getURL(for asset: Asset) -> URL?
+    func getURL(for asset: Asset, variant: Asset.Variant) -> URL?
     
     func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL?
 }

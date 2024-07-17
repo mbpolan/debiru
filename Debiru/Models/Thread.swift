@@ -35,6 +35,26 @@ extension Thread {
         
         return false
     }
+    
+    func toPost() -> Post {
+        return Post(id: self.id,
+                    boardId: self.boardId,
+                    threadId: self.id,
+                    isRoot: false,
+                    author: self.author,
+                    date: self.date,
+                    replyToId: 0,
+                    subject: self.subject,
+                    content: self.content,
+                    sticky: self.sticky,
+                    closed: self.closed,
+                    spoileredImage: self.spoileredImage,
+                    attachment: self.attachment,
+                    threadStatistics: self.statistics,
+                    archived: false,
+                    archivedDate: nil,
+                    replies: [])
+    }
 }
 
 struct ThreadStatistics: Equatable, Hashable, Codable {

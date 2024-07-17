@@ -324,7 +324,14 @@ struct FourChanDataProvider: DataProvider {
         return URL(string: "\(webBoardsBaseUrl)/\(thread.boardId)/thread/\(thread.id)")
     }
     
-    func getURL(for asset: Asset) -> URL? {
+    func getURL(for asset: Asset, variant: Asset.Variant) -> URL? {
+        // for thumbnail images, append an "s" to the asset id. some assets only have thumbnail variants available,
+        // in which case don't modify the id
+        let suffix = variant == .thumbnail ? "s" : ""
+        let fileExtension = variant == .thumbnail ? ".jpg" : asset.extension
+        
+        let key = "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)"
+        
         return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)")
     }
     

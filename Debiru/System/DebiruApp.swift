@@ -36,6 +36,7 @@ struct DebiruApp: App {
         WindowGroup(for: UUID.self) { _ in
             ContentView()
                 .environment(appState)
+                .environment(\.deviceType, .defaultValue)
                 .task {
                     await loadBoards()
                 }
