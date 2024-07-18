@@ -14,20 +14,6 @@ struct BoardView: View {
     let board: Board
     @State private var viewModel: ViewModel = .init()
     
-    private func loadBoard() async {
-        do {
-            viewModel.state = .loading
-            
-            let threads = try await FourChanDataProvider().getCatalog(for: board)
-            viewModel.threads = ContentProvider.instance.processPosts(threads.map { $0.toPost() }, in: board)
-            
-            viewModel.state = .ready
-        } catch {
-            print(error)
-            viewModel.state = .error("Failed to load boards: \(error.localizedDescription)")
-        }
-    }
-    
     var body: some View {
         Group {
             switch viewModel.state {
@@ -46,6 +32,34 @@ struct BoardView: View {
         .navigationTitle(board.title)
         .task {
             await loadBoard()
+        }
+        .refreshable {
+            await refresh()
+        }
+    }
+    
+    private func updateData() async throws {
+        let threads = try await FourChanDataProvider().getCatalog(for: board)
+        viewModel.threads = ContentProvider.instance.processPosts(threads.map { $0.toPost() }, in: board)
+    }
+    
+    private func loadBoard() async {
+        do {
+            viewModel.state = .loading
+            
+            try await updateData()
+            viewModel.state = .ready
+        } catch {
+            print(error)
+            viewModel.state = .error("Failed to load boards: \(error.localizedDescription)")
+        }
+    }
+    
+    private func refresh() async {
+        do {
+            try await updateData()
+        } catch {
+            viewModel.state = .error("Failed to load boards: \(error.localizedDescription)")
         }
     }
 }
