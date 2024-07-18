@@ -18,10 +18,12 @@ struct PostView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            // show the subject if one was given
             if let text = post.subject {
                 subject(text)
             }
             
+            // show information about the author and post itself
             HStack(alignment: .firstTextBaseline) {
                 Text(post.author.name ?? "Anonymous")
                     .bold()
@@ -33,13 +35,18 @@ struct PostView: View {
                 Text(formatter.localizedString(for: post.date, relativeTo: .now))
             }
             
+            // render the asset and content
             body {
                 if let asset = post.attachment {
                     AssetView(asset: asset)
                         .padding(.trailing)
                 }
                 
-                Text(post.body ?? "")
+                // align content text to the left
+                HStack(alignment: .firstTextBaseline) {
+                    Text(post.body ?? "")
+                    Spacer()
+                }
             }
             .padding(.vertical)
         }
@@ -74,7 +81,7 @@ fileprivate struct AssetView: View {
     
     var body: some View {
         switch asset.fileType {
-        case .image:
+        case .image, .webm:
             AsyncImage(url: dataProvider.getURL(for: asset, variant: .thumbnail)) { image in
                 image.resizable().scaledToFit()
             } placeholder: {
@@ -83,7 +90,7 @@ fileprivate struct AssetView: View {
             .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
             .clipShape(RoundedRectangle(cornerSize: CGSize(width: 5, height: 5)))
             
-        case .webm, .animatedImage:
+        case .animatedImage:
             EmptyView()
         }
     }

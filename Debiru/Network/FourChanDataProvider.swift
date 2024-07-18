@@ -331,9 +331,7 @@ struct FourChanDataProvider: DataProvider {
         let suffix = variant == .thumbnail ? "s" : ""
         let fileExtension = variant == .thumbnail ? ".jpg" : asset.extension
         
-        let key = "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)"
-        
-        return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(asset.extension)")
+        return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)")
     }
     
     func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL? {
