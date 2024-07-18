@@ -17,7 +17,9 @@ struct BoardView: View {
     private func loadBoard() async {
         do {
             viewModel.state = .loading
-            viewModel.threads = try await FourChanDataProvider().getCatalog(for: board)
+            
+            let threads = try await FourChanDataProvider().getCatalog(for: board)
+            viewModel.threads = ContentProvider.instance.processPosts(threads.map { $0.toPost() }, in: board)
             
             viewModel.state = .ready
         } catch {
@@ -36,8 +38,8 @@ struct BoardView: View {
                 Text(message)
                 
             case .ready:
-                List(viewModel.threads) { thread in
-                    PostView(post: thread.toPost())
+                List(viewModel.threads) { post in
+                    PostView(post: post)
                 }
             }
         }
@@ -53,7 +55,7 @@ struct BoardView: View {
 @Observable
 fileprivate class ViewModel {
     var state: State = .loading
-    var threads: [Thread] = []
+    var threads: [Post] = []
     
     enum State {
         case loading

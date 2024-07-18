@@ -17,6 +17,7 @@ struct Post: Identifiable, Hashable {
     let replyToId: Int?
     let subject: String?
     let content: String?
+    let body: AttributedString?
     let sticky: Bool
     let closed: Bool
     let spoileredImage: Bool

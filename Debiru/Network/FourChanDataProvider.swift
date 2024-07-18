@@ -230,6 +230,7 @@ struct FourChanDataProvider: DataProvider {
                         replyToId: post.replyTo == 0 ? nil : post.replyTo,
                         subject: post.subject,
                         content: post.content,
+                        body: nil,
                         sticky: post.sticky == 1,
                         closed: post.closed == 1,
                         spoileredImage: post.spoiler == 1,

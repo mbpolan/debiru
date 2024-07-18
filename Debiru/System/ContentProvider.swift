@@ -54,8 +54,7 @@ struct ContentProvider {
             // build a map of post ids to their models
             return posts.map { post in
                 // did this post's content change?
-                guard let content = postsToContent[post.id],
-                      content.dirty else { return post }
+                guard let content = postsToContent[post.id] else { return post }
                 
                 return Post(id: post.id,
                             boardId: post.boardId,
@@ -66,6 +65,7 @@ struct ContentProvider {
                             replyToId: post.replyToId,
                             subject: post.subject,
                             content: try? content.document.html(),
+                            body: try? processContent(content.document),
                             sticky: post.sticky,
                             closed: post.closed,
                             spoileredImage: post.spoileredImage,
@@ -105,6 +105,50 @@ struct ContentProvider {
             }
         } catch {
             print(error)
+        }
+    }
+    
+    private func processContent(_ html: Document) throws -> AttributedString {
+        var strings: [AttributedString] = []
+        
+        for node in html.body()?.getChildNodes() ?? [] {
+            switch node {
+            case let n as TextNode:
+                // append the text as-is without adding any attributes
+                strings.append(AttributedString(stringLiteral: n.text()))
+                
+            case let n as Element:
+                switch n.tagName() {
+                case "br":
+                    // convert this into a line break
+                    strings.append(AttributedString(stringLiteral: "\n"))
+                    
+                case "a":
+                    // anchor tags contain either external, reply-to or cross-board links
+                    strings.append(AttributedString(stringLiteral: try n.text()))
+                    
+                case "span":
+                    // span tags contain quotes and other styled text
+                    var str = AttributedString(stringLiteral: try n.text())
+                    
+                    if n.hasClass("quote") {
+                        str.foregroundColor = .systemGreen
+                    }
+                    
+                    strings.append(str)
+                    
+                default:
+                    // unknown or otherwise unhandled tag
+                    strings.append(AttributedString(stringLiteral: try n.text()))
+                }
+                
+            default:
+                break
+            }
+        }
+        
+        return strings.reduce(AttributedString()) { memo, v in
+            return memo + v
         }
     }
 }

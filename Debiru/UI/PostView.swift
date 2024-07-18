@@ -33,7 +33,7 @@ struct PostView: View {
                 AssetView(asset: asset)
             }
             
-            Text(post.content ?? "")
+            Text(post.body ?? "")
         }
     }
 }
@@ -92,6 +92,7 @@ fileprivate struct CountryFlagView: View {
                         replyToId: nil,
                         subject: "Some subject line",
                         content: "This is a post content\nMulti-line!",
+                        body: AttributedString(stringLiteral: "This is a post content\nMulti-line!"),
                         sticky: false,
                         closed: false,
                         spoileredImage: false,

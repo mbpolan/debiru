@@ -46,6 +46,7 @@ extension Thread {
                     replyToId: 0,
                     subject: self.subject,
                     content: self.content,
+                    body: nil,
                     sticky: self.sticky,
                     closed: self.closed,
                     spoileredImage: self.spoileredImage,
