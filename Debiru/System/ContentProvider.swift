@@ -111,6 +111,7 @@ struct ContentProvider {
     private func processContent(_ html: Document) throws -> AttributedString {
         var strings: [AttributedString] = []
         
+        // perform a first-level only parse, treating all nested elements as a single entity
         for node in html.body()?.getChildNodes() ?? [] {
             switch node {
             case let n as TextNode:
@@ -131,6 +132,7 @@ struct ContentProvider {
                     // span tags contain quotes and other styled text
                     var str = AttributedString(stringLiteral: try n.text())
                     
+                    // apply styles based on what classes this element has
                     if n.hasClass("quote") {
                         str.foregroundColor = .systemGreen
                     }

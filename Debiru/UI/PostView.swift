@@ -18,6 +18,10 @@ struct PostView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            if let text = post.subject {
+                subject(text)
+            }
+            
             HStack(alignment: .firstTextBaseline) {
                 Text(post.author.name ?? "Anonymous")
                     .bold()
@@ -29,11 +33,36 @@ struct PostView: View {
                 Text(formatter.localizedString(for: post.date, relativeTo: .now))
             }
             
-            if let asset = post.attachment {
-                AssetView(asset: asset)
+            body {
+                if let asset = post.attachment {
+                    AssetView(asset: asset)
+                        .padding(.trailing)
+                }
+                
+                Text(post.body ?? "")
             }
-            
-            Text(post.body ?? "")
+            .padding(.vertical)
+        }
+    }
+    
+    @ViewBuilder
+    private func subject(_ text: String) -> some View {
+        if deviceType == .iOS {
+            Text(text)
+                .font(.title3)
+        } else {
+            Text(text)
+                .font(.title)
+        }
+    }
+    
+    private func body<Content : View>(@ViewBuilder content: @escaping () -> Content) -> some View {
+        Group {
+            if deviceType == .iOS {
+                VStack(content: content)
+            } else {
+                HStack(content: content)
+            }
         }
     }
 }
@@ -46,9 +75,14 @@ fileprivate struct AssetView: View {
     var body: some View {
         switch asset.fileType {
         case .image:
-            AsyncImage(url: dataProvider.getURL(for: asset, variant: .thumbnail)) { img in
-                img.image?.resizable().scaledToFit()
+            AsyncImage(url: dataProvider.getURL(for: asset, variant: .thumbnail)) { image in
+                image.resizable().scaledToFit()
+            } placeholder: {
+                ProgressView()
             }
+            .frame(width: CGFloat(asset.thumbnailWidth), height: CGFloat(asset.thumbnailHeight))
+            .clipShape(RoundedRectangle(cornerSize: CGSize(width: 5, height: 5)))
+            
         case .webm, .animatedImage:
             EmptyView()
         }
@@ -72,7 +106,11 @@ fileprivate struct CountryFlagView: View {
     
     private func makeFlag(_ code: String) -> some View {
         if let flag = Flag(countryCode: code) {
+            #if os(iOS)
             return Image(uiImage: flag.image(style: .roundedRect))
+            #else
+            return Image(nsImage: flag.originalImage)
+            #endif
         } else {
             return Image(systemName: "x")
         }
