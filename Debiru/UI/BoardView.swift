@@ -30,7 +30,7 @@ struct BoardView: View {
             }
         }
         .navigationTitle(board.title)
-        .task {
+        .task(id: board.id) {
             await loadBoard()
         }
         .refreshable {
@@ -81,5 +81,8 @@ fileprivate class ViewModel {
 // MARK: - Previews
 
 #Preview {
-    BoardView(board: Board(id: "a", title: "Anime", description: "", features: .none))
+    BoardView(board: Board(id: "a",
+                         title: "Anime",
+                         description: "",
+                         features: .none))
 }
