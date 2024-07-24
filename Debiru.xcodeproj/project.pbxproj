@@ -13,11 +13,11 @@
 		27662DCC2C474919002A678D /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCB2C474919002A678D /* Settings.swift */; };
 		27662DCE2C4749F8002A678D /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCD2C4749F8002A678D /* SidebarView.swift */; };
 		27662DD02C475E6C002A678D /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DCF2C475E6C002A678D /* WindowState.swift */; };
-		27662DD22C47610D002A678D /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD12C47610D002A678D /* LandingView.swift */; };
 		27662DD42C4764DD002A678D /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD32C4764DD002A678D /* DetailView.swift */; };
 		27662DD62C47698C002A678D /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD52C47698C002A678D /* BoardView.swift */; };
 		27662DD82C476BEE002A678D /* PostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD72C476BEE002A678D /* PostView.swift */; };
 		27662DDA2C476F01002A678D /* DeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD92C476F01002A678D /* DeviceType.swift */; };
+		27662DDC2C51BDD4002A678D /* ThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDB2C51BDD4002A678D /* ThreadView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -50,11 +50,11 @@
 		27662DCB2C474919002A678D /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		27662DCD2C4749F8002A678D /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		27662DCF2C475E6C002A678D /* WindowState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowState.swift; sourceTree = "<group>"; };
-		27662DD12C47610D002A678D /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
 		27662DD32C4764DD002A678D /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		27662DD52C47698C002A678D /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		27662DD72C476BEE002A678D /* PostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostView.swift; sourceTree = "<group>"; };
 		27662DD92C476F01002A678D /* DeviceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceType.swift; sourceTree = "<group>"; };
+		27662DDB2C51BDD4002A678D /* ThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -141,10 +141,10 @@
 			children = (
 				27662DC92C47484F002A678D /* ContentView.swift */,
 				27662DCD2C4749F8002A678D /* SidebarView.swift */,
-				27662DD12C47610D002A678D /* LandingView.swift */,
 				27662DD32C4764DD002A678D /* DetailView.swift */,
 				27662DD52C47698C002A678D /* BoardView.swift */,
 				27662DD72C476BEE002A678D /* PostView.swift */,
+				27662DDB2C51BDD4002A678D /* ThreadView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -275,7 +275,6 @@
 			files = (
 				279CFF8625FFEC9000884724 /* Thread.swift in Sources */,
 				27662DD42C4764DD002A678D /* DetailView.swift in Sources */,
-				27662DD22C47610D002A678D /* LandingView.swift in Sources */,
 				27BBF1F726043CA000534CB7 /* DataCache.swift in Sources */,
 				27662DCE2C4749F8002A678D /* SidebarView.swift in Sources */,
 				27C056092610F5130037A91B /* User.swift in Sources */,
@@ -290,6 +289,7 @@
 				273CBF1A2933FA1500D17677 /* CaptchaV3.swift in Sources */,
 				27662DDA2C476F01002A678D /* DeviceType.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
+				27662DDC2C51BDD4002A678D /* ThreadView.swift in Sources */,
 				27E4B806265C7F8F00E183CB /* Submission.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
 				27662DCC2C474919002A678D /* Settings.swift in Sources */,

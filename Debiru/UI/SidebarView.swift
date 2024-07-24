@@ -40,10 +40,14 @@ struct SidebarView: View {
                 }
             },
             set: {
+//                windowState.route.removeLast(windowState.route.count)
+                
+                
                 if let board = $0 {
-                    windowState.currentItem = .board(board)
+                    windowState.route = NavigationPath([ViewableItem.board(board)])
+//                    windowState.currentItem = .board(board)
                 } else {
-                    windowState.currentItem = nil
+                    windowState.route = NavigationPath()
                 }
             }
         )

@@ -21,16 +21,17 @@ struct PostView: View {
             // show the subject if one was given
             if let text = post.subject {
                 subject(text)
+                    .textSelection(.enabled)
             }
             
             // show information about the author and post itself
-            HStack(alignment: .firstTextBaseline) {
-                Text(post.author.name ?? "Anonymous")
-                    .bold()
-                
+            HStack(alignment: .center) {
                 if let country = post.author.country {
                     CountryFlagView(country: country)
                 }
+                
+                Text(post.author.name ?? "Anonymous")
+                    .bold()
                 
                 Text(formatter.localizedString(for: post.date, relativeTo: .now))
             }
@@ -45,6 +46,11 @@ struct PostView: View {
                 // align content text to the left
                 HStack(alignment: .firstTextBaseline) {
                     Text(post.body ?? "")
+                        .textSelection(.enabled)
+                        .environment(\.openURL, OpenURLAction { url in
+                                            return .systemAction
+                                        })
+                    
                     Spacer()
                 }
             }
@@ -68,7 +74,7 @@ struct PostView: View {
             if deviceType == .iOS {
                 VStack(content: content)
             } else {
-                HStack(content: content)
+                HStack(alignment: .top, content: content)
             }
         }
     }
@@ -104,8 +110,12 @@ fileprivate struct CountryFlagView: View {
         switch country {
         case .code(let code, let name):
             makeFlag(code)
-        case .fake(let code, let name):
+                .clipShape(.circle)
+                .help(name)
+        case .fake(_, let name):
             Text("X")
+                .clipShape(.circle)
+                .help(name)
         case .unknown:
             Text("?")
         }
@@ -114,7 +124,7 @@ fileprivate struct CountryFlagView: View {
     private func makeFlag(_ code: String) -> some View {
         if let flag = Flag(countryCode: code) {
             #if os(iOS)
-            return Image(uiImage: flag.image(style: .roundedRect))
+            return Image(uiImage: flag.originalImage)
             #else
             return Image(nsImage: flag.originalImage)
             #endif

@@ -10,16 +10,11 @@ import SwiftUI
 // MARK: - View
 
 struct DetailView: View {
-    @Environment(WindowState.self) private var windowState
-    
     var body: some View {
-        switch windowState.currentItem {
-        case .board(let board):
-            BoardView(board: board)
-        case .thread(let board, let thread):
-            Text("Viewing: thread \(thread.id)")
-        case .none:
-            LandingView()
+        Group {
+            Text("Select a board to view threads")
+                .font(.subheadline)
+                .foregroundStyle(.placeholder)
         }
     }
 }
@@ -28,6 +23,4 @@ struct DetailView: View {
 
 #Preview {
     DetailView()
-        .environment(AppState())
-        .environment(WindowState())
 }

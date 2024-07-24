@@ -12,6 +12,7 @@ import SwiftUI
 /// A view that displays threads in a particular board.
 struct BoardView: View {
     let board: Board
+    @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
     
     var body: some View {
@@ -26,6 +27,13 @@ struct BoardView: View {
             case .ready:
                 List(viewModel.threads) { post in
                     PostView(post: post)
+                        .onTapGesture {
+                            let thread = self.toThread(post)
+                            
+                            windowState.route.append(thread)
+//                            windowState.currentItem = thread
+                            
+                        }
                 }
             }
         }
@@ -36,6 +44,20 @@ struct BoardView: View {
         .refreshable {
             await refresh()
         }
+    }
+    
+    private func toThread(_ post: Post) -> ViewableItem {
+        return ViewableItem.thread(board, Thread(id: post.id,
+                                                 boardId: board.id,
+                                                 author: post.author,
+                                                 date: post.date,
+                                                 subject: post.subject,
+                                                 content: post.content,
+                                                 sticky: post.sticky,
+                                                 closed: post.closed,
+                                                 spoileredImage: post.spoileredImage,
+                                                 attachment: post.attachment,
+                                                 statistics: post.threadStatistics ?? ThreadStatistics(replies: 0, images: 0, uniquePosters: 0, bumpLimit: false, imageLimit: false, page: 0)))
     }
     
     private func updateData() async throws {

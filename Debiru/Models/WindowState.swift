@@ -6,10 +6,12 @@
 //
 
 import Observation
+import SwiftUI
 
 /// A model that represents the current state of a window group.
 @Observable
 class WindowState {
+    var route: NavigationPath = .init()
     var currentItem: ViewableItem?
 }
 
