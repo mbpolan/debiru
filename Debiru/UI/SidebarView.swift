@@ -25,10 +25,10 @@ struct SidebarView: View {
             }
         }
         .navigationTitle("Boards")
+        .listStyle(.sidebar)
         #if os(iOS)
         .searchable(text: $viewModel.filter)
         #endif
-        .listStyle(.sidebar)
     }
     
     private var boards: [Board] {

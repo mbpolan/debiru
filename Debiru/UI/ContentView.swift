@@ -76,7 +76,15 @@ fileprivate struct PhoneContentView: View {
                     }
                 }
         }
-        
+        .toolbar {
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    windowState.clearNavigation()
+                } label: {
+                    Label("", systemImage: "house")
+                }
+            }
+        }
     }
 }
 

@@ -14,6 +14,10 @@ class WindowState {
     var route: NavigationPath = .init()
     var currentItem: ViewableItem?
     
+    func clearNavigation() {
+        self.route = NavigationPath()
+    }
+    
     func navigate(boardId: String) {
         self.route.append(ViewableItem.board(boardId: boardId))
     }
