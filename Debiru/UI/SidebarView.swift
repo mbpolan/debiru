@@ -13,9 +13,10 @@ import SwiftUI
 struct SidebarView: View {
     @Environment(AppState.self) private var appState
     @Environment(WindowState.self) private var windowState
+    @State private var viewModel: ViewModel = .init()
     
     var body: some View {
-        List(appState.boards, id: \.id, selection: self.currentBoard) { board in
+        List(boards, id: \.id, selection: self.currentBoard) { board in
             HStack {
                 Text("/\(board.id)/")
                     .bold()
@@ -23,8 +24,25 @@ struct SidebarView: View {
                 Text(board.title)
             }
         }
-        .listStyle(.sidebar)
         .navigationTitle("Boards")
+        #if os(iOS)
+        .searchable(text: $viewModel.filter)
+        #endif
+        .listStyle(.sidebar)
+    }
+    
+    private var boards: [Board] {
+        if viewModel.filter == "" {
+            return appState.boards
+        }
+        
+        return appState.boards.filter { board in
+            if viewModel.filter.starts(with: "/") {
+                return board.id.contains(viewModel.filter.trimmingCharacters(in: ["/"]))
+            } else {
+                return board.title.localizedCaseInsensitiveContains(viewModel.filter)
+            }
+        }
     }
     
     private var currentBoard: Binding<String?> {
@@ -50,6 +68,13 @@ struct SidebarView: View {
             }
         )
     }
+}
+
+// MARK: - View Model
+
+@Observable
+fileprivate class ViewModel {
+    var filter: String = ""
 }
 
 // MARK: - Previews

@@ -25,7 +25,7 @@ struct BoardView: View {
                 Text(message)
                 
             case .ready:
-                List(viewModel.threads) { post in
+                List(self.threads) { post in
                     PostView(post: post,
                              onTapGesture: { handleGoToThread(post) },
                              onViewAsset: handleViewAsset)
@@ -33,11 +33,26 @@ struct BoardView: View {
             }
         }
         .navigationTitle(viewModel.board?.title ?? "")
+        .searchable(text: $viewModel.filter)
         .task(id: boardId) {
             await loadBoard()
         }
         .refreshable {
             await refresh()
+        }
+    }
+    
+    private var threads: [Post] {
+        return viewModel.threads.filter { post in
+            if viewModel.filter == "" {
+                return true
+            } else if let subject = post.subject, subject.localizedCaseInsensitiveContains(viewModel.filter) {
+                return true
+            } else if let body = post.content, body.localizedCaseInsensitiveContains(viewModel.filter) {
+                return true
+            } else {
+                return false
+            }
         }
     }
     
@@ -87,6 +102,7 @@ fileprivate class ViewModel {
     var state: State = .loading
     var board: Board?
     var threads: [Post] = []
+    var filter: String = ""
     
     enum State {
         case loading
