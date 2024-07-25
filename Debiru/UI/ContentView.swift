@@ -19,9 +19,6 @@ struct ContentView: View {
             if horizontalSizeClass == .compact {
                 PhoneContentView()
                     .environment(windowState)
-                    .environment(\.openURL, OpenURLAction { url in
-                        return .systemAction
-                    })
             } else {
                 DesktopContentView()
                     .environment(windowState)
