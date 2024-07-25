@@ -15,7 +15,7 @@ struct SidebarView: View {
     @Environment(WindowState.self) private var windowState
     
     var body: some View {
-        List(appState.boards, id: \.self, selection: self.currentBoard) { board in
+        List(appState.boards, id: \.id, selection: self.currentBoard) { board in
             HStack {
                 Text("/\(board.id)/")
                     .bold()
@@ -27,25 +27,21 @@ struct SidebarView: View {
         .navigationTitle("Boards")
     }
     
-    private var currentBoard: Binding<Board?> {
-        return Binding<Board?>(
+    private var currentBoard: Binding<String?> {
+        return Binding<String?>(
             get: {
                 switch windowState.currentItem {
-                case .board(let board):
-                    return board
-                case .thread(let board, _):
-                    return board
+                case .board(let boardId):
+                    return boardId
+                case .thread(let boardId, _):
+                    return boardId
                 case .none:
                     return nil
                 }
             },
             set: {
-//                windowState.route.removeLast(windowState.route.count)
-                
-                
-                if let board = $0 {
-                    windowState.route = NavigationPath([ViewableItem.board(board)])
-//                    windowState.currentItem = .board(board)
+                if let boardId = $0 {
+                    windowState.route = NavigationPath([ViewableItem.board(boardId: boardId)])
                 } else {
                     windowState.route = NavigationPath()
                 }

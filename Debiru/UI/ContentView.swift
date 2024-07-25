@@ -15,13 +15,41 @@ struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     var body: some View {
-        if horizontalSizeClass == .compact {
-            PhoneContentView()
-                .environment(windowState)
-        } else {
-            DesktopContentView()
-                .environment(windowState)
+        Group {
+            if horizontalSizeClass == .compact {
+                PhoneContentView()
+                    .environment(windowState)
+                    .environment(\.openURL, OpenURLAction { url in
+                        return .systemAction
+                    })
+            } else {
+                DesktopContentView()
+                    .environment(windowState)
+            }
         }
+        .environment(\.openURL, OpenURLAction { url in
+            return handleOpenURL(url)
+        })
+    }
+    
+    private func handleOpenURL(_ url: URL) -> OpenURLAction.Result {
+        let str = url.absoluteString
+        
+        // internal link to a board or post
+        if str.starts(with: "//boards.4channel.org/") {
+            let path = str.replacingOccurrences(of: "//boards.4channel.org/", with: "").trimmingCharacters(in: ["/"]).split(separator: "/")
+            
+            if path.count == 1 {
+                windowState.route.append(ViewableItem.board(boardId: String(path[0])))
+                return .handled
+            } else {
+                print("Unsupported URL: \(str)")
+                return .systemAction
+            }
+        }
+        
+        
+        return .systemAction
     }
 }
 
@@ -38,10 +66,10 @@ fileprivate struct PhoneContentView: View {
             SidebarView()
                 .navigationDestination(for: ViewableItem.self) { item in
                     switch item {
-                    case .board(let board):
-                        BoardView(board: board)
-                    case .thread(let board, let thread):
-                        ThreadView(board: board, thread: thread)
+                    case .board(let boardId):
+                        BoardView(boardId: boardId)
+                    case .thread(let boardId, let threadId):
+                        ThreadView(boardId: boardId, threadId: threadId)
                     }
                 }
         }
@@ -67,10 +95,10 @@ fileprivate struct DesktopContentView: View {
             }
             .navigationDestination(for: ViewableItem.self) { item in
                 switch item {
-                case .board(let board):
-                    BoardView(board: board)
-                case .thread(let board, let thread):
-                    ThreadView(board: board, thread: thread)
+                case .board(let boardId):
+                    BoardView(boardId: boardId)
+                case .thread(let boardId, let threadId):
+                    ThreadView(boardId: boardId, threadId: threadId)
                 }
             }
         }

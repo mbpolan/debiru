@@ -13,9 +13,11 @@ protocol DataProvider {
     
     func getBoards() async throws -> [Board]
     
+    func getBoard(for boardId: String) async throws -> Board?
+    
     func getCatalog(for board: Board) async throws -> [Thread]
     
-    func getPosts(for thread: Thread) async throws -> [Post]
+    func getPosts(for threadId: Int, in boardId: String) async throws -> [Post]
     
     func getCaptchaV3(from html: String) throws -> CaptchaV3Challenge
     

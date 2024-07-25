@@ -17,15 +17,15 @@ class WindowState {
 
 /// An enumeration of possible items that can be viewed in the app.
 enum ViewableItem: Identifiable, Hashable, Codable {
-    case board(Board)
-    case thread(Board, Thread)
+    case board(boardId: String)
+    case thread(boardId: String, threadId: Int)
     
     var id: String {
         switch self {
-        case .board(let board):
-            return board.id
-        case .thread(_, let thread):
-            return String(thread.id)
+        case .board(let boardId):
+            return boardId
+        case .thread(let boardId, let threadId):
+            return "\(boardId)-\(threadId)"
         }
     }
 }
@@ -48,11 +48,12 @@ extension ViewableItem {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        if let board = try? values.decode(Board.self, forKey: .board) {
-            self = .board(board)
-        } else if let pair = try? values.decode(BoardThreadTuple.self, forKey: .thread) {
-            self = .thread(pair.board, pair.thread)
-        }
+        // FIXME
+//        if let board = try? values.decode(Board.self, forKey: .board) {
+//            self = .board(board)
+//        } else if let pair = try? values.decode(BoardThreadTuple.self, forKey: .thread) {
+//            self = .thread(pair.board, pair.thread)
+//        }
         
         throw ViewableItemCodingError.decoding("Failed to decode: \(dump(values))")
     }
@@ -64,9 +65,11 @@ extension ViewableItem {
         case .board(let board):
             try container.encode(board, forKey: .board)
         case .thread(let board, let thread):
-            try container.encode(BoardThreadTuple(
-                                    board: board,
-                                    thread: thread), forKey: .thread)
+            break
+            // FIXME
+//            try container.encode(BoardThreadTuple(
+//                                    board: board,
+//                                    thread: thread), forKey: .thread)
         }
         
     }

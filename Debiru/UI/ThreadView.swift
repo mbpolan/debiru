@@ -11,8 +11,8 @@ import SwiftUI
 
 /// A view that displays posts in a single thread.
 struct ThreadView: View {
-    let board: Board
-    let thread: Thread
+    let boardId: String
+    let threadId: Int
     @State private var viewModel: ViewModel = .init()
     
     var body: some View {
@@ -30,35 +30,40 @@ struct ThreadView: View {
                 }
             }
         }
-        .task(id: thread.id) {
+        .task(id: threadId) {
             await loadThread()
         }
         .refreshable {
             await refresh()
         }
-        .navigationTitle("Thread")
+        .navigationTitle(viewModel.thread?.subject ?? viewModel.board?.title ?? "")
+        #if os(macOS)
+        .navigationSubtitle(viewModel.board?.title ?? "")
+        #endif
     }
     
-    private func updateData() async throws {
-        let data = try await FourChanDataProvider().getPosts(for: thread)
+    private func updateData() async throws -> ViewModel.State {
+        guard let board = try await FourChanDataProvider().getBoard(for: boardId) else {
+            return .error("Board \(boardId) does not exist")
+        }
+        
+        let data = try await FourChanDataProvider().getPosts(for: threadId, in: boardId)
         viewModel.posts = ContentProvider.instance.processPosts(data, in: board).map { ThreadPost(post: $0) }
+        return .ready
     }
     
     private func loadThread() async {
         do {
             viewModel.state = .loading
-            
-            try await updateData()
-            viewModel.state = .ready
+            viewModel.state = try await updateData()
         } catch {
-            print(error)
             viewModel.state = .error("Failed to load posts: \(error.localizedDescription)")
         }
     }
     
     private func refresh() async {
         do {
-            try await updateData()
+            viewModel.state = try await updateData()
         } catch {
             viewModel.state = .error("Failed to load posts: \(error.localizedDescription)")
         }
@@ -68,6 +73,8 @@ struct ThreadView: View {
 @Observable
 fileprivate class ViewModel {
     var state: State = .loading
+    var board: Board?
+    var thread: Thread?
     var posts: [ThreadPost] = []
     
     enum State {

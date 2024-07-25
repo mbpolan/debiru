@@ -85,6 +85,11 @@ struct FourChanDataProvider: DataProvider {
             }) ?? []
     }
     
+    func getBoard(for boardId: String) async throws -> Board? {
+        let boards = try await getBoards()
+        return boards.first { $0.id == boardId }
+    }
+    
     func getCatalog(for board: Board) async throws -> [Thread] {
         return try await getData(
             url: "\(apiBaseUrl)/\(board.id)/catalog.json",
@@ -147,9 +152,9 @@ struct FourChanDataProvider: DataProvider {
             }) ?? []
     }
     
-    func getPosts(for thread: Thread) async throws -> [Post] {
+    func getPosts(for threadId: Int, in boardId: String) async throws -> [Post] {
         return try await getData(
-            url: "\(apiBaseUrl)/\(thread.boardId)/thread/\(thread.id).json",
+            url: "\(apiBaseUrl)/\(boardId)/thread/\(threadId).json",
             mapper: { (value: ThreadPostsModel) in
                 var postsToReplies: [Int: [Int]] = [:]
                 var rootPosts: [Int: Bool] = [:]
@@ -165,7 +170,7 @@ struct FourChanDataProvider: DataProvider {
                     }
                     
                     // this post if considered a root if it does not reply to other posts or if one of its replies is to the thread starter
-                    rootPosts[post.id] = replies.count == 0 || replies.contains { $0 == thread.id }
+                    rootPosts[post.id] = replies.count == 0 || replies.contains { $0 == threadId }
                 }
                 
                 return value.posts.map { post in
@@ -181,7 +186,7 @@ struct FourChanDataProvider: DataProvider {
                         
                         asset = Asset(
                             id: id,
-                            boardId: thread.boardId,
+                            boardId: boardId,
                             width: width,
                             height: height,
                             thumbnailWidth: thumbWidth,
@@ -217,8 +222,8 @@ struct FourChanDataProvider: DataProvider {
                     
                     return Post(
                         id: post.id,
-                        boardId: thread.boardId,
-                        threadId: thread.id,
+                        boardId: boardId,
+                        threadId: threadId,
                         isRoot: rootPosts[post.id] ?? true,
                         author: User(
                             name: post.author,

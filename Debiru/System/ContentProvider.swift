@@ -134,6 +134,16 @@ struct ContentProvider {
                     // an anchor with no class implies an external link
                     if try n.className() == "" {
                         str.link = URL(string: href)
+                    } else if try n.className() == "quotelink" {
+                        str.link = URL(string: href)
+                        // cross-board link
+//                        if href.starts(with: "/") || href.starts(with: "//") {
+//                            let url = href
+//                                .replacingOccurrences(of: "boards.4channel.org", with: "")
+//                                .replacingOccurrences(of: "/", with: "")
+//                            
+//                            str.link = URL(string: "internal://board/\(url)")
+//                        }
                     }
                     
                     strings.append(str)

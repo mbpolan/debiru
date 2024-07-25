@@ -13,8 +13,8 @@ import SwiftUI
 // A view that displays a post's content, author and other contextual information.
 struct PostView: View {
     let post: Post
-    private let formatter: RelativeDateTimeFormatter = .init()
     @Environment(\.deviceType) private var deviceType
+    private static let formatter: RelativeDateTimeFormatter = .init()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -33,7 +33,7 @@ struct PostView: View {
                 Text(post.author.name ?? "Anonymous")
                     .bold()
                 
-                Text(formatter.localizedString(for: post.date, relativeTo: .now))
+                Text(PostView.formatter.localizedString(for: post.date, relativeTo: .now))
             }
             
             // render the asset and content
@@ -46,10 +46,8 @@ struct PostView: View {
                 // align content text to the left
                 HStack(alignment: .firstTextBaseline) {
                     Text(post.body ?? "")
-                        .textSelection(.enabled)
-                        .environment(\.openURL, OpenURLAction { url in
-                                            return .systemAction
-                                        })
+                        // enabling this breaks the url action above :/
+                        //.textSelection(.enabled)
                     
                     Spacer()
                 }
@@ -76,6 +74,16 @@ struct PostView: View {
             } else {
                 HStack(alignment: .top, content: content)
             }
+        }
+    }
+    
+    private func handleOpenURL(_ url: URL) -> OpenURLAction.Result {
+        switch url.scheme {
+        case "debiru://":
+            let path = url.pathComponents
+            return .handled
+        default:
+            return .systemAction
         }
     }
 }

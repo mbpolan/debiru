@@ -11,7 +11,7 @@ import SwiftUI
 
 /// A view that displays threads in a particular board.
 struct BoardView: View {
-    let board: Board
+    let boardId: String
     @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
     
@@ -28,14 +28,13 @@ struct BoardView: View {
                 List(viewModel.threads) { post in
                     PostView(post: post)
                         .onTapGesture {
-                            let thread = self.toThread(post)
-                            windowState.route.append(thread)
+                            windowState.route.append(ViewableItem.thread(boardId: boardId, threadId: post.threadId))
                         }
                 }
             }
         }
-        .navigationTitle(board.title)
-        .task(id: board.id) {
+        .navigationTitle(viewModel.board?.title ?? boardId)
+        .task(id: boardId) {
             await loadBoard()
         }
         .refreshable {
@@ -43,40 +42,31 @@ struct BoardView: View {
         }
     }
     
-    private func toThread(_ post: Post) -> ViewableItem {
-        return ViewableItem.thread(board, Thread(id: post.id,
-                                                 boardId: board.id,
-                                                 author: post.author,
-                                                 date: post.date,
-                                                 subject: post.subject,
-                                                 content: post.content,
-                                                 sticky: post.sticky,
-                                                 closed: post.closed,
-                                                 spoileredImage: post.spoileredImage,
-                                                 attachment: post.attachment,
-                                                 statistics: post.threadStatistics ?? ThreadStatistics(replies: 0, images: 0, uniquePosters: 0, bumpLimit: false, imageLimit: false, page: 0)))
-    }
-    
-    private func updateData() async throws {
+    private func updateData() async throws -> ViewModel.State {
+        guard let board = try await FourChanDataProvider().getBoard(for: boardId) else {
+            return .error("Board \(boardId) does not exist")
+        }
+        
         let threads = try await FourChanDataProvider().getCatalog(for: board)
+        
+        viewModel.board = board
         viewModel.threads = ContentProvider.instance.processPosts(threads.map { $0.toPost() }, in: board)
+        return .ready
     }
     
     private func loadBoard() async {
         do {
             viewModel.state = .loading
             
-            try await updateData()
-            viewModel.state = .ready
+            viewModel.state = try await updateData()
         } catch {
-            print(error)
             viewModel.state = .error("Failed to load boards: \(error.localizedDescription)")
         }
     }
     
     private func refresh() async {
         do {
-            try await updateData()
+            viewModel.state = try await updateData()
         } catch {
             viewModel.state = .error("Failed to load boards: \(error.localizedDescription)")
         }
@@ -88,6 +78,7 @@ struct BoardView: View {
 @Observable
 fileprivate class ViewModel {
     var state: State = .loading
+    var board: Board?
     var threads: [Post] = []
     
     enum State {
@@ -100,8 +91,5 @@ fileprivate class ViewModel {
 // MARK: - Previews
 
 #Preview {
-    BoardView(board: Board(id: "a",
-                         title: "Anime",
-                         description: "",
-                         features: .none))
+    BoardView(boardId: "a")
 }
