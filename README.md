@@ -21,6 +21,8 @@ priority relative to supporting macOS as a first class citizen.
 
 ## Developing
 
+❗ This project is going through a rewrite. New development is happening over in `experiment/v2`. ❗
+
 You'll need macOS 11.x and Xcode 12.4. 
 
 Additionally, you'll need a recent version of [Sourcery](https://github.com/krzysztofzablocki/Sourcery), and
