@@ -29,10 +29,7 @@ struct BoardView: View {
                     PostView(post: post)
                         .onTapGesture {
                             let thread = self.toThread(post)
-                            
                             windowState.route.append(thread)
-//                            windowState.currentItem = thread
-                            
                         }
                 }
             }

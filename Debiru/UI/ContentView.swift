@@ -41,7 +41,7 @@ fileprivate struct PhoneContentView: View {
                     case .board(let board):
                         BoardView(board: board)
                     case .thread(let board, let thread):
-                        Text("Viewing: thread \(thread.id)")
+                        ThreadView(board: board, thread: thread)
                     }
                 }
         }
@@ -70,7 +70,7 @@ fileprivate struct DesktopContentView: View {
                 case .board(let board):
                     BoardView(board: board)
                 case .thread(let board, let thread):
-                    Text("Viewing: thread \(thread.id)")
+                    ThreadView(board: board, thread: thread)
                 }
             }
         }

@@ -18,7 +18,7 @@ class WindowState {
 /// An enumeration of possible items that can be viewed in the app.
 enum ViewableItem: Identifiable, Hashable, Codable {
     case board(Board)
-    case thread(Board?, Thread)
+    case thread(Board, Thread)
     
     var id: String {
         switch self {
@@ -41,7 +41,7 @@ extension ViewableItem {
     }
     
     private struct BoardThreadTuple: Codable {
-        let board: Board?
+        let board: Board
         let thread: Thread
     }
     
