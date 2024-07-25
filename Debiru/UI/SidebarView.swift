@@ -35,6 +35,8 @@ struct SidebarView: View {
                     return boardId
                 case .thread(let boardId, _):
                     return boardId
+                case .asset(let asset):
+                    return asset.boardId
                 case .none:
                     return nil
                 }

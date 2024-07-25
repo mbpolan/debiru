@@ -13,6 +13,7 @@ import SwiftUI
 struct ThreadView: View {
     let boardId: String
     let threadId: Int
+    @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
     
     var body: some View {
@@ -26,7 +27,7 @@ struct ThreadView: View {
                 
             case .ready:
                 List(viewModel.posts, children: \.children) { item in
-                    PostView(post: item.post)
+                    PostView(post: item.post, onViewAsset: handleViewAsset)
                 }
             }
         }
@@ -36,10 +37,14 @@ struct ThreadView: View {
         .refreshable {
             await refresh()
         }
-        .navigationTitle(viewModel.thread?.subject ?? viewModel.board?.title ?? "")
+        .navigationTitle(viewModel.thread?.subject ?? viewModel.board?.title ?? "#\(threadId)")
         #if os(macOS)
         .navigationSubtitle(viewModel.board?.title ?? "")
         #endif
+    }
+    
+    private func handleViewAsset(_ asset: Asset) {
+        windowState.navigate(asset: asset)
     }
     
     private func updateData() async throws -> ViewModel.State {

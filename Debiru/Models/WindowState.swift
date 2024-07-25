@@ -13,12 +13,25 @@ import SwiftUI
 class WindowState {
     var route: NavigationPath = .init()
     var currentItem: ViewableItem?
+    
+    func navigate(boardId: String) {
+        self.route.append(ViewableItem.board(boardId: boardId))
+    }
+    
+    func navigate(boardId: String, threadId: Int) {
+        self.route.append(ViewableItem.thread(boardId: boardId, threadId: threadId))
+    }
+    
+    func navigate(asset: Asset) {
+        self.route.append(ViewableItem.asset(asset: asset))
+    }
 }
 
 /// An enumeration of possible items that can be viewed in the app.
 enum ViewableItem: Identifiable, Hashable, Codable {
     case board(boardId: String)
     case thread(boardId: String, threadId: Int)
+    case asset(asset: Asset)
     
     var id: String {
         switch self {
@@ -26,6 +39,8 @@ enum ViewableItem: Identifiable, Hashable, Codable {
             return boardId
         case .thread(let boardId, let threadId):
             return "\(boardId)-\(threadId)"
+        case .asset(let asset):
+            return "\(asset.boardId)-\(asset.id)"
         }
     }
 }
@@ -70,6 +85,8 @@ extension ViewableItem {
 //            try container.encode(BoardThreadTuple(
 //                                    board: board,
 //                                    thread: thread), forKey: .thread)
+        case .asset(let asset):
+            break
         }
         
     }

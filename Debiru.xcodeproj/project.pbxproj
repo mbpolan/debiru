@@ -18,6 +18,7 @@
 		27662DD82C476BEE002A678D /* PostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD72C476BEE002A678D /* PostView.swift */; };
 		27662DDA2C476F01002A678D /* DeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD92C476F01002A678D /* DeviceType.swift */; };
 		27662DDC2C51BDD4002A678D /* ThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDB2C51BDD4002A678D /* ThreadView.swift */; };
+		27662DDE2C5300E4002A678D /* AssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDD2C5300E3002A678D /* AssetView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -55,6 +56,7 @@
 		27662DD72C476BEE002A678D /* PostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostView.swift; sourceTree = "<group>"; };
 		27662DD92C476F01002A678D /* DeviceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceType.swift; sourceTree = "<group>"; };
 		27662DDB2C51BDD4002A678D /* ThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadView.swift; sourceTree = "<group>"; };
+		27662DDD2C5300E3002A678D /* AssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				27662DD52C47698C002A678D /* BoardView.swift */,
 				27662DD72C476BEE002A678D /* PostView.swift */,
 				27662DDB2C51BDD4002A678D /* ThreadView.swift */,
+				27662DDD2C5300E3002A678D /* AssetView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				27E4B808265C892400E183CB /* MutableFormData.swift in Sources */,
 				27662DD02C475E6C002A678D /* WindowState.swift in Sources */,
 				27B06E20264F293E00FCBC0B /* DataManager.swift in Sources */,
+				27662DDE2C5300E4002A678D /* AssetView.swift in Sources */,
 				27662DCA2C47484F002A678D /* ContentView.swift in Sources */,
 				27BFE1DD263CAE83004E7E2F /* DownloadedAsset.swift in Sources */,
 				273CBF1A2933FA1500D17677 /* CaptchaV3.swift in Sources */,

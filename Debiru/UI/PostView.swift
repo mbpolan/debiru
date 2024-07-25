@@ -13,6 +13,8 @@ import SwiftUI
 // A view that displays a post's content, author and other contextual information.
 struct PostView: View {
     let post: Post
+    var onTapGesture: (() -> Void)? = { }
+    var onViewAsset: ((_: Asset) -> Void)? = { _ in }
     @Environment(\.deviceType) private var deviceType
     private static let formatter: RelativeDateTimeFormatter = .init()
     
@@ -21,7 +23,7 @@ struct PostView: View {
             // show the subject if one was given
             if let text = post.subject {
                 subject(text)
-                    .textSelection(.enabled)
+                    .onTapGesture(perform: onTapGesture ?? { })
             }
             
             // show information about the author and post itself
@@ -35,18 +37,21 @@ struct PostView: View {
                 
                 Text(PostView.formatter.localizedString(for: post.date, relativeTo: .now))
             }
+            .onTapGesture(perform: onTapGesture ?? { })
             
             // render the asset and content
             body {
                 if let asset = post.attachment {
-                    AssetView(asset: asset)
+                    ThumbnailView(asset: asset)
                         .padding(.trailing)
+                        .onTapGesture(perform: { onViewAsset?(asset) })
                 }
                 
                 // align content text to the left
                 HStack(alignment: .firstTextBaseline) {
                     Text(post.body ?? "")
-                        // enabling this breaks the url action above :/
+                        .onTapGesture(perform: onTapGesture ?? { })
+                        // enabling this breaks the url navigation :/
                         //.textSelection(.enabled)
                     
                     Spacer()
@@ -76,20 +81,10 @@ struct PostView: View {
             }
         }
     }
-    
-    private func handleOpenURL(_ url: URL) -> OpenURLAction.Result {
-        switch url.scheme {
-        case "debiru://":
-            let path = url.pathComponents
-            return .handled
-        default:
-            return .systemAction
-        }
-    }
 }
 
-/// A view that displays a media asset.
-fileprivate struct AssetView: View {
+/// A view that displays a media asset thumbnail.
+fileprivate struct ThumbnailView: View {
     let asset: Asset
     private let dataProvider: DataProvider = FourChanDataProvider()
     

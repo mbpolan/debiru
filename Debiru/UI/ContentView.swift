@@ -34,10 +34,14 @@ struct ContentView: View {
         
         // internal link to a board or post
         if str.starts(with: "//boards.4channel.org/") {
-            let path = str.replacingOccurrences(of: "//boards.4channel.org/", with: "").trimmingCharacters(in: ["/"]).split(separator: "/")
+            let path = str
+                    .replacingOccurrences(of: "//boards.4channel.org/", with: "")
+                    .trimmingCharacters(in: ["/"])
+                    .split(separator: "/")
             
+            // if there is only one path segment, it's most likely a cross-board link
             if path.count == 1 {
-                windowState.route.append(ViewableItem.board(boardId: String(path[0])))
+                windowState.navigate(boardId: String(path[0]))
                 return .handled
             } else {
                 print("Unsupported URL: \(str)")
@@ -67,6 +71,8 @@ fileprivate struct PhoneContentView: View {
                         BoardView(boardId: boardId)
                     case .thread(let boardId, let threadId):
                         ThreadView(boardId: boardId, threadId: threadId)
+                    case .asset(let asset):
+                        AssetView(asset: asset)
                     }
                 }
         }
@@ -96,6 +102,8 @@ fileprivate struct DesktopContentView: View {
                     BoardView(boardId: boardId)
                 case .thread(let boardId, let threadId):
                     ThreadView(boardId: boardId, threadId: threadId)
+                case .asset(let asset):
+                    AssetView(asset: asset)
                 }
             }
         }

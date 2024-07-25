@@ -26,20 +26,27 @@ struct BoardView: View {
                 
             case .ready:
                 List(viewModel.threads) { post in
-                    PostView(post: post)
-                        .onTapGesture {
-                            windowState.route.append(ViewableItem.thread(boardId: boardId, threadId: post.threadId))
-                        }
+                    PostView(post: post,
+                             onTapGesture: { handleGoToThread(post) },
+                             onViewAsset: handleViewAsset)
                 }
             }
         }
-        .navigationTitle(viewModel.board?.title ?? boardId)
+        .navigationTitle(viewModel.board?.title ?? "")
         .task(id: boardId) {
             await loadBoard()
         }
         .refreshable {
             await refresh()
         }
+    }
+    
+    private func handleGoToThread(_ post: Post) {
+        windowState.navigate(boardId: boardId, threadId: post.threadId)
+    }
+    
+    private func handleViewAsset(_ asset: Asset) {
+        windowState.navigate(asset: asset)
     }
     
     private func updateData() async throws -> ViewModel.State {
