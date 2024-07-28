@@ -15,6 +15,7 @@ struct ThreadView: View {
     let threadId: Int
     @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
+    private static let dataProvider: DataProvider = FourChanDataProvider()
     
     var body: some View {
         Group {
@@ -46,6 +47,9 @@ struct ThreadView: View {
         }
         .toolbar {
             ToolbarItemGroup {
+                ShareLink(item: self.shareLink)
+                
+                #if os(macOS)
                 Button(action: {
                     Task {
                         await loadThread()
@@ -54,8 +58,13 @@ struct ThreadView: View {
                     Image(systemName: "arrow.clockwise")
                 })
                 .disabled(viewModel.state == .loading)
+                #endif
             }
         }
+    }
+    
+    private var shareLink: URL {
+        ThreadView.dataProvider.getURL(for: boardId, threadId: threadId)
     }
     
     private var posts: [ThreadPost] {

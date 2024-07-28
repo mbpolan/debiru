@@ -23,24 +23,24 @@ struct AssetView: View {
     
     var body: some View {
         GeometryReader { geo in
-            if let url = AssetView.dataProvider.getURL(for: asset, variant: .original) {
-                switch asset.fileType {
-                case .image:
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFit()
-                    } placeholder: {
-                        ProgressView()
-                    }
-                    
-                case .animatedImage, .webm:
-                    WebView(url: url, size: geo.size)
-                        .frame(width: geo.size.width, height: geo.size.height)
+            switch asset.fileType {
+            case .image:
+                AsyncImage(url: self.url) { image in
+                    image.resizable().scaledToFit()
+                } placeholder: {
+                    ProgressView()
                 }
-            } else {
-                Text("Invalid URL!")
+                
+            case .animatedImage, .webm:
+                WebView(url: self.url, size: geo.size)
+                    .frame(width: geo.size.width, height: geo.size.height)
             }
         }
         .navigationTitle("\(asset.filename)\(asset.extension)")
+    }
+    
+    private var url: URL {
+        AssetView.dataProvider.getURL(for: asset, variant: .original)
     }
 }
 

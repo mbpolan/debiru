@@ -25,13 +25,13 @@ protocol DataProvider {
     
     func getCountryFlagImage(for countryCode: String) async throws -> Data?
     
-    func getURL(for board: Board) -> URL?
+    func getURL(for boardId: String) -> URL
     
-    func getURL(for thread: Thread) -> URL?
+    func getURL(for boardId: String, threadId: Int) -> URL
     
-    func getURL(for asset: Asset, variant: Asset.Variant) -> URL?
+    func getURL(for asset: Asset, variant: Asset.Variant) -> URL
     
-    func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL?
+    func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL
 }
 
 enum NetworkError: Error {

@@ -322,25 +322,25 @@ struct FourChanDataProvider: DataProvider {
         return try await getImageData(key)
     }
     
-    func getURL(for board: Board) -> URL? {
-        return URL(string: "\(webBaseUrl)/\(board.id)/")
+    func getURL(for boardId: String) -> URL {
+        return URL(string: "\(webBaseUrl)/\(boardId)/")!
     }
     
-    func getURL(for thread: Thread) -> URL? {
-        return URL(string: "\(webBoardsBaseUrl)/\(thread.boardId)/thread/\(thread.id)")
+    func getURL(for boardId: String, threadId: Int) -> URL {
+        URL(string: "\(webBoardsBaseUrl)/\(boardId)/thread/\(threadId)")!
     }
     
-    func getURL(for asset: Asset, variant: Asset.Variant) -> URL? {
+    func getURL(for asset: Asset, variant: Asset.Variant) -> URL {
         // for thumbnail images, append an "s" to the asset id. some assets only have thumbnail variants available,
         // in which case don't modify the id
         let suffix = variant == .thumbnail ? "s" : ""
         let fileExtension = variant == .thumbnail ? ".jpg" : asset.extension
         
-        return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)")
+        return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)")!
     }
     
-    func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL? {
-        return URL(string: "https://sys.4chan.org/captcha?framed=1&board=\(captchaBoard.id)&thread_id=\(threadId)")
+    func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL {
+        return URL(string: "https://sys.4chan.org/captcha?framed=1&board=\(captchaBoard.id)&thread_id=\(threadId)")!
     }
     
     private func determineFileType(_ fileExtension: String) -> Asset.FileType {

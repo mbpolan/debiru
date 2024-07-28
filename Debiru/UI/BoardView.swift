@@ -42,6 +42,7 @@ struct BoardView: View {
         .refreshable {
             await refresh()
         }
+        #if os(macOS)
         .toolbar {
             ToolbarItemGroup {
                 Button(action: {
@@ -54,6 +55,7 @@ struct BoardView: View {
                 .disabled(viewModel.state == .loading)
             }
         }
+        #endif
     }
     
     private var threads: [Post] {
