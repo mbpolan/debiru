@@ -8,13 +8,20 @@
 import FlagKit
 import SwiftUI
 
+// MARK: - Data
+
+enum AssetAction {
+    case view
+    case download
+}
+
 // MARK: - View
 
 // A view that displays a post's content, author and other contextual information.
 struct PostView: View {
     let post: Post
     var onTapGesture: (() -> Void)? = { }
-    var onViewAsset: ((_: Asset) -> Void)? = { _ in }
+    var onAssetAction: ((_: Asset, _: AssetAction) -> Void)? = { _, _ in }
     @Environment(\.deviceType) private var deviceType
     private static let formatter: RelativeDateTimeFormatter = .init()
     
@@ -56,7 +63,8 @@ struct PostView: View {
                 if let asset = post.attachment {
                     ThumbnailView(asset: asset)
                         .padding(.trailing)
-                        .onTapGesture(perform: { onViewAsset?(asset) })
+                        .onTapGesture(perform: { onAssetAction?(asset, .view) })
+                        .onLongPressGesture(perform: { onAssetAction?(asset, .download) })
                 }
                 
                 // align content text to the left

@@ -28,8 +28,8 @@ struct BoardView: View {
                 List(self.threads) { post in
                     PostView(post: post,
                              onTapGesture: { handleGoToThread(post) },
-                             onViewAsset: handleViewAsset)
-                        .postViewListItem()
+                             onAssetAction: handleAssetAction)
+                    .postViewListItem()
                 }
             }
         }
@@ -76,8 +76,13 @@ struct BoardView: View {
         windowState.navigate(boardId: boardId, threadId: post.threadId)
     }
     
-    private func handleViewAsset(_ asset: Asset) {
-        windowState.navigate(asset: asset)
+    private func handleAssetAction(_ asset: Asset, _ action: AssetAction) {
+        switch action {
+        case .view:
+            windowState.navigate(asset: asset)
+        case .download:
+            windowState.setAssetDownload(asset)
+        }
     }
     
     private func updateData() async throws -> ViewModel.State {

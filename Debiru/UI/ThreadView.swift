@@ -28,7 +28,7 @@ struct ThreadView: View {
                 
             case .ready:
                 List(self.posts, children: \.children) { item in
-                    PostView(post: item.post, onViewAsset: handleViewAsset)
+                    PostView(post: item.post, onAssetAction: handleAssetAction)
                         .postViewListItem()
                 }
             }
@@ -81,8 +81,13 @@ struct ThreadView: View {
         }
     }
     
-    private func handleViewAsset(_ asset: Asset) {
-        windowState.navigate(asset: asset)
+    private func handleAssetAction(_ asset: Asset, _ action: AssetAction) {
+        switch action {
+        case .view:
+            windowState.navigate(asset: asset)
+        case .download:
+            break
+        }
     }
     
     private func updateData() async throws -> ViewModel.State {

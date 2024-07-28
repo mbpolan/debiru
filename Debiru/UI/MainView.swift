@@ -7,13 +7,13 @@
 
 import SwiftUI
 
+// MARK: - Phone View
+
 #if os(iOS)
 typealias MainView = PhoneMainView
 #else
 typealias MainView = DesktopMainView
 #endif
-
-// MARK: - Phone View
 
 #if os(iOS)
 

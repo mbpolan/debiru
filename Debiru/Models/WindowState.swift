@@ -13,6 +13,18 @@ import SwiftUI
 class WindowState {
     var route: NavigationPath = .init()
     var currentItem: ViewableItem?
+    var assetDownloading: Bool = false
+    var assetDownload: Asset?
+    
+    func setAssetDownload(_ asset: Asset) {
+        self.assetDownloading = true
+        self.assetDownload = asset
+    }
+    
+    func clearAssetDownload() {
+        self.assetDownloading = false
+        self.assetDownload = nil
+    }
     
     func clearNavigation() {
         self.route = NavigationPath()
