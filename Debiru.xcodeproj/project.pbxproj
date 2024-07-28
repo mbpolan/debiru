@@ -129,11 +129,11 @@
 		2799460825FD9E5A001DCCE3 /* Debiru */ = {
 			isa = PBXGroup;
 			children = (
-				27662DE12C56B554002A678D /* Extensions */,
-				2799460D25FD9E5B001DCCE3 /* Assets.xcassets */,
-				27BA39C52634E77300C9C519 /* Credits.html */,
 				2799461325FD9E5B001DCCE3 /* Debiru.entitlements */,
+				27BA39C52634E77300C9C519 /* Credits.html */,
 				2799461225FD9E5B001DCCE3 /* Info.plist */,
+				2799460D25FD9E5B001DCCE3 /* Assets.xcassets */,
+				27662DE12C56B554002A678D /* Extensions */,
 				279CFF7325FEBCC900884724 /* Models */,
 				279CFF6E25FEBC2400884724 /* Network */,
 				2799460F25FD9E5B001DCCE3 /* Preview Content */,

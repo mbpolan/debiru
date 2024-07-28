@@ -28,6 +28,18 @@ struct PostView: View {
             
             // show information about the author and post itself
             HStack(alignment: .center) {
+                if post.sticky {
+                    Image(systemName: "pin.fill")
+                        .foregroundStyle(.green)
+                        .help("This thread is pinned")
+                }
+                
+                if post.closed {
+                    Image(systemName: "lock.fill")
+                        .foregroundStyle(.red)
+                        .help("No replies can be posted in this thread")
+                }
+                
                 if let country = post.author.country {
                     CountryFlagView(country: country)
                 }
