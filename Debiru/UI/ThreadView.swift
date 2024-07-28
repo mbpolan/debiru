@@ -112,7 +112,7 @@ fileprivate class ViewModel {
     var posts: [ThreadPost] = []
     var filter: String = ""
     
-    enum State {
+    enum State: Equatable {
         case loading
         case ready
         case error(_ message: String)

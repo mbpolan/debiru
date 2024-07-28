@@ -63,7 +63,7 @@ struct ContentProvider {
                             author: post.author,
                             date: post.date,
                             replyToId: post.replyToId,
-                            subject: post.subject,
+                            subject: post.subject?.decodingEntities(),
                             content: try? content.document.html(),
                             body: try? processContent(content.document),
                             sticky: post.sticky,
@@ -116,7 +116,7 @@ struct ContentProvider {
             switch node {
             case let n as TextNode:
                 // append the text as-is without adding any attributes
-                strings.append(AttributedString(stringLiteral: n.text()))
+                strings.append(AttributedString(stringLiteral: n.text().decodingEntities()))
                 
             case let n as Element:
                 switch n.tagName() {
@@ -125,32 +125,22 @@ struct ContentProvider {
                     strings.append(AttributedString(stringLiteral: "\n"))
                     
                 case "a":
-                    var str = AttributedString(stringLiteral: try n.text())
+                    var str = AttributedString(stringLiteral: try n.text().decodingEntities())
                     let href = try n.attr("href")
                     
                     // anchor tags contain either external, reply-to or cross-board links
                     // determine which kind it is by examining the class or the protocol of the link
                     
                     // an anchor with no class implies an external link
-                    if try n.className() == "" {
+                    if try n.className() == "" || n.className() == "quotelink" {
                         str.link = URL(string: href)
-                    } else if try n.className() == "quotelink" {
-                        str.link = URL(string: href)
-                        // cross-board link
-//                        if href.starts(with: "/") || href.starts(with: "//") {
-//                            let url = href
-//                                .replacingOccurrences(of: "boards.4channel.org", with: "")
-//                                .replacingOccurrences(of: "/", with: "")
-//                            
-//                            str.link = URL(string: "internal://board/\(url)")
-//                        }
                     }
                     
                     strings.append(str)
                     
                 case "span":
                     // span tags contain quotes and other styled text
-                    var str = AttributedString(stringLiteral: try n.text())
+                    var str = AttributedString(stringLiteral: try n.text().decodingEntities())
                     
                     // apply styles based on what classes this element has
                     if n.hasClass("quote") {
@@ -161,7 +151,7 @@ struct ContentProvider {
                     
                 default:
                     // unknown or otherwise unhandled tag
-                    strings.append(AttributedString(stringLiteral: try n.text()))
+                    strings.append(AttributedString(stringLiteral: try n.text().decodingEntities()))
                 }
                 
             default:
