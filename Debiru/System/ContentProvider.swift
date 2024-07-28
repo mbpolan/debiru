@@ -127,14 +127,7 @@ struct ContentProvider {
                 case "a":
                     var str = AttributedString(stringLiteral: try n.text().decodingEntities())
                     let href = try n.attr("href")
-                    
-                    // anchor tags contain either external, reply-to or cross-board links
-                    // determine which kind it is by examining the class or the protocol of the link
-                    
-                    // an anchor with no class implies an external link
-                    if try n.className() == "" || n.className() == "quotelink" {
-                        str.link = URL(string: href)
-                    }
+                    str.link = URL(string: href)
                     
                     strings.append(str)
                     
