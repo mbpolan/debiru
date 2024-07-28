@@ -29,16 +29,30 @@ struct BoardView: View {
                     PostView(post: post,
                              onTapGesture: { handleGoToThread(post) },
                              onViewAsset: handleViewAsset)
+                        .postViewListItem()
                 }
             }
         }
         .navigationTitle(viewModel.board?.title ?? "")
         .searchable(text: $viewModel.filter)
+        .postList()
         .task(id: boardId) {
             await loadBoard()
         }
         .refreshable {
             await refresh()
+        }
+        .toolbar {
+            ToolbarItemGroup {
+                Button(action: {
+                    Task {
+                        await loadBoard()
+                    }
+                }, label: {
+                    Image(systemName: "arrow.clockwise")
+                })
+                .disabled(viewModel.state == .loading)
+            }
         }
     }
     
@@ -104,7 +118,7 @@ fileprivate class ViewModel {
     var threads: [Post] = []
     var filter: String = ""
     
-    enum State {
+    enum State: Equatable {
         case loading
         case ready
         case error(_ message: String)

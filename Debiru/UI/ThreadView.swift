@@ -28,6 +28,7 @@ struct ThreadView: View {
             case .ready:
                 List(self.posts, children: \.children) { item in
                     PostView(post: item.post, onViewAsset: handleViewAsset)
+                        .postViewListItem()
                 }
             }
         }
@@ -35,12 +36,25 @@ struct ThreadView: View {
         #if os(macOS)
         .navigationSubtitle(viewModel.board?.title ?? "")
         #endif
+        .postList()
         .searchable(text: $viewModel.filter)
         .task(id: threadId) {
             await loadThread()
         }
         .refreshable {
             await refresh()
+        }
+        .toolbar {
+            ToolbarItemGroup {
+                Button(action: {
+                    Task {
+                        await loadThread()
+                    }
+                }, label: {
+                    Image(systemName: "arrow.clockwise")
+                })
+                .disabled(viewModel.state == .loading)
+            }
         }
     }
     

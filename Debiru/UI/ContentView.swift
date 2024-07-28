@@ -12,17 +12,11 @@ import SwiftUI
 /// A view that displays the main content of the app.
 struct ContentView: View {
     @State private var windowState: WindowState = .init()
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     var body: some View {
         Group {
-            if horizontalSizeClass == .compact {
-                PhoneContentView()
-                    .environment(windowState)
-            } else {
-                DesktopContentView()
-                    .environment(windowState)
-            }
+            MainView()
+                .environment(windowState)
         }
         .environment(\.openURL, OpenURLAction { url in
             return handleOpenURL(url)
@@ -56,8 +50,10 @@ struct ContentView: View {
 
 // MARK: - Phone View
 
+#if os(iOS)
+
 /// A view that displays main app content intended for phones.
-fileprivate struct PhoneContentView: View {
+fileprivate struct MainView: View {
     @Environment(WindowState.self) var windowState
     
     var body: some View {
@@ -88,10 +84,14 @@ fileprivate struct PhoneContentView: View {
     }
 }
 
+#endif
+
 // MARK: - Desktop View
 
+#if os(macOS)
+
 /// A view that displays main app content intended for desktops.
-fileprivate struct DesktopContentView: View {
+fileprivate struct MainView: View {
     @Environment(WindowState.self) var windowState
     
     var body: some View {
@@ -117,6 +117,8 @@ fileprivate struct DesktopContentView: View {
         }
     }
 }
+
+#endif
 
 
 // MARK: - Previews

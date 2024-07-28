@@ -19,6 +19,7 @@
 		27662DDA2C476F01002A678D /* DeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DD92C476F01002A678D /* DeviceType.swift */; };
 		27662DDC2C51BDD4002A678D /* ThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDB2C51BDD4002A678D /* ThreadView.swift */; };
 		27662DDE2C5300E4002A678D /* AssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDD2C5300E3002A678D /* AssetView.swift */; };
+		27662DE02C534D94002A678D /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDF2C534D94002A678D /* ViewModifiers.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -57,6 +58,7 @@
 		27662DD92C476F01002A678D /* DeviceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceType.swift; sourceTree = "<group>"; };
 		27662DDB2C51BDD4002A678D /* ThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadView.swift; sourceTree = "<group>"; };
 		27662DDD2C5300E3002A678D /* AssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetView.swift; sourceTree = "<group>"; };
+		27662DDF2C534D94002A678D /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 		2799462025FDA1E8001DCCE3 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				27662DDF2C534D94002A678D /* ViewModifiers.swift */,
 				27662DC92C47484F002A678D /* ContentView.swift */,
 				27662DCD2C4749F8002A678D /* SidebarView.swift */,
 				27662DD32C4764DD002A678D /* DetailView.swift */,
@@ -295,6 +298,7 @@
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				27662DDC2C51BDD4002A678D /* ThreadView.swift in Sources */,
 				27E4B806265C7F8F00E183CB /* Submission.swift in Sources */,
+				27662DE02C534D94002A678D /* ViewModifiers.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,
 				27662DCC2C474919002A678D /* Settings.swift in Sources */,
 				27C568332602D2A000983ECD /* Asset.swift in Sources */,
