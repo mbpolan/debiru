@@ -5,23 +5,14 @@
 //  Created by Mike Polan on 3/13/21.
 //
 
-import Combine
 import SwiftUI
 
 @main
 struct DebiruApp: App {
+    @Environment(\.colorScheme) private var systemColorScheme: ColorScheme
+    @AppStorage(StorageKeys.colorScheme) private var preferredColorScheme: PreferredColorScheme = .system
     @State private var appState: AppState = .init()
     private let dataProvider: DataProvider = FourChanDataProvider()
-    
-    init() {
-        // check and request permissions for data
-        switch DataManager.shared.checkSaveDirectory() {
-        case .failure(let error):
-            print(error.localizedDescription)
-        default:
-            break
-        }
-    }
     
     /// Loads the list of boards available.
     private func loadBoards() async {
@@ -40,9 +31,28 @@ struct DebiruApp: App {
                 .task {
                     await loadBoards()
                 }
+                .preferredColorScheme(colorScheme)
         }
-#if os(macOS)
+        #if os(macOS)
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
-#endif
+        #endif
+        
+        #if os(macOS)
+        Settings {
+            SettingsView()
+                .preferredColorScheme(colorScheme)
+        }
+        #endif
+    }
+    
+    private var colorScheme: ColorScheme? {
+        switch preferredColorScheme {
+        case .dark:
+            return .dark
+        case .light:
+            return .light
+        case .system:
+            return nil
+        }
     }
 }

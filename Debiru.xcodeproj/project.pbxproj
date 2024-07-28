@@ -21,6 +21,8 @@
 		27662DDE2C5300E4002A678D /* AssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDD2C5300E3002A678D /* AssetView.swift */; };
 		27662DE02C534D94002A678D /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DDF2C534D94002A678D /* ViewModifiers.swift */; };
 		27662DE32C56B55F002A678D /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DE22C56B55E002A678D /* String.swift */; };
+		27662DE52C56D30C002A678D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DE42C56D30C002A678D /* SettingsView.swift */; };
+		27662DE72C56F897002A678D /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DE62C56F896002A678D /* MainView.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -61,6 +63,8 @@
 		27662DDD2C5300E3002A678D /* AssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetView.swift; sourceTree = "<group>"; };
 		27662DDF2C534D94002A678D /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		27662DE22C56B55E002A678D /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		27662DE42C56D30C002A678D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		27662DE62C56F896002A678D /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -154,14 +158,16 @@
 		2799462025FDA1E8001DCCE3 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				27662DDF2C534D94002A678D /* ViewModifiers.swift */,
-				27662DC92C47484F002A678D /* ContentView.swift */,
-				27662DCD2C4749F8002A678D /* SidebarView.swift */,
-				27662DD32C4764DD002A678D /* DetailView.swift */,
-				27662DD52C47698C002A678D /* BoardView.swift */,
-				27662DD72C476BEE002A678D /* PostView.swift */,
-				27662DDB2C51BDD4002A678D /* ThreadView.swift */,
 				27662DDD2C5300E3002A678D /* AssetView.swift */,
+				27662DD52C47698C002A678D /* BoardView.swift */,
+				27662DC92C47484F002A678D /* ContentView.swift */,
+				27662DD32C4764DD002A678D /* DetailView.swift */,
+				27662DE62C56F896002A678D /* MainView.swift */,
+				27662DD72C476BEE002A678D /* PostView.swift */,
+				27662DE42C56D30C002A678D /* SettingsView.swift */,
+				27662DCD2C4749F8002A678D /* SidebarView.swift */,
+				27662DDB2C51BDD4002A678D /* ThreadView.swift */,
+				27662DDF2C534D94002A678D /* ViewModifiers.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -169,9 +175,9 @@
 		2799462125FDA1EF001DCCE3 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				27183919294E7F6C007C9A43 /* ContentProvider.swift */,
 				27B06E1F264F293E00FCBC0B /* DataManager.swift */,
 				2799460925FD9E5A001DCCE3 /* DebiruApp.swift */,
-				27183919294E7F6C007C9A43 /* ContentProvider.swift */,
 				27662DCB2C474919002A678D /* Settings.swift */,
 			);
 			path = System;
@@ -180,9 +186,9 @@
 		279CFF6E25FEBC2400884724 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				27BBF1F626043CA000534CB7 /* DataCache.swift */,
 				279CFF6F25FEBC7D00884724 /* DataProvider.swift */,
 				279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */,
-				27BBF1F626043CA000534CB7 /* DataCache.swift */,
 				27E4B807265C892400E183CB /* MutableFormData.swift */,
 			);
 			path = Network;
@@ -191,18 +197,18 @@
 		279CFF7325FEBCC900884724 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				27BFE1DC263CAE83004E7E2F /* DownloadedAsset.swift */,
 				2799462425FDA2EB001DCCE3 /* AppState.swift */,
-				2799462825FDA32D001DCCE3 /* Board.swift */,
-				279CFF8525FFEC9000884724 /* Thread.swift */,
 				27C568322602D2A000983ECD /* Asset.swift */,
-				27BBC9D4260AC265005D8183 /* Post.swift */,
-				27C056082610F5130037A91B /* User.swift */,
-				27C056142612998D0037A91B /* Link.swift */,
-				27E4B805265C7F8F00E183CB /* Submission.swift */,
+				2799462825FDA32D001DCCE3 /* Board.swift */,
 				273CBF192933FA1500D17677 /* CaptchaV3.swift */,
-				27662DCF2C475E6C002A678D /* WindowState.swift */,
 				27662DD92C476F01002A678D /* DeviceType.swift */,
+				27BFE1DC263CAE83004E7E2F /* DownloadedAsset.swift */,
+				27C056142612998D0037A91B /* Link.swift */,
+				27BBC9D4260AC265005D8183 /* Post.swift */,
+				27E4B805265C7F8F00E183CB /* Submission.swift */,
+				279CFF8525FFEC9000884724 /* Thread.swift */,
+				27C056082610F5130037A91B /* User.swift */,
+				27662DCF2C475E6C002A678D /* WindowState.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -305,6 +311,7 @@
 				27662DDE2C5300E4002A678D /* AssetView.swift in Sources */,
 				27662DCA2C47484F002A678D /* ContentView.swift in Sources */,
 				27BFE1DD263CAE83004E7E2F /* DownloadedAsset.swift in Sources */,
+				27662DE52C56D30C002A678D /* SettingsView.swift in Sources */,
 				273CBF1A2933FA1500D17677 /* CaptchaV3.swift in Sources */,
 				27662DDA2C476F01002A678D /* DeviceType.swift in Sources */,
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
@@ -317,6 +324,7 @@
 				279CFF7025FEBC7D00884724 /* DataProvider.swift in Sources */,
 				279CFF7525FEBDD300884724 /* FourChanDataProvider.swift in Sources */,
 				27662DD62C47698C002A678D /* BoardView.swift in Sources */,
+				27662DE72C56F897002A678D /* MainView.swift in Sources */,
 				2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */,
 				27BBC9D5260AC265005D8183 /* Post.swift in Sources */,
 			);

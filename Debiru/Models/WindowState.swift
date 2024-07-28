@@ -29,6 +29,10 @@ class WindowState {
     func navigate(asset: Asset) {
         self.route.append(ViewableItem.asset(asset: asset))
     }
+    
+    func navigateToSettings() {
+        self.route.append(ViewableItem.settings)
+    }
 }
 
 /// An enumeration of possible items that can be viewed in the app.
@@ -36,6 +40,7 @@ enum ViewableItem: Identifiable, Hashable, Codable {
     case board(boardId: String)
     case thread(boardId: String, threadId: Int)
     case asset(asset: Asset)
+    case settings
     
     var id: String {
         switch self {
@@ -45,6 +50,8 @@ enum ViewableItem: Identifiable, Hashable, Codable {
             return "\(boardId)-\(threadId)"
         case .asset(let asset):
             return "\(asset.boardId)-\(asset.id)"
+        case .settings:
+            return "settings"
         }
     }
 }
@@ -90,6 +97,8 @@ extension ViewableItem {
 //                                    board: board,
 //                                    thread: thread), forKey: .thread)
         case .asset(let asset):
+            break
+        case .settings:
             break
         }
         

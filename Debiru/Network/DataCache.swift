@@ -82,22 +82,8 @@ class DataCache: NSObject, NSCacheDelegate {
     }
     
     private func configureFromUserDefaults() {
-        let defaults = UserDefaults.standard
+//        let defaults = UserDefaults.standard
         
-        enabled = defaults.bool(forKey: StorageKeys.cacheEnabled, defaultValue: defaults.cacheEnabled())
-        
-        // apply cache cost limits if enabled
-        if enabled {
-            if defaults.bool(forKey: StorageKeys.limitCacheEnabled, defaultValue: defaults.limitCacheEnabled()) {
-                // convert user defaults into bytes
-                cache.totalCostLimit = (defaults.integer(
-                                            forKey: StorageKeys.maximumCacheSize,
-                                            defaultValue: defaults.maximumCacheSize())) * 1024 * 1024
-            } else {
-                // no limit specified
-                cache.totalCostLimit = 0
-            }
-        }
     }
 }
 

@@ -7,22 +7,15 @@
 
 import Foundation
 
+enum PreferredColorScheme: String, RawRepresentable {
+    case dark = "dark"
+    case light = "light"
+    case system = "system"
+}
+
 struct StorageKeys {
     static let colorScheme = "colorScheme"
-    static let autoWatchReplied = "autoWatchReplied"
-    static let showRelativeDates = "showRelativeDates"
-    static let refreshTimeout = "refreshTimeout"
     static let defaultImageLocation = "defaultImageLocation"
-    static let maxQuickSearchResults = "maxQuickSearchResults"
-    static let groupImagesByBoard = "groupImagesByBoard"
-    static let notificationsEnabled = "notificationsEnabled"
-    static let soundNotificationEnabled = "soundNotificationEnabled"
-    static let maximumCacheSize = "maximumCacheSize"
-    static let cacheEnabled = "cacheEnabled"
-    static let limitCacheEnabled = "limitCacheEnabled"
-    static let boardWordFilters = "boardWordFilters"
-    
-    static let bookmarkSaveDirectory = "bookmarkSaveDirectory"
 }
 
 extension UserDefaults {

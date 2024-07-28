@@ -37,49 +37,6 @@ struct DataManager {
         url.stopAccessingSecurityScopedResource()
         return result
     }
-    
-    func checkSaveDirectory() -> Result<Void, Error> {
-#if os(macOS)
-        guard let bookmark = UserDefaults.standard.data(forKey: StorageKeys.bookmarkSaveDirectory) else {
-            return .failure(DataError.noSaveDirectoryDefined)
-        }
-        
-        do {
-            var stale = false
-            let url = try URL(
-                resolvingBookmarkData: bookmark,
-                options: .withSecurityScope,
-                bookmarkDataIsStale: &stale)
-            
-            if stale {
-                return bookmarkSaveDirectory(url)
-            }
-            
-            return .success(())
-        } catch (let error) {
-            return .failure(error)
-        }
-#endif
-        return .success(())
-    }
-    
-    func bookmarkSaveDirectory(_ url: URL) -> Result<Void, Error> {
-#if os(macOS)
-        do {
-            let data = try url.bookmarkData(
-                options: .withSecurityScope,
-                includingResourceValuesForKeys: nil,
-                relativeTo: nil)
-            
-            UserDefaults.standard.set(data, forKey: StorageKeys.bookmarkSaveDirectory)
-            
-            return .success(())
-        } catch (let error) {
-            return .failure(error)
-        }
-#endif
-        return .success(())
-    }
 }
 
 extension DataManager {
