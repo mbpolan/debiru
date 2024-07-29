@@ -13,18 +13,6 @@ import SwiftUI
 class WindowState {
     var route: NavigationPath = .init()
     var currentItem: ViewableItem?
-    var assetDownloading: Bool = false
-    var assetDownload: Asset?
-    
-    func setAssetDownload(_ asset: Asset) {
-        self.assetDownloading = true
-        self.assetDownload = asset
-    }
-    
-    func clearAssetDownload() {
-        self.assetDownloading = false
-        self.assetDownload = nil
-    }
     
     func clearNavigation() {
         self.route = NavigationPath()
@@ -42,6 +30,10 @@ class WindowState {
         self.route.append(ViewableItem.asset(asset: asset))
     }
     
+    func navigateToDownloads() {
+        self.route.append(ViewableItem.downloads)
+    }
+    
     func navigateToSettings() {
         self.route.append(ViewableItem.settings)
     }
@@ -52,6 +44,7 @@ enum ViewableItem: Identifiable, Hashable, Codable {
     case board(boardId: String)
     case thread(boardId: String, threadId: Int)
     case asset(asset: Asset)
+    case downloads
     case settings
     
     var id: String {
@@ -62,6 +55,8 @@ enum ViewableItem: Identifiable, Hashable, Codable {
             return "\(boardId)-\(threadId)"
         case .asset(let asset):
             return "\(asset.boardId)-\(asset.id)"
+        case .downloads:
+            return "downloads"
         case .settings:
             return "settings"
         }
@@ -109,6 +104,8 @@ extension ViewableItem {
 //                                    board: board,
 //                                    thread: thread), forKey: .thread)
         case .asset(let asset):
+            break
+        case .downloads:
             break
         case .settings:
             break

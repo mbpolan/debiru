@@ -12,6 +12,7 @@ import SwiftUI
 /// A view that displays threads in a particular board.
 struct BoardView: View {
     let boardId: String
+    @AppStorage(StorageKeys.defaultImageLocation) private var imageSaveLocation: URL = Settings.defaultImageLocation
     @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
     
@@ -81,7 +82,9 @@ struct BoardView: View {
         case .view:
             windowState.navigate(asset: asset)
         case .download:
-            windowState.setAssetDownload(asset)
+            DownloadManager.instance().addDownload(asset: asset, to: imageSaveLocation
+                .appendingPathComponent(boardId, conformingTo: .fileURL)
+                .appendingPathComponent("\(asset.filename)\(asset.extension)", conformingTo: .fileURL))
         }
     }
     

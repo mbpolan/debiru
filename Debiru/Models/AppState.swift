@@ -40,7 +40,7 @@ class Download: Identifiable {
     }
     
     var id: String {
-        return "\(asset.boardId)-\(asset.id)"
+        return String(asset.id)
     }
     
     enum State {

@@ -55,7 +55,7 @@ struct SidebarView: View {
                     return boardId
                 case .asset(let asset):
                     return asset.boardId
-                case .none, .settings:
+                case .none, .downloads, .settings:
                     return nil
                 }
             },

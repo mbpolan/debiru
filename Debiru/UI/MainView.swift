@@ -34,6 +34,8 @@ struct PhoneMainView: View {
                         ThreadView(boardId: boardId, threadId: threadId)
                     case .asset(let asset):
                         AssetView(asset: asset)
+                    case .downloads:
+                        DownloadsView()
                     case .settings:
                         SettingsView()
                     }
@@ -48,6 +50,12 @@ struct PhoneMainView: View {
                         windowState.clearNavigation()
                     } label: {
                         Label("", systemImage: "house")
+                    }
+                    
+                    Button {
+                        windowState.navigateToDownloads()
+                    } label: {
+                        Label("", systemImage: "square.and.arrow.down")
                     }
                     
                     Button {

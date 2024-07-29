@@ -14,6 +14,10 @@ struct DebiruApp: App {
     @State private var appState: AppState = .init()
     private let dataProvider: DataProvider = FourChanDataProvider()
     
+    init() {
+        DownloadManager.initialize(appState: appState)
+    }
+    
     /// Loads the list of boards available.
     private func loadBoards() async {
         do {

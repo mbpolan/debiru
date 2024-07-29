@@ -39,6 +39,7 @@ struct PhoneDownloadsView: View {
                     Group {
                         Image(systemName: "checkmark.circle")
                         Text(assetName(download.asset))
+                            .lineLimit(1)
                         
                         Spacer()
                         
