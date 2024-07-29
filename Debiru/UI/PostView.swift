@@ -64,7 +64,11 @@ struct PostView: View {
                     ThumbnailView(asset: asset)
                         .padding(.trailing)
                         .onTapGesture(perform: { onAssetAction?(asset, .view) })
-                        .onLongPressGesture(perform: { onAssetAction?(asset, .download) })
+                        .contextMenu {
+                            Button(action: { onAssetAction?(asset, .download) }, label: {
+                                Text("Download")
+                            })
+                        }
                 }
                 
                 // align content text to the left

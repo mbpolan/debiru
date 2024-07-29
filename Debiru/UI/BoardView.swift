@@ -30,7 +30,7 @@ struct BoardView: View {
                     PostView(post: post,
                              onTapGesture: { handleGoToThread(post) },
                              onAssetAction: handleAssetAction)
-                    .postViewListItem()
+                    .postViewListItem(post)
                 }
             }
         }

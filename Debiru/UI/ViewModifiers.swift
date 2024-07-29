@@ -11,6 +11,7 @@ import SwiftUI
 
 /// A view modifier that decorates a PostView for displaying in a list.
 struct PostViewListItem: ViewModifier {
+    let post: Post
     
     func body(content: Content) -> some View {
         content
@@ -50,8 +51,8 @@ struct PostList: ViewModifier {
 // MARK: - Extensions
 
 extension View {
-    func postViewListItem() -> some View {
-        modifier(PostViewListItem())
+    func postViewListItem(_ post: Post) -> some View {
+        modifier(PostViewListItem(post: post))
     }
     
     func postList() -> some View {

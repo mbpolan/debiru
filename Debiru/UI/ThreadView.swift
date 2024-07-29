@@ -29,7 +29,7 @@ struct ThreadView: View {
             case .ready:
                 List(self.posts, children: \.children) { item in
                     PostView(post: item.post, onAssetAction: handleAssetAction)
-                        .postViewListItem()
+                        .postViewListItem(item.post)
                 }
             }
         }
