@@ -49,18 +49,25 @@ struct PhoneDownloadsView: View {
                     
                 case .error(let message):
                     Image(systemName: "exclamationmark.triangle")
-                    Text(assetName(download.asset))
+                        .help(message)
                     
+                    Text(assetName(download.asset))
                 }
             }
         }
         .navigationTitle("Downloads")
     }
     
+    /// Returns the filename to display for an asset.
+    ///
+    /// - Returns: A filename to show to the user.
     private func assetName(_ asset: Asset) -> String {
         return "\(asset.filename)\(asset.extension)"
     }
     
+    /// Handles an action to view the asset.
+    ///
+    /// - Parameter url: The local URL of the asset.
     private func handleOpenAsset(_ url: URL) {
         openURL(url)
     }
