@@ -19,6 +19,7 @@ typealias ViewRepresentable = NSViewRepresentable
 /// A view that displays an asset.
 struct AssetView: View {
     let asset: Asset
+    @AppStorage(StorageKeys.defaultImageLocation) private var imageSaveLocation: URL = Settings.defaultImageLocation
     private static let dataProvider: DataProvider = FourChanDataProvider()
     
     var body: some View {
@@ -29,6 +30,11 @@ struct AssetView: View {
                     image.resizable().scaledToFit()
                 } placeholder: {
                     ProgressView()
+                }
+                .contextMenu {
+                    Button(action: handleDownloadAsset, label: {
+                        Text("Download")
+                    })
                 }
                 
             case .animatedImage, .webm:
@@ -41,6 +47,12 @@ struct AssetView: View {
     
     private var url: URL {
         AssetView.dataProvider.getURL(for: asset, variant: .original)
+    }
+    
+    private func handleDownloadAsset() {
+        DownloadManager.instance().addDownload(asset: asset, to: imageSaveLocation
+            .appendingPathComponent(asset.boardId, conformingTo: .fileURL)
+            .appendingPathComponent("\(asset.filename)\(asset.extension)", conformingTo: .fileURL))
     }
 }
 
