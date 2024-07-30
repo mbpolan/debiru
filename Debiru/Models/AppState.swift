@@ -108,6 +108,10 @@ class Download: Identifiable, Codable {
         return String(asset.id)
     }
     
+    var filename: String {
+        return "\(asset.filename)\(asset.extension)"
+    }
+    
     enum State: Codable {
         case downloading(completedBytes: Int64)
         case finished(on: Date, localURL: URL)

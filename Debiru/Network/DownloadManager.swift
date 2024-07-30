@@ -11,14 +11,15 @@ import Foundation
 class DownloadManager: NSObject, URLSessionDownloadDelegate {
     private static var shared: DownloadManager?
     private static let dataProvider: DataProvider = FourChanDataProvider()
+    private let assetManager: AssetManager
     private var appState: AppState
     private var downloads: [DownloadTask]
     
     /// Initializes the download manager.
     ///
     /// - Parameter appState: The app state to back the download manager.
-    static func initialize(appState: AppState) {
-        DownloadManager.shared = .init(appState: appState)
+    static func initialize(appState: AppState, assetManager: AssetManager) {
+        DownloadManager.shared = .init(appState: appState, assetManager: assetManager)
     }
     
     /// Returns the shared instance of this service.
@@ -65,24 +66,34 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         
         let task = self.downloads.remove(at: idx)
         
-        var data: Data?
-        var state: Download.State = .finished(on: .now, localURL: location)
-        
-        // copy the file to its final destination
-        do {
-            data = try Data(contentsOf: location)
-            FileManager.default.createFile(atPath: task.localURL.path(), contents: data)
-        } catch {
-            state = .error(message: error.localizedDescription)
-        }
-        
-        // update app state with the final state of the download
-        DispatchQueue.main.async { [weak self] in
-            guard let download = self?.appState.downloads.first(where: { $0.id == task.id }) else {
+        Task.detached {
+            guard let download = self.appState.downloads.first(where: { $0.id == task.id }) else {
                 return
             }
             
-            download.state = state
+            var state: Download.State = .finished(on: .now, localURL: location)
+            
+            // copy the file to its final destination
+            do {
+                let data = try Data(contentsOf: location)
+                let result = await self.assetManager.saveImage(fileName: download.asset.filename, data: data)
+                switch result {
+                case .success:
+                    break
+                case .denied:
+                    state = .error(message: "Access to save image was denied")
+                case .error(let message):
+                    state = .error(message: message)
+                }
+                //            FileManager.default.createFile(atPath: task.localURL.path(), contents: data)
+            } catch {
+                state = .error(message: error.localizedDescription)
+            }
+            
+            // update app state with the final state of the download
+            DispatchQueue.main.async { [state] in
+                download.state = state
+            }
         }
     }
     
@@ -103,8 +114,9 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         }
     }
     
-    private init(appState: AppState) {
+    private init(appState: AppState, assetManager: AssetManager) {
         self.appState = appState
+        self.assetManager = assetManager
         self.downloads = []
     }
 }

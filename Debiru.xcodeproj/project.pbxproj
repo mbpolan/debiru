@@ -25,6 +25,7 @@
 		27662DE72C56F897002A678D /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DE62C56F896002A678D /* MainView.swift */; };
 		27662DE92C57035C002A678D /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DE82C57035C002A678D /* DownloadsView.swift */; };
 		27662DEB2C570AEC002A678D /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DEA2C570AEC002A678D /* DownloadManager.swift */; };
+		27662DED2C586AC5002A678D /* AssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27662DEC2C586AC5002A678D /* AssetManager.swift */; };
 		2799460A25FD9E5A001DCCE3 /* DebiruApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799460925FD9E5A001DCCE3 /* DebiruApp.swift */; };
 		2799460E25FD9E5B001DCCE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799460D25FD9E5B001DCCE3 /* Assets.xcassets */; };
 		2799461125FD9E5B001DCCE3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2799461025FD9E5B001DCCE3 /* Preview Assets.xcassets */; };
@@ -69,6 +70,7 @@
 		27662DE62C56F896002A678D /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		27662DE82C57035C002A678D /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
 		27662DEA2C570AEC002A678D /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
+		27662DEC2C586AC5002A678D /* AssetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetManager.swift; sourceTree = "<group>"; };
 		2799460625FD9E5A001DCCE3 /* Debiru.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Debiru.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2799460925FD9E5A001DCCE3 /* DebiruApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebiruApp.swift; sourceTree = "<group>"; };
 		2799460D25FD9E5B001DCCE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 				27B06E1F264F293E00FCBC0B /* DataManager.swift */,
 				2799460925FD9E5A001DCCE3 /* DebiruApp.swift */,
 				27662DCB2C474919002A678D /* Settings.swift */,
+				27662DEC2C586AC5002A678D /* AssetManager.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -193,9 +196,9 @@
 			children = (
 				27BBF1F626043CA000534CB7 /* DataCache.swift */,
 				279CFF6F25FEBC7D00884724 /* DataProvider.swift */,
+				27662DEA2C570AEC002A678D /* DownloadManager.swift */,
 				279CFF7425FEBDD300884724 /* FourChanDataProvider.swift */,
 				27E4B807265C892400E183CB /* MutableFormData.swift */,
-				27662DEA2C570AEC002A678D /* DownloadManager.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 				2799462525FDA2EB001DCCE3 /* AppState.swift in Sources */,
 				27662DDC2C51BDD4002A678D /* ThreadView.swift in Sources */,
 				27662DE92C57035C002A678D /* DownloadsView.swift in Sources */,
+				27662DED2C586AC5002A678D /* AssetManager.swift in Sources */,
 				27E4B806265C7F8F00E183CB /* Submission.swift in Sources */,
 				27662DE02C534D94002A678D /* ViewModifiers.swift in Sources */,
 				2799462925FDA32D001DCCE3 /* Board.swift in Sources */,

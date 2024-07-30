@@ -13,6 +13,7 @@ struct DebiruApp: App {
     @Environment(\.scenePhase) private var scenePhase: ScenePhase
     @AppStorage(StorageKeys.colorScheme) private var preferredColorScheme: PreferredColorScheme = .system
     @State private var appState: AppState = .init()
+    private let assetManager: AssetManager = .init()
     private let dataProvider: DataProvider = FourChanDataProvider()
     
     var body: some Scene {
@@ -64,7 +65,7 @@ struct DebiruApp: App {
         await loadState()
         await loadBoards()
         
-        DownloadManager.initialize(appState: appState)
+        DownloadManager.initialize(appState: appState, assetManager: assetManager)
     }
     
     /// Loads and initializes the app state.
