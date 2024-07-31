@@ -13,6 +13,7 @@ import Foundation
 class AppState: Codable {
     var boards: [Board] = []
     var downloads: [Download] = []
+    var newDownloads: Int = 0
     
     init() {
     }
@@ -27,6 +28,7 @@ class AppState: Codable {
         
         boards = try values.decode([Board].self, forKey: ._boards)
         downloads = try values.decode([Download].self, forKey: ._downloads)
+        newDownloads = try values.decode(Int.self, forKey: ._newDownloads)
     }
     
     /// Loads the app state from persistence.
@@ -71,11 +73,13 @@ class AppState: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(boards, forKey: ._boards)
         try container.encode(downloads, forKey: ._downloads)
+        try container.encode(newDownloads, forKey: ._newDownloads)
     }
     
     enum CodingKeys: String, CodingKey {
         case _boards = "boards"
         case _downloads = "downloads"
+        case _newDownloads = "_newDownloads"
     }
     
     private static func fileURL() throws -> URL {
@@ -108,10 +112,6 @@ class Download: Identifiable, Codable {
         asset = try values.decode(Asset.self, forKey: ._asset)
         state = try values.decode(State.self, forKey: ._state)
         created = try values.decode(Date.self, forKey: ._created)
-    }
-    
-    var filename: String {
-        return "\(asset.filename)\(asset.extension)"
     }
     
     func encode(to encoder: any Encoder) throws {

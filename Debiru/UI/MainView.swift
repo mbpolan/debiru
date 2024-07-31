@@ -19,6 +19,7 @@ typealias MainView = DesktopMainView
 
 /// A view that displays main app content intended for phones.
 struct PhoneMainView: View {
+    @Environment(AppState.self) var appState
     @Environment(WindowState.self) var windowState
     
     var body: some View {
@@ -52,11 +53,13 @@ struct PhoneMainView: View {
                         Label("", systemImage: "house")
                     }
                     
+                    
                     Button {
                         windowState.navigateToDownloads()
                     } label: {
-                        Label("", systemImage: "square.and.arrow.down")
+                        Label("", systemImage: "square.and.arrow.down.on.square")
                     }
+                    .numberBadge(appState.newDownloads)
                     
                     Button {
                         windowState.navigateToSettings()
@@ -113,5 +116,6 @@ struct DesktopMainView: View {
 
 #Preview {
     MainView()
+        .environment(AppState())
         .environment(WindowState())
 }

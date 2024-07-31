@@ -74,6 +74,10 @@ struct PhoneDownloadsView: View {
             }
         }
         .navigationTitle("Downloads")
+        .task {
+            // reset the new download counter now that the user has viewed their downloads
+            appState.newDownloads = 0
+        }
     }
     
     /// The list of downloads that should be displayed in the view.

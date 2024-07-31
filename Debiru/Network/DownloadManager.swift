@@ -58,6 +58,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
                                            totalBytes: asset.size,
                                            currentBytes: 0,
                                            task: task))
+        self.appState.newDownloads += 1
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
