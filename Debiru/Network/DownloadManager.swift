@@ -45,13 +45,14 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     func addDownload(asset: Asset, to localURL: URL) {
         let remoteURL = DownloadManager.dataProvider.getURL(for: asset, variant: .original)
         
-        self.appState.downloads.append(Download(asset: asset, state: .downloading(completedBytes: 0)))
+        let download = Download(asset: asset, state: .downloading(completedBytes: 0), created: .now)
+        self.appState.downloads.append(download)
         
         let task = URLSession.shared.downloadTask(with: remoteURL)
         task.delegate = self
         task.resume()
         
-        self.downloads.append(DownloadTask(id: String(asset.id),
+        self.downloads.append(DownloadTask(id: download.id,
                                            remoteURL: remoteURL,
                                            localURL: localURL,
                                            totalBytes: asset.size,
@@ -65,53 +66,57 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         }
         
         let task = self.downloads.remove(at: idx)
+        guard let download = self.appState.downloads.first(where: { $0.id == task.id }) else {
+            return
+        }
         
-        Task.detached {
-            guard let download = self.appState.downloads.first(where: { $0.id == task.id }) else {
-                return
-            }
-            
-            var state: Download.State = .finished(on: .now, localURL: location)
+        Task {
+            let state: Download.State
             
             // copy the file to its final destination
             do {
                 let data = try Data(contentsOf: location)
-                let result = await self.assetManager.saveImage(fileName: download.asset.filename, data: data)
+                let result = await self.assetManager.saveImage(filename: download.asset.fullName, data: data)
+                
                 switch result {
-                case .success:
-                    break
+                case .success(let location):
+                    state = .finished(on: .now, localURL: location)
                 case .denied:
                     state = .error(message: "Access to save image was denied")
                 case .error(let message):
                     state = .error(message: message)
                 }
-                //            FileManager.default.createFile(atPath: task.localURL.path(), contents: data)
             } catch {
                 state = .error(message: error.localizedDescription)
             }
             
             // update app state with the final state of the download
-            DispatchQueue.main.async { [state] in
-                download.state = state
-            }
+            await self.updateDownload(task.id, state: state)
         }
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         guard let task = self.downloads.first(where: { $0.task == downloadTask }) else {
+            print("Cannot find download for task \(downloadTask.taskIdentifier)")
             return
         }
         
-        task.currentBytes += totalBytesWritten
+        task.currentBytes = totalBytesWritten
         
-        // update app state with current progress
-        DispatchQueue.main.async { [weak self] in
-            guard let download = self?.appState.downloads.first(where: { $0.id == task.id }) else {
-                return
-            }
-            
-            download.state = .downloading(completedBytes: task.currentBytes)
+        Task {
+            await self.updateDownload(task.id, state: .downloading(completedBytes: task.currentBytes))
         }
+    }
+    
+    @MainActor
+    private func updateDownload(_ id: UUID, state: Download.State) {
+        guard let idx = self.appState.downloads.firstIndex(where: { $0.id == id }) else {
+            return
+        }
+        
+        // replace the download in the array to force a state update
+        let download = self.appState.downloads[idx]
+        self.appState.downloads[idx] = Download(asset: download.asset, state: state, created: download.created, id: download.id)
     }
     
     private init(appState: AppState, assetManager: AssetManager) {
@@ -123,14 +128,14 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
 
 /// A task that tracks the progress of a single file download.
 fileprivate class DownloadTask {
-    let id: String
+    let id: UUID
     let remoteURL: URL
     let localURL: URL
     let totalBytes: Int64
     var currentBytes: Int64
     let task: URLSessionDownloadTask
     
-    init(id: String, remoteURL: URL, localURL: URL, totalBytes: Int64, currentBytes: Int64, task: URLSessionDownloadTask) {
+    init(id: UUID, remoteURL: URL, localURL: URL, totalBytes: Int64, currentBytes: Int64, task: URLSessionDownloadTask) {
         self.id = id
         self.remoteURL = remoteURL
         self.localURL = localURL

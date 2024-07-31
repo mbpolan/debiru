@@ -11,12 +11,14 @@ import SwiftUI
 struct DebiruApp: App {
     @Environment(\.colorScheme) private var systemColorScheme: ColorScheme
     @Environment(\.scenePhase) private var scenePhase: ScenePhase
+    @Environment(\.openWindow) private var openWindow
     @AppStorage(StorageKeys.colorScheme) private var preferredColorScheme: PreferredColorScheme = .system
     @State private var appState: AppState = .init()
     private let assetManager: AssetManager = .init()
     private let dataProvider: DataProvider = FourChanDataProvider()
     
     var body: some Scene {
+        
         WindowGroup(for: UUID.self) { _ in
             ContentView()
                 .environment(appState)
@@ -32,14 +34,27 @@ struct DebiruApp: App {
                         }
                     }
                 }
-                
         }
         #if os(macOS)
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
+        .commands {
+            CommandGroup(before: .windowList) {
+                Divider()
+                Button("Downloads") {
+                    openWindow(id: "downloads")
+                }
+                .keyboardShortcut("y", modifiers: .command)
+            }
+        }
         #endif
         
         #if os(macOS)
-        Settings {
+        WindowGroup(id: "downloads") {
+            DownloadsView()
+                .environment(appState)
+        }
+        
+        SwiftUI.Settings {
             SettingsView()
                 .preferredColorScheme(colorScheme)
         }

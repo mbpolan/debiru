@@ -89,37 +89,51 @@ class AppState: Codable {
 
 @Observable
 class Download: Identifiable, Codable {
-    var asset: Asset
+    let id: UUID
+    let asset: Asset
     var state: State
+    let created: Date
     
-    init(asset: Asset, state: State) {
+    init(asset: Asset, state: State, created: Date, id: UUID = .init()) {
+        self.id = id
         self.asset = asset
         self.state = state
+        self.created = created
     }
     
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
+        id = try values.decode(UUID.self, forKey: ._id)
         asset = try values.decode(Asset.self, forKey: ._asset)
         state = try values.decode(State.self, forKey: ._state)
-    }
-    
-    var id: String {
-        return String(asset.id)
+        created = try values.decode(Date.self, forKey: ._created)
     }
     
     var filename: String {
         return "\(asset.filename)\(asset.extension)"
     }
     
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(id, forKey: ._id)
+        try container.encode(asset, forKey: ._asset)
+        try container.encode(state, forKey: ._state)
+        try container.encode(created, forKey: ._date)
+    }
+    
     enum State: Codable {
         case downloading(completedBytes: Int64)
-        case finished(on: Date, localURL: URL)
+        case finished(on: Date, localURL: URL?)
         case error(message: String)
     }
     
     enum CodingKeys: String, CodingKey {
+        case _id = "id"
         case _asset = "asset"
         case _state = "state"
+        case _created  = "created"
+        case _date = "date"
     }
 }

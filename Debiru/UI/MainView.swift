@@ -99,7 +99,7 @@ struct DesktopMainView: View {
                     ThreadView(boardId: boardId, threadId: threadId)
                 case .asset(let asset):
                     AssetView(asset: asset)
-                case .settings:
+                case .settings, .downloads:
                     EmptyView()
                 }
             }

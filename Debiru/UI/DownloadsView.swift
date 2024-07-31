@@ -15,6 +15,10 @@ typealias DownloadsView = PhoneDownloadsView
 typealias DownloadsView = DesktopDownloadsView
 #endif
 
+// MARK: - Phone View
+
+#if os(iOS)
+
 /// A view that displays and allows managing asset downloads for phone form factors.
 struct PhoneDownloadsView: View {
     @Environment(AppState.self) private var appState
@@ -68,10 +72,119 @@ struct PhoneDownloadsView: View {
     /// Handles an action to view the asset.
     ///
     /// - Parameter url: The local URL of the asset.
-    private func handleOpenAsset(_ url: URL) {
-        openURL(url)
+    private func handleOpenAsset(_ url: URL?) {
+        if let url = url {
+            openURL(url)
+        }
     }
 }
+
+#elseif os(macOS)
+
+// MARK: - Desktop View
+
+/// A view that presents a table of assets currently known to the download manager.
+struct DesktopDownloadsView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.openURL) private var openURL
+    private static let dateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+    private static let relativeDateFormatter = RelativeDateTimeFormatter()
+    
+    var body: some View {
+        Table(appState.downloads) {
+            TableColumn("File", value: \.filename)
+            
+            TableColumn("Date") { item in
+                Text(Self.dateFormatter.string(for: item.created) ?? "Unknown")
+                    .help(Self.relativeDateFormatter.string(for: item.created) ?? "Unknown")
+            }
+            
+            TableColumn("Size") { item in
+                Text("\(item.asset.size) bytes")
+            }
+            
+            TableColumn("Status") { item in
+                switch item.state {
+                case .finished(_, _):
+                    Text("Complete")
+                    
+                case .error(let message):
+                    Text(message)
+                        .help(message)
+                    
+                case .downloading(let completedBytes):
+                    ProgressView(value: Float(completedBytes), total: Float(item.asset.size))
+                        .progressViewStyle(LinearProgressViewStyle())
+                }
+            }
+        }
+        .contextMenu(forSelectionType: UUID.self, menu: { items in
+            Button("Reveal in Finder") {
+                NSWorkspace.shared.activateFileViewerSelecting(downloadLocation(items))
+            }
+            .disabled(!canRevealInFinder(items))
+        }, primaryAction: handleOpenFile)
+    }
+    
+    /// Handles opening the local file associated with an asset.
+    ///
+    /// - Parameter items: The UUID (singleton set) of the table row item.
+    private func handleOpenFile(_ items: Set<UUID>) {
+        let locations = downloadLocation(items)
+        guard let url = locations.first else {
+            return
+        }
+        
+        NSWorkspace.shared.open(url)
+    }
+    
+    /// Determines if an asset should be viewable in Finder.
+    ///
+    /// - Parameter items: The UUID (singleton set) of the table row item.
+    ///
+    /// - Returns: Boolean true if viewable, false if not.
+    private func canRevealInFinder(_ items: Set<UUID>) -> Bool {
+        guard let download = self.appState.downloads.first(where: { $0.id == items.first }) else {
+            return false
+        }
+        
+        switch download.state {
+        case .finished(_, let location):
+            return location != nil
+        default:
+            return false
+        }
+    }
+    
+    /// Returns the local URL of a downloaded asset.
+    ///
+    /// - Parameter items: The UUID (singleton set) of the table row item.
+    ///
+    /// - Returns: A singleton array containing the local URL, or an empty array if the URL cannot be determined.
+    private func downloadLocation(_ items: Set<UUID>) -> [URL] {
+        guard let download = self.appState.downloads.first(where: { $0.id == items.first }) else {
+            return []
+        }
+        
+        switch download.state {
+        case .finished(_, let location):
+            if let location = location {
+                return [location]
+            } else {
+                return []
+            }
+        default:
+            return []
+        }
+    }
+}
+
+#endif
 
 // MARK: - Previews
 
@@ -88,7 +201,8 @@ struct PhoneDownloadsView: View {
                                                       filename: "foo",
                                                       extension: ".jpg",
                                                       fileType: .image, size: 160403333),
-                                         state: .downloading(completedBytes: 130403333)),
+                                         state: .downloading(completedBytes: 130403333),
+                                         created: .now),
                                 Download(asset: .init(id: 678905,
                                                       boardId: "g",
                                                       width: 100,
@@ -98,7 +212,8 @@ struct PhoneDownloadsView: View {
                                                       filename: "foo",
                                                       extension: ".jpg",
                                                       fileType: .image, size: 160403333),
-                                         state: .finished(on: .now, localURL: URL(string: "https://google.pl")!)),
+                                         state: .finished(on: .now, localURL: URL(string: "https://google.pl")!),
+                                         created: .now),
                                 Download(asset: .init(id: 92020232,
                                                       boardId: "g",
                                                       width: 100,
@@ -108,6 +223,7 @@ struct PhoneDownloadsView: View {
                                                       filename: "foo",
                                                       extension: ".jpg",
                                                       fileType: .image, size: 160403333),
-                                         state: .error(message: "The image no longer exists")),
+                                         state: .error(message: "The image no longer exists"),
+                                         created: .now),
                               ]))
 }

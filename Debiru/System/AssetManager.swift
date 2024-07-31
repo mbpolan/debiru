@@ -5,11 +5,11 @@
 //  Created by Mike Polan on 7/29/24.
 //
 
-// MARK: - Models
+// MARK: - Protocols and Models
 
 /// Enumeration of possible results for asset management operations.
 enum AssetResult {
-    case success
+    case success(location: URL?)
     case denied
     case error(message: String)
 }
@@ -21,18 +21,18 @@ enum AssetResult {
 import Photos
 import UIKit
 
-/// A service that manages the creation of new assets.
+/// A service that manages the creation of new assets in the user's photo library.
 struct AssetManager {
     private static let albumName = "Debiru Images"
     private static var shared: AssetManager?
     
     /// Saves an image or media asset to the user's photo library.
     ///
-    /// - Parameter fileName: The filename of the asset.
+    /// - Parameter filename: The filename of the asset.
     /// - Parameter data: The raw data of the asset.
     ///
     /// - Returns: A result indicating the outcome of the operation.
-    func saveImage(fileName: String, data: Data) async -> AssetResult {
+    func saveImage(filename: String, data: Data) async -> AssetResult {
         do {
             guard await hasAccess(), let album = try await getOrCreateAlbum() else {
                 return .denied
@@ -48,7 +48,7 @@ struct AssetManager {
                 addAssetRequest?.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
             })
             
-            return .success
+            return .success(location: nil)
         } catch {
             return .error(message: error.localizedDescription)
         }
@@ -90,6 +90,41 @@ struct AssetManager {
     private func hasAccess() async -> Bool {
         let result = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
         return result == .authorized || result == .limited
+    }
+}
+
+#else
+
+// MARK: - macOS
+
+import Foundation
+
+/// A service that manages the creation of new assets using a filesystem hierarchy.
+struct AssetManager {
+    
+    /// Saves an image or media asset to the filesystem.
+    ///
+    /// The file will be created based on the current user default for image save locations.
+    ///
+    /// - Parameter filename: The filename of the asset.
+    /// - Parameter data: The raw data of the asset.
+    ///
+    /// - Returns: A result indicating the outcome of the operation.
+    func saveImage(filename: String, data: Data) async -> AssetResult {
+        guard let location = UserDefaults.standard.string(forKey: StorageKeys.defaultImageLocation) else {
+            return .error(message: "Invalid location")
+        }
+        
+        do {
+            let destination = URL(fileURLWithPath: location)
+                .appendingPathComponent(filename, conformingTo: .fileURL)
+            
+            try data.write(to: destination)
+            
+            return .success(location: destination)
+        } catch {
+            return .error(message: error.localizedDescription)
+        }
     }
 }
 
