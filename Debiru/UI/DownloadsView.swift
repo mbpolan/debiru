@@ -23,13 +23,14 @@ typealias DownloadsView = DesktopDownloadsView
 struct PhoneDownloadsView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.openURL) private var openURL
+    @State private var viewModel: ViewModel = .init()
     private static let dateFormatter = RelativeDateTimeFormatter()
     
     var body: some View {
         List(appState.downloads) { download in
-            HStack(alignment: .center) {
-                switch download.state {
-                case .downloading(let completedBytes):
+            switch download.state {
+            case .downloading(let completedBytes):
+                HStack(alignment: .center) {
                     Image(systemName: "arrow.down.circle.dotted")
                     Text(assetName(download.asset))
                         .padding(.trailing, 25)
@@ -38,24 +39,31 @@ struct PhoneDownloadsView: View {
                     
                     ProgressView(value: Float(completedBytes), total: Float(download.asset.size))
                         .progressViewStyle(LinearProgressViewStyle())
+                }
+                
+            case .finished(let on, let localURL):
+                HStack(alignment: .center) {
+                    Image(systemName: "checkmark.circle")
+                    Text(assetName(download.asset))
+                        .lineLimit(1)
                     
-                case .finished(let on, let localURL):
-                    Group {
-                        Image(systemName: "checkmark.circle")
-                        Text(assetName(download.asset))
-                            .lineLimit(1)
-                        
-                        Spacer()
-                        
-                        Text(PhoneDownloadsView.dateFormatter.localizedString(for: on, relativeTo: .now))
-                    }
-                    .onTapGesture { handleOpenAsset(localURL) }
+                    Spacer()
                     
-                case .error(let message):
+                    Text(PhoneDownloadsView.dateFormatter.localizedString(for: on, relativeTo: .now))
+                }
+                .onTapGesture { handleOpenAsset(localURL) }
+                
+            case .error(let message):
+                HStack(alignment: .center) {
                     Image(systemName: "exclamationmark.triangle")
                         .help(message)
                     
                     Text(assetName(download.asset))
+                }
+                .onTapGesture { viewModel.popoverShown = true }
+                .popover(isPresented: $viewModel.popoverShown) {
+                    Text(message)
+                        .padding()
                 }
             }
         }
@@ -74,9 +82,16 @@ struct PhoneDownloadsView: View {
     /// - Parameter url: The local URL of the asset.
     private func handleOpenAsset(_ url: URL?) {
         if let url = url {
-            openURL(url)
+            UIApplication.shared.open(url)
         }
     }
+}
+
+// MARK: - Phone View Model
+
+@Observable
+fileprivate class ViewModel {
+    var popoverShown: Bool = false
 }
 
 #elseif os(macOS)

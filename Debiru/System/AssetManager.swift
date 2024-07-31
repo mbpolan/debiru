@@ -42,16 +42,39 @@ struct AssetManager {
                 return .error(message: "Invalid image data")
             }
             
+            var localIdentifier: String?
+            
             try await PHPhotoLibrary.shared().performChanges({
                 let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
                 let addAssetRequest = PHAssetCollectionChangeRequest(for: album)
                 addAssetRequest?.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
+                
+                localIdentifier = creationRequest.placeholderForCreatedAsset?.localIdentifier
             })
             
-            return .success(location: nil)
+            // build a url to the photo asset if we have enough information
+            var location: URL?
+            if let photoID = localIdentifier {
+                location = getPhotosURL(for: photoID, in: album.localIdentifier)
+            }
+            
+            return .success(location: location)
         } catch {
             return .error(message: error.localizedDescription)
         }
+    }
+    
+    /// Returns a URL for deep-linking to a photo in the user's photo library.
+    ///
+    /// - Parameter photoID: The local identifier of the photo asset.
+    /// - Parameter albumID: The local identifier of the album.
+    ///
+    /// - Returns: A URL for the photo.
+    private func getPhotosURL(for photoID: String, in albumID: String) -> URL? {
+        let albumUUID = albumID.prefix(while: { $0 != "/" })
+        let assetUUID = photoID.prefix(while: { $0 != "/" })
+        
+        return URL(string: "photos:albums?albumUuid=\(albumUUID)&assetUuid=\(assetUUID)")
     }
     
     /// Returns or creates the default album for the app.
