@@ -27,11 +27,12 @@ struct PhoneDownloadsView: View {
     private static let dateFormatter = RelativeDateTimeFormatter()
     
     var body: some View {
-        List(appState.downloads) { download in
+        List(self.downloads) { download in
             switch download.state {
             case .downloading(let completedBytes):
                 HStack(alignment: .center) {
                     Image(systemName: "arrow.down.circle.dotted")
+                    
                     Text(assetName(download.asset))
                         .padding(.trailing, 25)
                     
@@ -41,15 +42,16 @@ struct PhoneDownloadsView: View {
                         .progressViewStyle(LinearProgressViewStyle())
                 }
                 
-            case .finished(let on, let localURL):
+            case .finished(_, let localURL):
                 HStack(alignment: .center) {
                     Image(systemName: "checkmark.circle")
+                    
                     Text(assetName(download.asset))
                         .lineLimit(1)
                     
                     Spacer()
                     
-                    Text(PhoneDownloadsView.dateFormatter.localizedString(for: on, relativeTo: .now))
+                    Text(PhoneDownloadsView.dateFormatter.localizedString(for: download.created, relativeTo: .now))
                 }
                 .onTapGesture { handleOpenAsset(localURL) }
                 
@@ -59,6 +61,10 @@ struct PhoneDownloadsView: View {
                         .help(message)
                     
                     Text(assetName(download.asset))
+                    
+                    Spacer()
+                    
+                    Text(PhoneDownloadsView.dateFormatter.localizedString(for: download.created, relativeTo: .now))
                 }
                 .onTapGesture { viewModel.popoverShown = true }
                 .popover(isPresented: $viewModel.popoverShown) {
@@ -68,6 +74,13 @@ struct PhoneDownloadsView: View {
             }
         }
         .navigationTitle("Downloads")
+    }
+    
+    /// The list of downloads that should be displayed in the view.
+    private var downloads: [Download] {
+        return appState.downloads.sorted(by: { a, b in
+            return a.created > b.created
+        })
     }
     
     /// Returns the filename to display for an asset.
