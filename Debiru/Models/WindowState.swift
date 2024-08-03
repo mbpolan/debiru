@@ -30,6 +30,10 @@ class WindowState {
         self.route.append(ViewableItem.asset(asset: asset))
     }
     
+    func navigateToSavedThreads() {
+        self.route.append(ViewableItem.savedThreads)
+    }
+    
     func navigateToDownloads() {
         self.route.append(ViewableItem.downloads)
     }
@@ -44,6 +48,7 @@ enum ViewableItem: Identifiable, Hashable, Codable {
     case board(boardId: String)
     case thread(boardId: String, threadId: Int)
     case asset(asset: Asset)
+    case savedThreads
     case downloads
     case settings
     
@@ -55,6 +60,8 @@ enum ViewableItem: Identifiable, Hashable, Codable {
             return "\(boardId)-\(threadId)"
         case .asset(let asset):
             return "\(asset.boardId)-\(asset.id)"
+        case .savedThreads:
+            return "savedThreads"
         case .downloads:
             return "downloads"
         case .settings:
@@ -104,6 +111,8 @@ extension ViewableItem {
 //                                    board: board,
 //                                    thread: thread), forKey: .thread)
         case .asset(let asset):
+            break
+        case .savedThreads:
             break
         case .downloads:
             break

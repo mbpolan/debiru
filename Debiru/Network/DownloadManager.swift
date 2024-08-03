@@ -45,7 +45,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     func addDownload(asset: Asset, to localURL: URL) {
         let remoteURL = DownloadManager.dataProvider.getURL(for: asset, variant: .original)
         
-        let download = Download(asset: asset, state: .downloading(completedBytes: 0), created: .now)
+        let download = Download(resource: .asset(asset), state: .downloading(completedBytes: 0), created: .now)
         self.appState.downloads.append(download)
         
         let task = URLSession.shared.downloadTask(with: remoteURL)
@@ -53,11 +53,39 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         task.resume()
         
         self.downloads.append(DownloadTask(id: download.id,
+                                           type: .asset,
                                            remoteURL: remoteURL,
                                            localURL: localURL,
                                            totalBytes: asset.size,
                                            currentBytes: 0,
-                                           task: task))
+                                           task: task,
+                                           subTasks: []))
+        self.appState.newDownloads += 1
+    }
+    
+    /// Adds a thread to download.
+    ///
+    /// - Parameter boardId: The ID of the board the thread is in.
+    /// - Parameter threadId: The ID of the thread.
+    /// - Parameter localURL: The URL to the directory where thread data will be written to.
+    func addDownload(boardId: String, threadId: Int, to localURL: URL) {
+        let remoteURL = Self.dataProvider.getDataURL(for: boardId, threadID: threadId)
+        
+        let download = Download(resource: .thread(boardId, threadId), state: .downloading(completedBytes: 0), created: .now)
+        self.appState.downloads.append(download)
+        
+        let task = URLSession.shared.downloadTask(with: remoteURL)
+        task.delegate = self
+        task.resume()
+        
+        self.downloads.append(DownloadTask(id: download.id,
+                                           type: .asset,
+                                           remoteURL: remoteURL,
+                                           localURL: localURL,
+                                           totalBytes: 0,
+                                           currentBytes: 0,
+                                           task: task,
+                                           subTasks: []))
         self.appState.newDownloads += 1
     }
     
@@ -77,7 +105,14 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             // copy the file to its final destination
             do {
                 let data = try Data(contentsOf: location)
-                let result = await self.assetManager.saveImage(filename: download.asset.fullName, data: data)
+                
+                let result: AssetResult
+                switch download.resource {
+                case .asset(let asset):
+                    result = await self.assetManager.saveImage(filename: asset.fullName, data: data)
+                case .thread(let boardID, let threadID):
+                    result = await self.assetManager.saveThread(directory: boardID, filename: "\(threadID).json", data: data)
+                }
                 
                 switch result {
                 case .success(let location):
@@ -117,7 +152,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         
         // replace the download in the array to force a state update
         let download = self.appState.downloads[idx]
-        self.appState.downloads[idx] = Download(asset: download.asset, state: state, created: download.created, id: download.id)
+        self.appState.downloads[idx] = Download(resource: download.resource, state: state, created: download.created, id: download.id)
     }
     
     private init(appState: AppState, assetManager: AssetManager) {
@@ -130,18 +165,27 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
 /// A task that tracks the progress of a single file download.
 fileprivate class DownloadTask {
     let id: UUID
+    let type: DownloadType
     let remoteURL: URL
     let localURL: URL
     let totalBytes: Int64
     var currentBytes: Int64
     let task: URLSessionDownloadTask
+    let subTasks: [DownloadTask]
     
-    init(id: UUID, remoteURL: URL, localURL: URL, totalBytes: Int64, currentBytes: Int64, task: URLSessionDownloadTask) {
+    init(id: UUID, type: DownloadType, remoteURL: URL, localURL: URL, totalBytes: Int64, currentBytes: Int64, task: URLSessionDownloadTask, subTasks: [DownloadTask]) {
         self.id = id
+        self.type = type
         self.remoteURL = remoteURL
         self.localURL = localURL
         self.totalBytes = totalBytes
         self.currentBytes = currentBytes
         self.task = task
+        self.subTasks = subTasks
+    }
+    
+    enum DownloadType {
+        case asset
+        case thread
     }
 }

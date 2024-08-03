@@ -35,6 +35,8 @@ struct PhoneMainView: View {
                         ThreadView(boardId: boardId, threadId: threadId)
                     case .asset(let asset):
                         AssetView(asset: asset)
+                    case .savedThreads:
+                        SavedThreadsView()
                     case .downloads:
                         DownloadsView()
                     case .settings:
@@ -53,6 +55,11 @@ struct PhoneMainView: View {
                         Label("", systemImage: "house")
                     }
                     
+                    Button {
+                        windowState.navigateToSavedThreads()
+                    } label: {
+                        Label("", systemImage: "bookmark")
+                    }
                     
                     Button {
                         windowState.navigateToDownloads()
@@ -102,7 +109,7 @@ struct DesktopMainView: View {
                     ThreadView(boardId: boardId, threadId: threadId)
                 case .asset(let asset):
                     AssetView(asset: asset)
-                case .settings, .downloads:
+                case .savedThreads, .settings, .downloads:
                     EmptyView()
                 }
             }

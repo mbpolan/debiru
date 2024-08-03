@@ -13,14 +13,16 @@ import Foundation
 class AppState: Codable {
     var boards: [Board] = []
     var downloads: [Download] = []
+    var savedThreads: [SavedThread] = []
     var newDownloads: Int = 0
     
     init() {
     }
     
-    init(boards: [Board], downloads: [Download] = []) {
+    init(boards: [Board], downloads: [Download] = [], savedThreads: [SavedThread] = []) {
         self.boards = boards
         self.downloads = downloads
+        self.savedThreads = savedThreads
     }
     
     required init(from decoder: Decoder) throws {
@@ -28,6 +30,7 @@ class AppState: Codable {
         
         boards = try values.decode([Board].self, forKey: ._boards)
         downloads = try values.decode([Download].self, forKey: ._downloads)
+        savedThreads = try values.decode([SavedThread].self, forKey: ._savedThreads)
         newDownloads = try values.decode(Int.self, forKey: ._newDownloads)
     }
     
@@ -71,15 +74,18 @@ class AppState: Codable {
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        
         try container.encode(boards, forKey: ._boards)
         try container.encode(downloads, forKey: ._downloads)
+        try container.encode(savedThreads, forKey: ._savedThreads)
         try container.encode(newDownloads, forKey: ._newDownloads)
     }
     
     enum CodingKeys: String, CodingKey {
         case _boards = "boards"
         case _downloads = "downloads"
-        case _newDownloads = "_newDownloads"
+        case _newDownloads = "newDownloads"
+        case _savedThreads = "savedThreads"
     }
     
     private static func fileURL() throws -> URL {
@@ -91,16 +97,17 @@ class AppState: Codable {
     }
 }
 
+/// An asset or resource that was requested to be downloaded.
 @Observable
 class Download: Identifiable, Codable {
     let id: UUID
-    let asset: Asset
+    let resource: Resource
     var state: State
     let created: Date
     
-    init(asset: Asset, state: State, created: Date, id: UUID = .init()) {
+    init(resource: Resource, state: State, created: Date, id: UUID = .init()) {
         self.id = id
-        self.asset = asset
+        self.resource = resource
         self.state = state
         self.created = created
     }
@@ -109,7 +116,7 @@ class Download: Identifiable, Codable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
         id = try values.decode(UUID.self, forKey: ._id)
-        asset = try values.decode(Asset.self, forKey: ._asset)
+        resource = try values.decode(Resource.self, forKey: ._resource)
         state = try values.decode(State.self, forKey: ._state)
         created = try values.decode(Date.self, forKey: ._created)
     }
@@ -118,9 +125,14 @@ class Download: Identifiable, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encode(id, forKey: ._id)
-        try container.encode(asset, forKey: ._asset)
+        try container.encode(resource, forKey: ._resource)
         try container.encode(state, forKey: ._state)
         try container.encode(created, forKey: ._date)
+    }
+    
+    enum Resource: Codable {
+        case asset(_ asset: Asset)
+        case thread(_ boardID: String, _ threadID: Int)
     }
     
     enum State: Codable {
@@ -131,9 +143,49 @@ class Download: Identifiable, Codable {
     
     enum CodingKeys: String, CodingKey {
         case _id = "id"
-        case _asset = "asset"
+        case _resource = "resource"
         case _state = "state"
         case _created  = "created"
         case _date = "date"
+    }
+}
+
+// A thread that was downloaded by the user.
+@Observable
+class SavedThread: Identifiable, Codable {
+    let original: Post
+    let created: Date
+    let localURL: URL
+    
+    init(original: Post, created: Date, localURL: URL) {
+        self.original = original
+        self.created = created
+        self.localURL = localURL
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        
+        original = try values.decode(Post.self, forKey: ._original)
+        created = try values.decode(Date.self, forKey: ._created)
+        localURL = try values.decode(URL.self, forKey: ._localURL)
+    }
+    
+    var id: String {
+        "\(original.boardId)-\(original.id)"
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(original, forKey: ._original)
+        try container.encode(created, forKey: ._created)
+        try container.encode(localURL, forKey: ._localURL)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case _original = "original"
+        case _created = "created"
+        case _localURL = "localURL"
     }
 }

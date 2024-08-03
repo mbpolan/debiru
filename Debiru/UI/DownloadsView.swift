@@ -129,7 +129,15 @@ struct DesktopDownloadsView: View {
     
     var body: some View {
         Table(appState.downloads) {
-            TableColumn("File", value: \.filename)
+            TableColumn("File") { item in
+                switch item.resource {
+                case .asset(let asset):
+                    Text(asset.fullName)
+                case .thread(let boardID, let threadID):
+                    Text("/\(boardID)/")
+                    Text(String(threadID))
+                }
+            }
             
             TableColumn("Date") { item in
                 Text(Self.dateFormatter.string(for: item.created) ?? "Unknown")
@@ -137,7 +145,12 @@ struct DesktopDownloadsView: View {
             }
             
             TableColumn("Size") { item in
-                Text("\(item.asset.size) bytes")
+                switch item.resource {
+                case .asset(let asset):
+                    Text("\(asset.size) bytes")
+                case .thread(_, _):
+                    Text("?")
+                }
             }
             
             TableColumn("Status") { item in
@@ -150,8 +163,15 @@ struct DesktopDownloadsView: View {
                         .help(message)
                     
                 case .downloading(let completedBytes):
-                    ProgressView(value: Float(completedBytes), total: Float(item.asset.size))
-                        .progressViewStyle(LinearProgressViewStyle())
+                    switch item.resource {
+                    case .asset(let asset):
+                        ProgressView(value: Float(completedBytes), total: Float(asset.size))
+                            .progressViewStyle(LinearProgressViewStyle())
+                    case .thread(_, _):
+                        ProgressView()
+                            .progressViewStyle(LinearProgressViewStyle())
+                    }
+                    
                 }
             }
         }
@@ -224,7 +244,7 @@ struct DesktopDownloadsView: View {
     DownloadsView()
         .environment(AppState(boards: [],
                               downloads: [
-                                Download(asset: .init(id: 123456,
+                                Download(resource: .asset(.init(id: 123456,
                                                       boardId: "g",
                                                       width: 100,
                                                       height: 100,
@@ -232,10 +252,10 @@ struct DesktopDownloadsView: View {
                                                       thumbnailHeight: 100,
                                                       filename: "foo",
                                                       extension: ".jpg",
-                                                      fileType: .image, size: 160403333),
+                                                      fileType: .image, size: 160403333)),
                                          state: .downloading(completedBytes: 130403333),
                                          created: .now),
-                                Download(asset: .init(id: 678905,
+                                Download(resource: .asset(.init(id: 678905,
                                                       boardId: "g",
                                                       width: 100,
                                                       height: 100,
@@ -243,10 +263,10 @@ struct DesktopDownloadsView: View {
                                                       thumbnailHeight: 100,
                                                       filename: "foo",
                                                       extension: ".jpg",
-                                                      fileType: .image, size: 160403333),
+                                                      fileType: .image, size: 160403333)),
                                          state: .finished(on: .now, localURL: URL(string: "https://google.pl")!),
                                          created: .now),
-                                Download(asset: .init(id: 92020232,
+                                Download(resource: .asset(.init(id: 92020232,
                                                       boardId: "g",
                                                       width: 100,
                                                       height: 100,
@@ -254,7 +274,7 @@ struct DesktopDownloadsView: View {
                                                       thumbnailHeight: 100,
                                                       filename: "foo",
                                                       extension: ".jpg",
-                                                      fileType: .image, size: 160403333),
+                                                      fileType: .image, size: 160403333)),
                                          state: .error(message: "The image no longer exists"),
                                          created: .now),
                               ]))

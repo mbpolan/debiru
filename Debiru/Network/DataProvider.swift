@@ -32,6 +32,8 @@ protocol DataProvider {
     func getURL(for asset: Asset, variant: Asset.Variant) -> URL
     
     func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL
+    
+    func getDataURL(for boardID: String, threadID: Int) -> URL
 }
 
 enum NetworkError: Error {

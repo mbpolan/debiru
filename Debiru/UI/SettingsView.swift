@@ -42,7 +42,7 @@ struct PhoneSettingsView: View {
 fileprivate struct GeneralSettingsView: View {
     @State private var viewModel: GeneralSettingsViewModel = .init()
     @AppStorage(StorageKeys.colorScheme) var colorScheme: PreferredColorScheme = .system
-    @AppStorage(StorageKeys.defaultImageLocation) var defaultImageLocation: URL = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
+    @AppStorage(StorageKeys.defaultImageLocation) var defaultImageLocation: URL = Settings.defaultImageLocation
     
     var body: some View {
         Form {
@@ -57,11 +57,11 @@ fileprivate struct GeneralSettingsView: View {
                     .tag(PreferredColorScheme.system)
             }
             
-            // changing the image save location is not supported on iOS
+            // changing the save locations is not supported on iOS
             #if os(macOS)
             HStack {
                 Text("Default image location")
-                Button(action: handleShowFileImporter) {
+                Button(action: handleShowFileImporterForImage) {
                     Text(defaultImageLocation.description.replacingOccurrences(of: "file://", with: ""))
                 }
             }
@@ -70,14 +70,22 @@ fileprivate struct GeneralSettingsView: View {
         .fileImporter(isPresented: $viewModel.fileImporterShown, allowedContentTypes: [.directory], onCompletion: self.handleFileImporterCompleted)
     }
     
-    private func handleShowFileImporter() {
+    private func handleShowFileImporterForImage() {
         viewModel.fileImporterShown = true
+        viewModel.fileImporterKey = .image
     }
     
     private func handleFileImporterCompleted(_ result: Result<URL, Error>) {
+        guard let key = viewModel.fileImporterKey else {
+            return
+        }
+        
         switch result {
         case .success(let url):
+            switch key {
+            case .image:
             defaultImageLocation = url
+            }
         case .failure(let error):
             // TODO
             break
@@ -91,11 +99,16 @@ fileprivate struct GeneralSettingsView: View {
 fileprivate class GeneralSettingsViewModel {
     var fileImporterShown: Bool = false
     var colorScheme: ColorScheme = .system
+    var fileImporterKey: FileImporterKey?
     
     enum ColorScheme: Equatable {
         case dark
         case light
         case system
+    }
+    
+    enum FileImporterKey {
+        case image
     }
 }
 

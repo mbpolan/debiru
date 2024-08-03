@@ -13,6 +13,7 @@ import SwiftUI
 struct BoardView: View {
     let boardId: String
     @AppStorage(StorageKeys.defaultImageLocation) private var imageSaveLocation: URL = Settings.defaultImageLocation
+    @AppStorage(StorageKeys.defaultDataLocation) private var dataSaveLocation: URL = Settings.defaultDataLocation
     @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
     
@@ -31,6 +32,11 @@ struct BoardView: View {
                              onTapGesture: { handleGoToThread(post) },
                              onAssetAction: handleAssetAction)
                     .postViewListItem(post)
+                    .contextMenu {
+                        Button("Save Thread") {
+                            DownloadManager.instance().addDownload(boardId: post.boardId, threadId: post.threadId, to: dataSaveLocation)
+                        }
+                    }
                 }
             }
         }

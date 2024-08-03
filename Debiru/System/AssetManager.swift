@@ -149,6 +149,34 @@ struct AssetManager {
             return .error(message: error.localizedDescription)
         }
     }
+    
+    /// Saves a thread data file to the filesystem.
+    ///
+    /// - Parameter directory: The parent subdirectory to store the file.
+    /// - Parameter filename: The filename of the thread file.
+    /// - Parameter data: The raw data.
+    ///
+    /// - Returns: A result indicating the outcome of the operation.
+    func saveThread(directory: String, filename: String, data: Data) async -> AssetResult {
+        do {
+            let parentDirectory = URL(fileURLWithPath: NSHomeDirectory())
+                .appendingPathComponent("threads", conformingTo: .directory)
+                .appendingPathComponent(directory, conformingTo: .directory)
+            
+            if !FileManager.default.fileExists(atPath: parentDirectory.path()) {
+                try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+            }
+            
+            let destination = parentDirectory
+                .appendingPathComponent(filename, conformingTo: .fileURL)
+            
+            try data.write(to: destination)
+            
+            return .success(location: destination)
+        } catch {
+            return .error(message: error.localizedDescription)
+        }
+    }
 }
 
 #endif

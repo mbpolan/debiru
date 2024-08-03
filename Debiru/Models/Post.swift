@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Post: Identifiable, Hashable {
+struct Post: Identifiable, Hashable, Codable {
     let id: Int
     let boardId: String
     let threadId: Int

@@ -16,6 +16,7 @@ enum PreferredColorScheme: String, RawRepresentable {
 struct StorageKeys {
     static let colorScheme = "colorScheme"
     static let defaultImageLocation = "defaultImageLocation"
+    static let defaultDataLocation = "defaultDataLocation"
 }
 
 struct Settings {
@@ -24,5 +25,13 @@ struct Settings {
     /// - Returns: A URL for the default image storage location.
     static var defaultImageLocation: URL {
         FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
+    }
+    
+    /// The default location where data should be saved.
+    ///
+    /// - Returns: A URL for the default data storage location.
+    static var defaultDataLocation: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Debiru", conformingTo: .directory)
     }
 }

@@ -154,7 +154,7 @@ struct FourChanDataProvider: DataProvider {
     
     func getPosts(for threadId: Int, in boardId: String) async throws -> [Post] {
         return try await getData(
-            url: "\(apiBaseUrl)/\(boardId)/thread/\(threadId).json",
+            url: getDataURL(for: boardId, threadID: threadId).absoluteString,
             mapper: { (value: ThreadPostsModel) in
                 var postsToReplies: [Int: [Int]] = [:]
                 var rootPosts: [Int: Bool] = [:]
@@ -341,6 +341,10 @@ struct FourChanDataProvider: DataProvider {
     
     func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL {
         return URL(string: "https://sys.4chan.org/captcha?framed=1&board=\(captchaBoard.id)&thread_id=\(threadId)")!
+    }
+    
+    func getDataURL(for boardID: String, threadID: Int) -> URL {
+        return URL(string: "\(apiBaseUrl)/\(boardID)/thread/\(threadID).json")!
     }
     
     private func determineFileType(_ fileExtension: String) -> Asset.FileType {
