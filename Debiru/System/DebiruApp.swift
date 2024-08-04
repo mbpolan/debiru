@@ -38,6 +38,13 @@ struct DebiruApp: App {
         #if os(macOS)
         .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
         .commands {
+            CommandGroup(after: .sidebar) {
+                Button("Refresh") {
+                    RefreshNotification().notify()
+                }
+                .keyboardShortcut("r", modifiers: .command)
+            }
+            
             CommandGroup(before: .windowList) {
                 Divider()
                 Button("Downloads") {

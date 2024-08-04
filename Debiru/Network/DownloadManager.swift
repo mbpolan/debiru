@@ -102,7 +102,6 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         Task {
             let state: Download.State
             
-            // copy the file to its final destination
             do {
                 let data = try Data(contentsOf: location)
                 

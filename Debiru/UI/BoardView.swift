@@ -46,6 +46,11 @@ struct BoardView: View {
         .task(id: boardId) {
             await loadBoard()
         }
+        .onRefresh {
+            Task {
+                await loadBoard()
+            }
+        }
         .refreshable {
             await refresh()
         }
