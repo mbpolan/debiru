@@ -51,6 +51,12 @@ struct DebiruApp: App {
                     openWindow(id: "downloads")
                 }
                 .keyboardShortcut("y", modifiers: .command)
+                
+                Divider()
+                Button("Search") {
+                    SearchNotification().notify()
+                }
+                .keyboardShortcut("o", modifiers: [.command, .shift])
             }
         }
         #endif

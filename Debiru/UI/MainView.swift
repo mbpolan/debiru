@@ -89,7 +89,8 @@ struct PhoneMainView: View {
 
 /// A view that displays main app content intended for desktops.
 struct DesktopMainView: View {
-    @Environment(WindowState.self) var windowState
+    @Environment(WindowState.self) private var windowState
+    @State private var viewModel: ViewModel = .init()
     
     var body: some View {
         @Bindable var windowState = windowState
@@ -99,7 +100,7 @@ struct DesktopMainView: View {
                 .environment(windowState)
         } detail: {
             NavigationStack(path: $windowState.route) {
-                Text("Select a board to view threads")
+                Text("Select a board or use ⌘ ⇧ O to bring up quick search")
             }
             .navigationDestination(for: ViewableItem.self) { item in
                 switch item {
@@ -114,7 +115,16 @@ struct DesktopMainView: View {
                 }
             }
         }
+        .sheet(isPresented: $viewModel.searchShown) {
+            SearchView()
+        }
+        .onSearch { viewModel.searchShown = true }
     }
+}
+
+@Observable
+fileprivate class ViewModel {
+    var searchShown: Bool = false
 }
 
 #endif

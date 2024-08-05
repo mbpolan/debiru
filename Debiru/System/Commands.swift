@@ -27,6 +27,24 @@ struct RefreshNotification {
     }
 }
 
+// MARK: - Refresh Notification
+
+/// A notification that gets published when the search view should be displayed.
+struct SearchNotification {
+    static var name = Notification.Name("search")
+    
+    static var publisher: AnyPublisher<Notification, Never> {
+        NotificationCenter
+            .default
+            .publisher(for: Self.name, object: nil)
+            .eraseToAnyPublisher()
+    }
+    
+    func notify() {
+        NotificationCenter.default.post(name: Self.name, object: nil)
+    }
+}
+
 // MARK: - Extensions
 
 extension View {
@@ -38,5 +56,9 @@ extension View {
     
     func onRefresh(_ perform: @escaping() -> Void) -> some View {
         return onNotification(RefreshNotification.name, perform: perform)
+    }
+    
+    func onSearch(_ perform: @escaping() -> Void) -> some View {
+        return onNotification(SearchNotification.name, perform: perform)
     }
 }
