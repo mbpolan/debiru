@@ -134,8 +134,10 @@ struct DesktopDownloadsView: View {
                 case .asset(let asset):
                     Text(asset.fullName)
                 case .thread(let boardID, let threadID):
-                    Text("/\(boardID)/")
-                    Text(String(threadID))
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("/\(boardID)/")
+                        Text(String(threadID))
+                    }
                 }
             }
             
@@ -145,11 +147,10 @@ struct DesktopDownloadsView: View {
             }
             
             TableColumn("Size") { item in
-                switch item.resource {
-                case .asset(let asset):
-                    Text("\(asset.size) bytes")
-                case .thread(_, _):
-                    Text("?")
+                if let size = item.totalSize {
+                    Text("\(size) bytes")
+                } else {
+                    Text("Unknown")
                 }
             }
             
@@ -163,15 +164,13 @@ struct DesktopDownloadsView: View {
                         .help(message)
                     
                 case .downloading(let completedBytes):
-                    switch item.resource {
-                    case .asset(let asset):
-                        ProgressView(value: Float(completedBytes), total: Float(asset.size))
+                    if let size = item.totalSize {
+                        ProgressView(value: Float(completedBytes), total: Float(size))
                             .progressViewStyle(LinearProgressViewStyle())
-                    case .thread(_, _):
+                    } else {
                         ProgressView()
                             .progressViewStyle(LinearProgressViewStyle())
                     }
-                    
                 }
             }
         }
@@ -245,37 +244,43 @@ struct DesktopDownloadsView: View {
         .environment(AppState(boards: [],
                               downloads: [
                                 Download(resource: .asset(.init(id: 123456,
-                                                      boardId: "g",
-                                                      width: 100,
-                                                      height: 100,
-                                                      thumbnailWidth: 100,
-                                                      thumbnailHeight: 100,
-                                                      filename: "foo",
-                                                      extension: ".jpg",
-                                                      fileType: .image, size: 160403333)),
+                                                                boardId: "g",
+                                                                width: 100,
+                                                                height: 100,
+                                                                thumbnailWidth: 100,
+                                                                thumbnailHeight: 100,
+                                                                filename: "foo",
+                                                                extension: ".jpg",
+                                                                fileType: .image,
+                                                                size: 160403333)),
                                          state: .downloading(completedBytes: 130403333),
-                                         created: .now),
+                                         created: .now,
+                                         totalSize: 160403333),
                                 Download(resource: .asset(.init(id: 678905,
-                                                      boardId: "g",
-                                                      width: 100,
-                                                      height: 100,
-                                                      thumbnailWidth: 100,
-                                                      thumbnailHeight: 100,
-                                                      filename: "foo",
-                                                      extension: ".jpg",
-                                                      fileType: .image, size: 160403333)),
+                                                                boardId: "g",
+                                                                width: 100,
+                                                                height: 100,
+                                                                thumbnailWidth: 100,
+                                                                thumbnailHeight: 100,
+                                                                filename: "foo",
+                                                                extension: ".jpg",
+                                                                fileType: .image,
+                                                                size: 160403333)),
                                          state: .finished(on: .now, localURL: URL(string: "https://google.pl")!),
-                                         created: .now),
+                                         created: .now,
+                                         totalSize: 160403333),
                                 Download(resource: .asset(.init(id: 92020232,
-                                                      boardId: "g",
-                                                      width: 100,
-                                                      height: 100,
-                                                      thumbnailWidth: 100,
-                                                      thumbnailHeight: 100,
-                                                      filename: "foo",
-                                                      extension: ".jpg",
-                                                      fileType: .image, size: 160403333)),
+                                                                boardId: "g",
+                                                                width: 100,
+                                                                height: 100,
+                                                                thumbnailWidth: 100,
+                                                                thumbnailHeight: 100,
+                                                                filename: "foo",
+                                                                extension: ".jpg",
+                                                                fileType: .image,
+                                                                size: 160403333)),
                                          state: .error(message: "The image no longer exists"),
-                                         created: .now),
+                                         created: .now,
+                                         totalSize: nil),
                               ]))
 }

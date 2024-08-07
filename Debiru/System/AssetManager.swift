@@ -150,6 +150,27 @@ struct AssetManager {
         }
     }
     
+    func saveThreadImage(directory: String, threadID: Int, filename: String, data: Data) async -> AssetResult {
+        do {
+            let parentDirectory = URL(fileURLWithPath: NSHomeDirectory())
+                .appendingPathComponent("threads", conformingTo: .directory)
+                .appendingPathComponent(directory, conformingTo: .directory)
+                .appendingPathComponent("\(threadID)", conformingTo: .directory)
+            
+            if !FileManager.default.fileExists(atPath: parentDirectory.path()) {
+                try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+            }
+            
+            let destination = parentDirectory
+                .appendingPathComponent(filename, conformingTo: .fileURL)
+            
+            try data.write(to: destination)
+            return .success(location: destination)
+        } catch {
+            return .error(message: error.localizedDescription)
+        }
+    }
+    
     /// Saves a thread data file to the filesystem.
     ///
     /// - Parameter directory: The parent subdirectory to store the file.
@@ -171,7 +192,6 @@ struct AssetManager {
                 .appendingPathComponent(filename, conformingTo: .fileURL)
             
             try data.write(to: destination)
-            
             return .success(location: destination)
         } catch {
             return .error(message: error.localizedDescription)

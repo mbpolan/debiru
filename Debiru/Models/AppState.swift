@@ -104,12 +104,14 @@ class Download: Identifiable, Codable {
     let resource: Resource
     var state: State
     let created: Date
+    var totalSize: Int64?
     
-    init(resource: Resource, state: State, created: Date, id: UUID = .init()) {
+    init(resource: Resource, state: State, created: Date, totalSize: Int64?, id: UUID = .init()) {
         self.id = id
         self.resource = resource
         self.state = state
         self.created = created
+        self.totalSize = totalSize
     }
     
     required init(from decoder: Decoder) throws {

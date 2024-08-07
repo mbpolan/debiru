@@ -5,6 +5,8 @@
 //  Created by Mike Polan on 3/17/21.
 //
 
+import Foundation
+
 struct Asset: Identifiable, Hashable, Equatable, Codable {
     let id: Int
     let boardId: String
@@ -20,6 +22,14 @@ struct Asset: Identifiable, Hashable, Equatable, Codable {
     var fullName: String {
         return "\(filename)\(`extension`)"
     }
+}
+
+struct RemoteAsset {
+    let id: Int
+    let fileExtension: String
+    let boardID: String
+    let size: Int64
+    let url: URL
 }
 
 extension Asset {

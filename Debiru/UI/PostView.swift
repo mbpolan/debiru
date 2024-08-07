@@ -115,7 +115,7 @@ fileprivate struct ThumbnailView: View {
     var body: some View {
         switch asset.fileType {
         case .image, .webm:
-            AsyncImage(url: dataProvider.getURL(for: asset, variant: .thumbnail)) { image in
+            AsyncImage(url: dataProvider.getURL(for: asset.id, boardID: asset.boardId, extension: asset.extension, variant: .thumbnail)) { image in
                 image.resizable().scaledToFit()
             } placeholder: {
                 ProgressView()

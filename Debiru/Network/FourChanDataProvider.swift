@@ -330,13 +330,13 @@ struct FourChanDataProvider: DataProvider {
         URL(string: "\(webBoardsBaseUrl)/\(boardId)/thread/\(threadId)")!
     }
     
-    func getURL(for asset: Asset, variant: Asset.Variant) -> URL {
+    func getURL(for assetID: Int, boardID: String, extension: String, variant: Asset.Variant) -> URL {
         // for thumbnail images, append an "s" to the asset id. some assets only have thumbnail variants available,
         // in which case don't modify the id
         let suffix = variant == .thumbnail ? "s" : ""
-        let fileExtension = variant == .thumbnail ? ".jpg" : asset.extension
+        let fileExtension = variant == .thumbnail ? ".jpg" : `extension`
         
-        return URL(string: "\(imageBaseUrl)/\(asset.boardId)/\(asset.id)\(suffix)\(fileExtension)")!
+        return URL(string: "\(imageBaseUrl)/\(boardID)/\(assetID)\(suffix)\(fileExtension)")!
     }
     
     func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL {
@@ -345,6 +345,25 @@ struct FourChanDataProvider: DataProvider {
     
     func getDataURL(for boardID: String, threadID: Int) -> URL {
         return URL(string: "\(apiBaseUrl)/\(boardID)/thread/\(threadID).json")!
+    }
+    
+    func getAssetURLs(for boardID: String, threadData: Data) throws -> [RemoteAsset] {
+        let model = try JSONDecoder().decode(ThreadPostsModel.self, from: threadData)
+        
+        return model.posts.compactMap { item in
+            if let assetID = item.assetId,
+               let fileExtension = item.extension {
+                let url = self.getURL(for: assetID, boardID: boardID, extension: fileExtension, variant: .original)
+                
+                return RemoteAsset(id: assetID,
+                                   fileExtension: fileExtension,
+                                   boardID: boardID,
+                                   size: item.fileSize ?? 0,
+                                   url: url)
+            }
+            
+            return nil
+        }
     }
     
     private func determineFileType(_ fileExtension: String) -> Asset.FileType {

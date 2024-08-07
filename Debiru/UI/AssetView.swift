@@ -46,7 +46,7 @@ struct AssetView: View {
     }
     
     private var url: URL {
-        AssetView.dataProvider.getURL(for: asset, variant: .original)
+        Self.dataProvider.getURL(for: asset.id, boardID: asset.boardId, extension: asset.extension, variant: .original)
     }
     
     private func handleDownloadAsset() {

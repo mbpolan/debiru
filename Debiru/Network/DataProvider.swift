@@ -29,11 +29,13 @@ protocol DataProvider {
     
     func getURL(for boardId: String, threadId: Int) -> URL
     
-    func getURL(for asset: Asset, variant: Asset.Variant) -> URL
+    func getURL(for assetID: Int, boardID: String, extension: String, variant: Asset.Variant) -> URL
     
     func getURL(for captchaBoard: Board, threadId: Int) async throws -> URL
     
     func getDataURL(for boardID: String, threadID: Int) -> URL
+    
+    func getAssetURLs(for boardID: String, threadData: Data) throws -> [RemoteAsset]
 }
 
 enum NetworkError: Error {
