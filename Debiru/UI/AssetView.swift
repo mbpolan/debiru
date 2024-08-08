@@ -50,9 +50,11 @@ struct AssetView: View {
     }
     
     private func handleDownloadAsset() {
-        DownloadManager.instance().addDownload(asset: asset, to: imageSaveLocation
-            .appendingPathComponent(asset.boardId, conformingTo: .fileURL)
-            .appendingPathComponent("\(asset.filename)\(asset.extension)", conformingTo: .fileURL))
+        Task {
+            await DownloadManager.instance().download(asset: asset, to: imageSaveLocation
+                .appendingPathComponent(asset.boardId, conformingTo: .fileURL)
+                .appendingPathComponent("\(asset.filename)\(asset.extension)", conformingTo: .fileURL))
+        }
     }
 }
 

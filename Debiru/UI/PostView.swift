@@ -10,9 +10,10 @@ import SwiftUI
 
 // MARK: - Data
 
-enum AssetAction {
-    case view
-    case download
+enum PostAction {
+    case viewAsset(_ asset: Asset)
+    case downloadAsset(_ asset: Asset)
+    case downloadThread(_ threadID: Int)
 }
 
 // MARK: - View
@@ -21,7 +22,7 @@ enum AssetAction {
 struct PostView: View {
     let post: Post
     var onTapGesture: (() -> Void)? = { }
-    var onAssetAction: ((_: Asset, _: AssetAction) -> Void)? = { _, _ in }
+    var onAction: ((_: PostAction) -> Void)? = { _ in }
     @Environment(\.deviceType) private var deviceType
     private static let formatter: RelativeDateTimeFormatter = .init()
     
@@ -55,6 +56,22 @@ struct PostView: View {
                     .bold()
                 
                 Text(PostView.formatter.localizedString(for: post.date, relativeTo: .now))
+                
+                if post.id == post.threadId {
+                    Menu {
+                        Button("Save Thread") {
+                            onAction?(.downloadThread(post.id))
+                        }
+                    } label: {
+                        #if os(iOS)
+                        Image(systemName: "ellipsis.circle")
+                        #else
+                        Text("")
+                        #endif
+                    }
+                    .menuStyle(.borderlessButton)
+                    .frame(width: 32)
+                }
             }
             .onTapGesture(perform: onTapGesture ?? { })
             
@@ -63,10 +80,10 @@ struct PostView: View {
                 if let asset = post.attachment {
                     ThumbnailView(asset: asset)
                         .padding(.trailing)
-                        .onTapGesture(perform: { onAssetAction?(asset, .view) })
+                        .onTapGesture(perform: { onAction?(.viewAsset(asset)) })
                         .contextMenu {
-                            Button(action: { onAssetAction?(asset, .download) }, label: {
-                                Text("Download")
+                            Button(action: { onAction?(.downloadAsset(asset)) }, label: {
+                                Text("Save")
                             })
                         }
                 }

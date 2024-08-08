@@ -28,7 +28,7 @@ struct ThreadView: View {
                 
             case .ready:
                 List(self.posts, children: \.children) { item in
-                    PostView(post: item.post, onAssetAction: handleAssetAction)
+                    PostView(post: item.post, onAction: handlePostAction)
                         .postViewListItem(item.post)
                 }
             }
@@ -81,11 +81,13 @@ struct ThreadView: View {
         }
     }
     
-    private func handleAssetAction(_ asset: Asset, _ action: AssetAction) {
+    private func handlePostAction(_ action: PostAction) {
         switch action {
-        case .view:
+        case .viewAsset(let asset):
             windowState.navigate(asset: asset)
-        case .download:
+        case .downloadAsset(let asset):
+            break
+        default:
             break
         }
     }

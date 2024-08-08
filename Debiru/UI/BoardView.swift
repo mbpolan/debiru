@@ -30,13 +30,8 @@ struct BoardView: View {
                 List(self.threads) { post in
                     PostView(post: post,
                              onTapGesture: { handleGoToThread(post) },
-                             onAssetAction: handleAssetAction)
+                             onAction: handlePostAction)
                     .postViewListItem(post)
-                    .contextMenu {
-                        Button("Save Thread") {
-                            DownloadManager.instance().addDownload(boardId: post.boardId, threadId: post.threadId, to: dataSaveLocation)
-                        }
-                    }
                 }
             }
         }
@@ -88,14 +83,22 @@ struct BoardView: View {
         windowState.navigate(boardId: boardId, threadId: post.threadId)
     }
     
-    private func handleAssetAction(_ asset: Asset, _ action: AssetAction) {
+    private func handlePostAction(_ action: PostAction) {
         switch action {
-        case .view:
+        case .viewAsset(let asset):
             windowState.navigate(asset: asset)
-        case .download:
-            DownloadManager.instance().addDownload(asset: asset, to: imageSaveLocation
-                .appendingPathComponent(boardId, conformingTo: .fileURL)
-                .appendingPathComponent("\(asset.filename)\(asset.extension)", conformingTo: .fileURL))
+            
+        case .downloadAsset(let asset):
+            Task {
+                await DownloadManager.instance().download(asset: asset, to: imageSaveLocation
+                    .appendingPathComponent(boardId, conformingTo: .fileURL)
+                    .appendingPathComponent("\(asset.filename)\(asset.extension)", conformingTo: .fileURL))
+            }
+        
+        case .downloadThread(let threadID):
+            Task {
+                await DownloadManager.instance().download(boardID: boardId, threadID: threadID, to: dataSaveLocation)
+            }
         }
     }
     

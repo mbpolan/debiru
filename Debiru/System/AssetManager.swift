@@ -149,7 +149,24 @@ struct AssetManager {
             return .error(message: error.localizedDescription)
         }
     }
+}
+
+#endif
+
+// MARK: - Common
+
+extension AssetManager {
     
+    /// Saves an image as part of a thread.
+    ///
+    /// Use this method to associate an image or media asset that is being saved as part of an overall thread.
+    ///
+    /// - Parameter directory: The parent directory to store the image under.
+    /// - Parameter threadID: The ID of the thread.
+    /// - Parameter filename: The filename of the image.
+    /// - Parameter data: The image data.
+    ///
+    /// - Returns: A result indicating the outcome of the operation.
     func saveThreadImage(directory: String, threadID: Int, filename: String, data: Data) async -> AssetResult {
         do {
             let parentDirectory = URL(fileURLWithPath: NSHomeDirectory())
@@ -198,5 +215,3 @@ struct AssetManager {
         }
     }
 }
-
-#endif

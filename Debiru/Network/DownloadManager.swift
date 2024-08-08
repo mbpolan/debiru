@@ -8,12 +8,11 @@
 import Foundation
 
 /// A service that manages file and media downloads.
-class DownloadManager: NSObject, URLSessionDownloadDelegate {
+class DownloadManager {
     private static var shared: DownloadManager?
     private static let dataProvider: DataProvider = FourChanDataProvider()
     private let assetManager: AssetManager
     private var appState: AppState
-    private var tasks: [DownloadTask]
     private let landingURL: URL
     
     /// Initializes the download manager.
@@ -39,215 +38,182 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     /// Adds an asset to download.
     ///
     /// This method will add an asset to the download manager, and update the app state to
-    /// track its progress.
+    /// track its progress. This method does not block.
     ///
     /// - Parameter asset: The asset to download.
     /// - Parameter localURL: The URL to write the data to.
-    func addDownload(asset: Asset, to localURL: URL) {
+    func download(asset: Asset, to localURL: URL) async {
         let remoteURL = DownloadManager.dataProvider.getURL(for: asset.id, boardID: asset.boardId, extension: asset.extension, variant: .original)
         
-        let download = Download(resource: .asset(asset), state: .downloading(completedBytes: 0), created: .now, totalSize: asset.size)
-        self.appState.downloads.append(download)
+        let download = Download(resource: .asset(asset), 
+                                state: .downloading(completedBytes: 0),
+                                created: .now,
+                                totalSize: asset.size)
         
-        let task = URLSession.shared.downloadTask(with: remoteURL)
-        task.delegate = self
-        task.resume()
+        Task { @MainActor in
+            self.appState.downloads.append(download)
+            self.appState.newDownloads += 1
+        }
         
-        self.tasks.append(DownloadTask(id: download.id,
-                                           parentID: nil,
-                                           type: .asset,
-                                           remoteURL: remoteURL,
-                                           localURL: localURL,
-                                           totalBytes: asset.size,
-                                           currentBytes: 0,
-                                           task: task,
-                                           subTasks: []))
-        self.appState.newDownloads += 1
+        let state = await withDownload(remoteURL: remoteURL) { data in
+            return await self.assetManager.saveImage(filename: asset.fullName, data: data)
+        }
+        
+        Task { @MainActor in
+            download.state = state
+        }
     }
     
     /// Adds a thread to download.
     ///
-    /// - Parameter boardId: The ID of the board the thread is in.
-    /// - Parameter threadId: The ID of the thread.
+    /// - Parameter boardID: The ID of the board the thread is in.
+    /// - Parameter threadID: The ID of the thread.
     /// - Parameter localURL: The URL to the directory where thread data will be written to.
-    func addDownload(boardId: String, threadId: Int, to localURL: URL) {
-        let remoteURL = Self.dataProvider.getDataURL(for: boardId, threadID: threadId)
+    func download(boardID: String, threadID: Int, to localURL: URL) async {
+        let remoteURL = Self.dataProvider.getDataURL(for: boardID, threadID: threadID)
         
-        let download = Download(resource: .thread(boardId, threadId), state: .downloading(completedBytes: 0), created: .now, totalSize: nil)
-        self.appState.downloads.append(download)
+        let download = Download(resource: .thread(boardID, threadID),
+                                state: .downloading(completedBytes: 0), 
+                                created: .now,
+                                totalSize: nil)
         
-        let task = URLSession.shared.downloadTask(with: remoteURL)
-        task.delegate = self
-        task.resume()
-        
-        self.tasks.append(DownloadTask(id: download.id,
-                                           parentID: nil,
-                                           type: .thread,
-                                           remoteURL: remoteURL,
-                                           localURL: localURL,
-                                           totalBytes: 0,
-                                           currentBytes: 0,
-                                           task: task,
-                                           subTasks: []))
-        self.appState.newDownloads += 1
-    }
-    
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        let source: URL
-        do {
-            source = try self.moveToLanding(location)
-        } catch {
-            print("ERROR: failed to copy to landing: \(error)")
-            
-            guard let task = self.tasks.first(where: { $0.task == downloadTask }) else {
-                return
-            }
-            
-            guard var download = self.appState.downloads.first(where: { $0.id == (task.parentID ?? task.id) }) else {
-                return
-            }
-            
-            Task {
-                await self.updateDownload(task.id, state: .error(message: error.localizedDescription))
-            }
-            
-            return
+        Task { @MainActor in
+            self.appState.downloads.append(download)
+            self.appState.newDownloads += 1
         }
         
-        Task {
-            guard let taskIdx = self.tasks.firstIndex(where: { $0.task == downloadTask }) else {
-                return
+        let threadState = await withDownload(remoteURL: remoteURL) { data in
+            return await self.assetManager.saveThread(directory: boardID, filename: "\(threadID).json", data: data)
+        }
+        
+        let overallState = await downloadThreadAssets(boardID: boardID, threadID: threadID, threadState: threadState, download: download)
+        
+        Task { @MainActor in
+            download.state = overallState
+        }
+    }
+    
+    /// Downloads all assets in a thread.
+    ///
+    /// - Parameter boardID: The ID of the board the thread is in.
+    /// - Parameter threadID: The ID of the thread to download.
+    /// - Parameter threadState: The download state of the thread data itself.
+    /// - Parameter download: The download data.
+    ///
+    /// - Returns: The overall state of downloading all assets.
+    private func downloadThreadAssets(boardID: String, threadID: Int, threadState: Download.State, download: Download) async -> Download.State {
+        let threadDataURL: URL
+        
+        switch threadState {
+        case .finished(_, let localURL):
+            guard let url = localURL else {
+                return threadState
             }
             
-            let task = self.tasks[taskIdx]
+            threadDataURL = url
+        default:
+            return threadState
+        }
+        
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: threadDataURL.path))
+            let assets = try Self.dataProvider.getAssetURLs(for: boardID, threadData: data)
             
-            guard var download = self.appState.downloads.first(where: { $0.id == (task.parentID ?? task.id) }) else {
-                return
+            if assets.isEmpty {
+                return .finished(on: .now, localURL: threadDataURL)
             }
             
-            guard let response = downloadTask.response as? HTTPURLResponse,
-                (200...299).contains(response.statusCode) else {
-                    return
+            // compute the total size of all assets in the thread
+            Task { @MainActor in
+                download.totalSize = assets.reduce(0, { memo, item in
+                    return memo + item.size
+                })
             }
             
-            do {
-                let data = try Data(contentsOf: URL(fileURLWithPath: source.path()))
-                
-                // determine where to write data to based on the parent task type
-                switch download.resource {
-                case .asset(let asset):
-                    // individual assets are saved to the image location on the platform
-                    let result = await self.assetManager.saveImage(filename: asset.fullName, data: data)
+            // create a separate task to download each asset
+            let results = try await withThrowingTaskGroup(of: Download.State.self) { group in
+                for asset in assets {
+                    group.addTask {
+                        return await self.withDownload(remoteURL: asset.url) { data in
+                            return await self.assetManager.saveThreadImage(directory: boardID,
+                                                                           threadID: threadID,
+                                                                           filename: "\(asset.id)\(asset.fileExtension)",
+                                                                           data: data)
+                        }
+                    }
+                }
                     
-                    let state: Download.State
+                var results: [Download.State] = []
+                for try await result in group {
+                    results.append(result)
+                }
+                
+                return results
+            }
+            
+            var errors = 0
+            for result in results {
+                switch result {
+                case .error(_):
+                    errors += 1
+                default:
+                    break
+                }
+            }
+            
+            if errors > 0 {
+                return .error(message: "Unable to save \(errors) out of \(assets.count) thread images")
+            }
+            
+            return .finished(on: .now, localURL: threadDataURL)
+        } catch {
+            return .error(message: error.localizedDescription)
+        }
+    }
+    
+    /// Performs an action to download data and checks the result of the download.
+    ///
+    /// - Parameter remoteURL: The URL of the asset to download.
+    /// - Parameter action: The closure to execute to process the downloaded data.
+    ///
+    /// - Returns: The download state.
+    private func withDownload(remoteURL: URL, action: (_ data: Data) async throws -> AssetResult) async -> Download.State {
+        let state: Download.State
+        
+        do {
+            let (url, response) = try await URLSession.shared.download(from: remoteURL)
+            
+            if let response = response as? HTTPURLResponse {
+                if response.statusCode == 200 {
+                    let data = try Data(contentsOf: url)
+                    
+                    let result = try await action(data)
                     switch result {
                     case .success(let location):
                         state = .finished(on: .now, localURL: location)
                     case .denied:
-                        state = .error(message: "Access to save image was denied")
-                    case .error(let message):
-                        state = .error(message: message)
+                        state = .error(message: "Access was not allowed to complete download")
+                    case .error(let error):
+                        state = .error(message: error)
                     }
-                    
-                    self.tasks.remove(at: taskIdx)
-                    await self.updateDownload(task.id, state: state)
-                    
-                case .thread(let boardID, let threadID):
-                    switch task.type {
-                    case .asset:
-                        _ = await self.assetManager.saveThreadImage(directory: boardID, threadID: threadID, filename: task.localURL.lastPathComponent, data: data)
-                        self.tasks.remove(at: taskIdx)
-                        
-                        if let parentTask = self.tasks.first(where: { $0.id == task.parentID }),
-                           let subTaskIdx = parentTask.subTasks.firstIndex(of: task.id) {
-                            
-                            parentTask.subTasks.remove(at: subTaskIdx)
-                            
-                            if parentTask.subTasks.isEmpty {
-                                await self.updateDownload(parentTask.id, state: .finished(on: .now, localURL: nil))
-                            } else {
-                                parentTask.currentBytes += task.totalBytes
-                                await self.updateDownload(parentTask.id, state: .downloading(completedBytes: parentTask.currentBytes))
-                            }
-                        } else {
-                            print("WARN: could not find parent task \(task.parentID)")
-                        }
-                        
-                    case .thread:
-                        _ = await self.assetManager.saveThread(directory: boardID, filename: "\(threadID).json", data: data)
-                        
-                        let assets = try Self.dataProvider.getAssetURLs(for: boardID, threadData: data)
-                        if !assets.isEmpty {
-                            let total = assets.reduce(0, { memo, item in
-                                return memo + item.size
-                            })
-                            
-                            let subTasks = assets.map { entry in
-                                let task = URLSession.shared.downloadTask(with: entry.url)
-                                task.delegate = self
-                                task.resume()
-                                
-                                let localURL = location.deletingLastPathComponent()
-                                    .appendingPathComponent("\(threadID)", conformingTo: .directory)
-                                    .appendingPathComponent("\(entry.id)\(entry.fileExtension)", conformingTo: .fileURL)
-                                
-                                return DownloadTask(id: .init(),
-                                             parentID: download.id,
-                                             type: .asset,
-                                             remoteURL: entry.url,
-                                             localURL: localURL,
-                                             totalBytes: entry.size,
-                                             currentBytes: 0,
-                                             task: task,
-                                             subTasks: [])
-                            }
-                            
-                            self.tasks.append(contentsOf: subTasks)
-                            task.subTasks.append(contentsOf: subTasks.map { $0.id })
-                            
-                            await self.updateDownload(task.id, state: .downloading(completedBytes: 0), totalSize: total)
-                        } else {
-                            self.tasks.remove(at: taskIdx)
-                            await self.updateDownload(task.id, state: .finished(on: .now, localURL: nil))
-                        }
-                    }
-                    
+                } else {
+                    state = .error(message: "Unsuccessful response from server: \(response.statusCode)")
                 }
-            } catch {
-                print("ERROR: failed to download \(task.id): \(error.localizedDescription)")
-                await self.updateDownload(task.id, state: .error(message: error.localizedDescription))
+            } else {
+                state = .error(message: "Invalid response from server")
             }
-        }
-    }
-    
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard let task = self.tasks.first(where: { $0.task == downloadTask }) else {
-            print("Cannot find download for task \(downloadTask.taskIdentifier)")
-            return
+        } catch {
+            state = .error(message: error.localizedDescription)
         }
         
-        task.currentBytes = totalBytesWritten
-        
-        Task {
-            await self.updateDownload(task.id, state: .downloading(completedBytes: task.currentBytes))
-        }
+        return state
     }
     
-    @MainActor
-    private func updateDownload(_ id: UUID, state: Download.State, totalSize: Int64? = nil) {
-        guard let idx = self.appState.downloads.firstIndex(where: { $0.id == id }) else {
-            return
-        }
-        
-        // replace the download in the array to force a state update
-        let download = self.appState.downloads[idx]
-        self.appState.downloads[idx] = Download(resource: download.resource, 
-                                                state: state,
-                                                created: download.created,
-                                                totalSize: totalSize ?? download.totalSize,
-                                                id: download.id)
-    }
-    
+    /// Moves a file to the app's landing zone.
+    ///
+    /// - Parameter from: The URL of the file.
+    ///
+    /// - Returns: The URL of the file in the landing zone.
     private func moveToLanding(_ from: URL) throws -> URL {
         let to = self.landingURL.appendingPathComponent(from.lastPathComponent, conformingTo: .fileURL)
         try FileManager.default.copyItem(at: from, to: URL(fileURLWithPath: to.absoluteString))
@@ -258,7 +224,6 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     private init(appState: AppState, assetManager: AssetManager) {
         self.appState = appState
         self.assetManager = assetManager
-        self.tasks = []
         
         guard let url = URL(string: NSHomeDirectory()) else {
             fatalError("Cannot establish landing URL")
@@ -271,36 +236,5 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         } catch {
             fatalError("Cannot create landing directory: \(error.localizedDescription)")
         }
-    }
-}
-
-/// A task that tracks the progress of a single file download.
-fileprivate class DownloadTask {
-    let id: UUID
-    let parentID: UUID?
-    let type: DownloadType
-    let remoteURL: URL
-    let localURL: URL
-    let totalBytes: Int64
-    var currentBytes: Int64
-    let task: URLSessionDownloadTask
-    var subTasks: [UUID]
-    
-    init(id: UUID, parentID: UUID?, type: DownloadType, remoteURL: URL, localURL: URL, totalBytes: Int64, currentBytes: Int64,
-         task: URLSessionDownloadTask, subTasks: [UUID]) {
-        self.id = id
-        self.parentID = parentID
-        self.type = type
-        self.remoteURL = remoteURL
-        self.localURL = localURL
-        self.totalBytes = totalBytes
-        self.currentBytes = currentBytes
-        self.task = task
-        self.subTasks = subTasks
-    }
-    
-    enum DownloadType {
-        case asset
-        case thread
     }
 }
