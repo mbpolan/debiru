@@ -153,99 +153,8 @@ struct FourChanDataProvider: DataProvider {
     }
     
     func getPosts(for threadId: Int, in boardId: String) async throws -> [Post] {
-        return try await getData(
-            url: getDataURL(for: boardId, threadID: threadId).absoluteString,
-            mapper: { (value: ThreadPostsModel) in
-                var postsToReplies: [Int: [Int]] = [:]
-                var rootPosts: [Int: Bool] = [:]
-                
-                // parse the conversations in this thread
-                // (a) build a map of post ids and the ids of posts that they are replying to
-                // (b) build a map of post ids to flags indicating the post is a top-level post
-                value.posts.forEach { post in
-                    let replies = parseRepliesTo(post.content ?? "")
-                    
-                    replies.forEach { reply in
-                        postsToReplies[reply, default: [Int]()].append(post.id)
-                    }
-                    
-                    // this post if considered a root if it does not reply to other posts or if one of its replies is to the thread starter
-                    rootPosts[post.id] = replies.count == 0 || replies.contains { $0 == threadId }
-                }
-                
-                return value.posts.map { post in
-                    var asset: Asset?
-                    if let id = post.assetId,
-                       let width = post.imageWidth,
-                       let height = post.imageHeight,
-                       let thumbWidth = post.thumbnailWidth,
-                       let thumbHeight = post.thumbnailHeight,
-                       let filename = post.filename,
-                       let ext = post.extension,
-                       let size = post.fileSize {
-                        
-                        asset = Asset(
-                            id: id,
-                            boardId: boardId,
-                            width: width,
-                            height: height,
-                            thumbnailWidth: thumbWidth,
-                            thumbnailHeight: thumbHeight,
-                            filename: filename,
-                            extension: ext,
-                            fileType: determineFileType(ext),
-                            size: size)
-                    }
-                    
-                    var threadStatistics: ThreadStatistics?
-                    if let replies = post.replies,
-                       let images = post.images,
-                       let uniquePosters = post.uniqueUsers {
-                        threadStatistics = ThreadStatistics(
-                            replies: replies,
-                            images: images,
-                            uniquePosters: uniquePosters,
-                            bumpLimit: post.bumpLimit == 1,
-                            imageLimit: post.imageLimit == 1,
-                            page: nil)
-                    }
-                    
-                    var archivedDate: Date? = nil
-                    if let archiveTime = post.archiveTime {
-                        archivedDate = Date(timeIntervalSince1970: TimeInterval(archiveTime))
-                    }
-                    
-                    let country = determineCountryFlag(
-                        code: post.countryCode,
-                        fakeCode: post.trollCountryCode,
-                        name: post.countryName)
-                    
-                    return Post(
-                        id: post.id,
-                        boardId: boardId,
-                        threadId: threadId,
-                        isRoot: rootPosts[post.id] ?? true,
-                        author: User(
-                            name: post.author,
-                            tripCode: post.trip,
-                            isSecure: post.trip?.starts(with: "!!") ?? false,
-                            tag: post.capCode?.toTag(),
-                            country: country),
-                        date: Date(timeIntervalSince1970: TimeInterval(post.time)),
-                        replyToId: post.replyTo == 0 ? nil : post.replyTo,
-                        subject: post.subject,
-                        content: post.content,
-                        body: nil,
-                        sticky: post.sticky == 1,
-                        closed: post.closed == 1,
-                        spoileredImage: post.spoiler == 1,
-                        attachment: asset,
-                        threadStatistics: threadStatistics,
-                        archived: post.archived == 1,
-                        archivedDate: archivedDate,
-                        replies: postsToReplies[post.id] ?? [])
-                }
-            }) ?? []
+        return try await getData(url: getDataURL(for: boardId, threadID: threadId).absoluteString,
+                                 mapper: { mapThreadPost(boardID: boardId, threadID: threadId, value: $0) }) ?? []
     }
     
     func getCaptchaV3(from html: String) throws -> CaptchaV3Challenge {
@@ -363,6 +272,103 @@ struct FourChanDataProvider: DataProvider {
             }
             
             return nil
+        }
+    }
+    
+    func getOriginalPost(for boardID: String, threadID: Int, fromthreadData threadData: Data) throws -> Post? {
+        let result = try JSONDecoder().decode(ThreadPostsModel.self, from: threadData)
+        return mapThreadPost(boardID: boardID, threadID: threadID, value: result).first
+    }
+            
+    private func mapThreadPost(boardID: String, threadID: Int, value: ThreadPostsModel) -> [Post] {
+        var postsToReplies: [Int: [Int]] = [:]
+        var rootPosts: [Int: Bool] = [:]
+        
+        // parse the conversations in this thread
+        // (a) build a map of post ids and the ids of posts that they are replying to
+        // (b) build a map of post ids to flags indicating the post is a top-level post
+        value.posts.forEach { post in
+            let replies = parseRepliesTo(post.content ?? "")
+            
+            replies.forEach { reply in
+                postsToReplies[reply, default: [Int]()].append(post.id)
+            }
+            
+            // this post if considered a root if it does not reply to other posts or if one of its replies is to the thread starter
+            rootPosts[post.id] = replies.count == 0 || replies.contains { $0 == threadID }
+        }
+        
+        return value.posts.map { post in
+            var asset: Asset?
+            if let id = post.assetId,
+               let width = post.imageWidth,
+               let height = post.imageHeight,
+               let thumbWidth = post.thumbnailWidth,
+               let thumbHeight = post.thumbnailHeight,
+               let filename = post.filename,
+               let ext = post.extension,
+               let size = post.fileSize {
+                
+                asset = Asset(
+                    id: id,
+                    boardId: boardID,
+                    width: width,
+                    height: height,
+                    thumbnailWidth: thumbWidth,
+                    thumbnailHeight: thumbHeight,
+                    filename: filename,
+                    extension: ext,
+                    fileType: determineFileType(ext),
+                    size: size)
+            }
+            
+            var threadStatistics: ThreadStatistics?
+            if let replies = post.replies,
+               let images = post.images,
+               let uniquePosters = post.uniqueUsers {
+                threadStatistics = ThreadStatistics(
+                    replies: replies,
+                    images: images,
+                    uniquePosters: uniquePosters,
+                    bumpLimit: post.bumpLimit == 1,
+                    imageLimit: post.imageLimit == 1,
+                    page: nil)
+            }
+            
+            var archivedDate: Date? = nil
+            if let archiveTime = post.archiveTime {
+                archivedDate = Date(timeIntervalSince1970: TimeInterval(archiveTime))
+            }
+            
+            let country = determineCountryFlag(
+                code: post.countryCode,
+                fakeCode: post.trollCountryCode,
+                name: post.countryName)
+            
+            return Post(
+                id: post.id,
+                boardId: boardID,
+                threadId: threadID,
+                isRoot: rootPosts[post.id] ?? true,
+                author: User(
+                    name: post.author,
+                    tripCode: post.trip,
+                    isSecure: post.trip?.starts(with: "!!") ?? false,
+                    tag: post.capCode?.toTag(),
+                    country: country),
+                date: Date(timeIntervalSince1970: TimeInterval(post.time)),
+                replyToId: post.replyTo == 0 ? nil : post.replyTo,
+                subject: post.subject,
+                content: post.content,
+                body: nil,
+                sticky: post.sticky == 1,
+                closed: post.closed == 1,
+                spoileredImage: post.spoiler == 1,
+                attachment: asset,
+                threadStatistics: threadStatistics,
+                archived: post.archived == 1,
+                archivedDate: archivedDate,
+                replies: postsToReplies[post.id] ?? [])
         }
     }
     

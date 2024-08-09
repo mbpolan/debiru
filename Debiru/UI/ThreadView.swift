@@ -13,6 +13,7 @@ import SwiftUI
 struct ThreadView: View {
     let boardId: String
     let threadId: Int
+    @AppStorage(StorageKeys.defaultDataLocation) private var dataSaveLocation: URL = Settings.defaultDataLocation
     @Environment(WindowState.self) private var windowState
     @State private var viewModel: ViewModel = .init()
     private static let dataProvider: DataProvider = FourChanDataProvider()
@@ -87,8 +88,10 @@ struct ThreadView: View {
             windowState.navigate(asset: asset)
         case .downloadAsset(let asset):
             break
-        default:
-            break
+        case .downloadThread(let threadID):
+            Task {
+                await DownloadManager.instance().download(boardID: boardId, threadID: threadID, to: dataSaveLocation)
+            }
         }
     }
     

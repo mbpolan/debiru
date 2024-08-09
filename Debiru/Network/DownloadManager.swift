@@ -90,6 +90,21 @@ class DownloadManager {
         
         Task { @MainActor in
             download.state = overallState
+            
+            switch overallState {
+            case .finished(let when, let localURL):
+                // read the downloaded data, extract the original post and save the thread in app state
+                // FIXME: maybe not reading the raw data multiple times would help?
+                if let localURL = localURL,
+                   let threadData = try? Data(contentsOf: localURL),
+                   let original = try Self.dataProvider.getOriginalPost(for: boardID, threadID: threadID, fromthreadData: threadData) {
+                    
+                    appState.savedThreads.append(SavedThread(original: original, created: when, localURL: localURL))
+                }
+                
+            default:
+                break
+            }
         }
     }
     

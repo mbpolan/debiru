@@ -36,6 +36,8 @@ protocol DataProvider {
     func getDataURL(for boardID: String, threadID: Int) -> URL
     
     func getAssetURLs(for boardID: String, threadData: Data) throws -> [RemoteAsset]
+    
+    func getOriginalPost(for boardID: String, threadID: Int, fromthreadData threadData: Data) throws -> Post?
 }
 
 enum NetworkError: Error {

@@ -27,26 +27,30 @@ struct PhoneDownloadsView: View {
     private static let dateFormatter = RelativeDateTimeFormatter()
     
     var body: some View {
-        List(self.downloads) { download in
+        List(appState.downloads) { download in
             switch download.state {
             case .downloading(let completedBytes):
                 HStack(alignment: .center) {
                     Image(systemName: "arrow.down.circle.dotted")
                     
-                    Text(assetName(download.asset))
+                    Text(label(download))
                         .padding(.trailing, 25)
                     
                     Spacer()
                     
-                    ProgressView(value: Float(completedBytes), total: Float(download.asset.size))
-                        .progressViewStyle(LinearProgressViewStyle())
+                    if let size = download.totalSize {
+                        ProgressView(value: Float(completedBytes), total: Float(size))
+                            .progressViewStyle(LinearProgressViewStyle())
+                    } else {
+                        ProgressView()
+                    }
                 }
                 
             case .finished(_, let localURL):
                 HStack(alignment: .center) {
                     Image(systemName: "checkmark.circle")
                     
-                    Text(assetName(download.asset))
+                    Text(label(download))
                         .lineLimit(1)
                     
                     Spacer()
@@ -60,7 +64,7 @@ struct PhoneDownloadsView: View {
                     Image(systemName: "exclamationmark.triangle")
                         .help(message)
                     
-                    Text(assetName(download.asset))
+                    Text(label(download))
                     
                     Spacer()
                     
@@ -87,11 +91,16 @@ struct PhoneDownloadsView: View {
         })
     }
     
-    /// Returns the filename to display for an asset.
+    /// Returns the label to display for a download.
     ///
-    /// - Returns: A filename to show to the user.
-    private func assetName(_ asset: Asset) -> String {
-        return "\(asset.filename)\(asset.extension)"
+    /// - Returns: A label to show for the download.
+    private func label(_ download: Download) -> String {
+        switch download.resource {
+        case .asset(let asset):
+            return "\(asset.filename)\(asset.extension)"
+        case .thread(let boardID, let threadID):
+            return "/\(boardID)/ - #\(threadID)"
+        }
     }
     
     /// Handles an action to view the asset.
