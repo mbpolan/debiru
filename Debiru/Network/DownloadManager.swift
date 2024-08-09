@@ -99,7 +99,12 @@ class DownloadManager {
                    let threadData = try? Data(contentsOf: localURL),
                    let original = try Self.dataProvider.getOriginalPost(for: boardID, threadID: threadID, fromthreadData: threadData) {
                     
-                    appState.savedThreads.append(SavedThread(original: original, created: when, localURL: localURL))
+                    // if this thread was already saved previously, replace its data instead
+                    if let idx = appState.savedThreads.firstIndex(where: { $0.original.boardId == boardID && $0.original.id == threadID }) {
+                        appState.savedThreads[idx] = SavedThread(original: original, created: when, localURL: localURL)
+                    } else {
+                        appState.savedThreads.append(SavedThread(original: original, created: when, localURL: localURL))
+                    }
                 }
                 
             default:
