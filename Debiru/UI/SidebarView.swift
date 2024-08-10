@@ -16,16 +16,53 @@ struct SidebarView: View {
     @State private var viewModel: ViewModel = .init()
     
     var body: some View {
-        List(boards, id: \.id, selection: self.currentBoard) { board in
-            HStack {
-                Text("/\(board.id)/")
-                    .bold()
-                Spacer()
-                Text(board.title)
+        ScrollView {
+            DisclosureGroup(isExpanded: $viewModel.debiruExpanded) {
+                Button(action: handleShowSavedThreads, label: {
+                    HStack(alignment: .firstTextBaseline) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Image(systemName: "bookmark")
+                            
+                            Text("Saved Threads")
+                            
+                            Spacer()
+                        }
+                    }
+                    .contentShape(Rectangle())
+                })
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 10)
+                .padding(.top, 7)
+            } label: {
+                Text("Debiru")
             }
+            .padding(.horizontal, 5)
+            
+            DisclosureGroup(isExpanded: $viewModel.boardsExpanded) {
+                LazyVStack {
+                    ForEach(boards) { board in
+                        Button(action: { handleBoard(board) }, label: {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text("/\(board.id)/")
+                                    .bold()
+                                
+                                Spacer()
+                                
+                                Text(board.title)
+                            }
+                            .contentShape(Rectangle())
+                        })
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.horizontal, 10)
+                        .padding(.top, 7)
+                    }
+                }
+            } label: {
+                Text("Boards")
+            }
+            .padding(.horizontal, 5)
         }
         .navigationTitle("Boards")
-        .listStyle(.sidebar)
         #if os(iOS)
         .searchable(text: $viewModel.filter)
         #endif
@@ -45,28 +82,12 @@ struct SidebarView: View {
         }
     }
     
-    private var currentBoard: Binding<String?> {
-        return Binding<String?>(
-            get: {
-                switch windowState.currentItem {
-                case .board(let boardId):
-                    return boardId
-                case .thread(let boardId, _):
-                    return boardId
-                case .asset(let asset):
-                    return asset.boardId
-                case .none, .savedThreads, .downloads, .settings:
-                    return nil
-                }
-            },
-            set: {
-                if let boardId = $0 {
-                    windowState.route = NavigationPath([ViewableItem.board(boardId: boardId)])
-                } else {
-                    windowState.route = NavigationPath()
-                }
-            }
-        )
+    private func handleShowSavedThreads() {
+        
+    }
+                               
+   private func handleBoard(_ board: Board) {
+       windowState.navigate(boardId: board.id)
     }
 }
 
@@ -75,6 +96,8 @@ struct SidebarView: View {
 @Observable
 fileprivate class ViewModel {
     var filter: String = ""
+    var debiruExpanded: Bool = true
+    var boardsExpanded: Bool = true
 }
 
 // MARK: - Previews

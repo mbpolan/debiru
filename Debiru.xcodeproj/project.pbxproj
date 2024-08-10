@@ -190,12 +190,12 @@
 		2799462125FDA1EF001DCCE3 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				27662DEC2C586AC5002A678D /* AssetManager.swift */,
+				27662DF02C5F199B002A678D /* Commands.swift */,
 				27183919294E7F6C007C9A43 /* ContentProvider.swift */,
 				27B06E1F264F293E00FCBC0B /* DataManager.swift */,
 				2799460925FD9E5A001DCCE3 /* DebiruApp.swift */,
 				27662DCB2C474919002A678D /* Settings.swift */,
-				27662DEC2C586AC5002A678D /* AssetManager.swift */,
-				27662DF02C5F199B002A678D /* Commands.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
